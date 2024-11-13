@@ -3,14 +3,14 @@ services:
     build:
       context: .
     volumes:
-      - ./shipment-monitoring:/shipment-monitoring
+      - ./shipment_monitoring:/shipment_monitoring
     command:
       - "sh"
       - "-c"
       - |
         pip install debugpy -t /tmp \
         && python /tmp/debugpy --wait-for-client --listen 0.0.0.0:5678 \
-        -m uvicorn shipment-monitoring.main:app --host 0.0.0.0 --port 8000
+        -m uvicorn shipment_monitoring.main:app --host 0.0.0.0 --port 8000
     ports:
       - 8000:8000
       - 5678:5678

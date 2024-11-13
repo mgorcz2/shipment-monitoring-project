@@ -14,6 +14,6 @@ class ShipmentService(IShipmentService):
     async def get_all_shipments(self) -> Iterable[ShipmentDTO]:
         return await self._repository.get_all_shipments()
 
-    async def get_by_id(self, shipment_id: int) -> ShipmentDTO | None:
+    async def get_shipment_by_id(self, shipment_id: int) -> ShipmentDTO | None:
         return await self._repository.get_by_id(shipment_id)
 
