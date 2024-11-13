@@ -9,7 +9,7 @@ RUN pip install -r /requirements.txt
 RUN apk del .tmp-build-deps
 
 RUN mkdir /shipment-monitoring
-COPY ./shipment-monitoring /shipment-monitoring
+COPY ./shipment_monitoring /shipment_monitoring
 
 RUN adduser -D user
 USER user

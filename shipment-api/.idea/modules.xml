@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../../SerwisyInternetowe/SerwisyInternetowe/airport-meteo-api_v2/.idea/airport-meteo-api_v2.iml" filepath="$PROJECT_DIR$/../../SerwisyInternetowe/SerwisyInternetowe/airport-meteo-api_v2/.idea/airport-meteo-api_v2.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/shipment-api.iml" filepath="$PROJECT_DIR$/.idea/shipment-api.iml" />
     </modules>
   </component>

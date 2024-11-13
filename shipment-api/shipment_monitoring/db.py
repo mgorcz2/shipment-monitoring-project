@@ -9,7 +9,7 @@ from asyncpg.exceptions import (    # type: ignore
     ConnectionDoesNotExistError,
 )
 
-from shipment_app.config import config
+from shipment_monitoring.config import config
 
 metadata = sqlalchemy.MetaData()
 
