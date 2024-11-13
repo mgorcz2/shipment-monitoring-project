@@ -8,5 +8,10 @@ class IShipmentService(ABC):
     async def get_shipment_by_id(self, shipment_id: int) -> Shipment | None:
         pass
 
+    @abstractmethod
     async def get_all_shipments(self) -> Iterable[Shipment]:
+        pass
+
+    @abstractmethod
+    async def add_shipment(self, shipment: ShipmentIn) -> Shipment | None:
         pass

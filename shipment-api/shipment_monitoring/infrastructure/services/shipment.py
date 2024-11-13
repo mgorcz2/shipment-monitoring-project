@@ -17,3 +17,5 @@ class ShipmentService(IShipmentService):
     async def get_shipment_by_id(self, shipment_id: int) -> ShipmentDTO | None:
         return await self._repository.get_by_id(shipment_id)
 
+    async def add_shipment(self, shipment: ShipmentDTO) -> ShipmentDTO | None:
+        return await self._repository.add_shipment(shipment)
