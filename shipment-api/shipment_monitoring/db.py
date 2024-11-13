@@ -19,7 +19,7 @@ shipment_table = sqlalchemy.Table(
     sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column('origin', sqlalchemy.String),
     sqlalchemy.Column('destination', sqlalchemy.String),
-    sqlalchemy.Column('weight', sqlalchemy.String),
+    sqlalchemy.Column('weight', sqlalchemy.Float),
     sqlalchemy.Column('status', sqlalchemy.String),
 )
 

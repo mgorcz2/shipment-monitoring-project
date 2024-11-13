@@ -12,3 +12,7 @@ class IShipmentRepository(ABC):
     @abstractmethod
     async def get_by_id(self, shipment_id: Any) -> Any | None:
         '''abstract '''
+
+    @abstractmethod
+    async def add_shipment(self, shipment: ShipmentIn) -> None:
+        '''abstract '''

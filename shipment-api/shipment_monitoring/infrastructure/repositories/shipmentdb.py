@@ -24,3 +24,9 @@ class ShipmentRepository(IShipmentRepository):
         )
         shipment = await database.fetch_one(query)
         return ShipmentDTO.from_record(shipment) if shipment else None
+
+    async def add_shipment(self, data: ShipmentIn) -> Any | None:
+        query = shipment_table.insert().values(**data.model_dump())
+        new_shipment_id = await database.execute(query)
+        new_shipment = await self.get_by_id(new_shipment_id)
+        return Shipment(**dict(new_shipment)) if new_shipment else None
