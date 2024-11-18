@@ -16,7 +16,7 @@ A web-based application for tracking and managing courier shipments. This servic
 ## Useful Commands
 - Installing production dependencies: pip install -r requirements.txt
 - Installing development dependencies: pip install -r requirements-dev.txt
-- Starting the application server: uvicorn airportapi.main:app --host 0.0.0.0 --port 8000
+- Starting the application server: uvicorn shipment-api.main:app --host 0.0.0.0 --port 8000
 - API documentation (Swagger): http://localhost:8000/docs
 - Building the project using Docker: docker compose build (to refresh the cache: docker compose build --no-cache)
 - Running the project using Docker: docker compose up (to avoid cache issues: docker compose up --force-recreate)
