@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.exception_handlers import http_exception_handler
 
 from shipment_monitoring.api.routers.shipment import router as shipment_router
+from shipment_monitoring.api.routers.user import router as user_router
 from shipment_monitoring.container import Container
 from shipment_monitoring.db import init_db, database
 
@@ -14,6 +15,7 @@ container = Container()
 container.wire(
     modules=[
         "shipment_monitoring.api.routers.shipment",
+        "shipment_monitoring.api.routers.user",
     ]
 )
 
@@ -27,6 +29,9 @@ async def lifespan(_: FastAPI) -> AsyncGenerator:
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(shipment_router, prefix="/shipment")
+app.include_router(user_router, prefix="/user")
+
+
 
 @app.exception_handler(HTTPException)
 async def http_exception_handle_logging(
