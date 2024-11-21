@@ -33,3 +33,15 @@ class UserRepository(IUserRepository):
         )
         user = await database.fetch_one(query)
         return UserDTO.from_record(user) if user else None
+
+    async def login_user(self,login,password) -> Any | None:
+        query = (
+            select (user_table)
+            .where(user_table.c.login == login)
+        )
+        user = await database.fetch_one(query)
+        if user:
+            if pwd_context.verify(password, user.password):
+                return UserDTO.from_record(user) if user else None
+
+
