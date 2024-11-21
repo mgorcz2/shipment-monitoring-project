@@ -8,11 +8,20 @@ from shipment_monitoring.db import (
     user_table, database
 )
 from shipment_monitoring.infrastructure.dto.user import UserDTO
+from passlib.context import CryptContext
+
+
+
+pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+async def hash_password(password) -> str:
+    return pwd_context.hash(password)
 
 
 class UserRepository(IUserRepository):
-    async def add_user(self, data: UserIn) -> Any | None:
-        query = user_table.insert().values(**data.model_dump())
+
+    async def register_user(self, data: UserIn) -> Any | None:
+        hashed_password = await hash_password(data.password)
+        query = user_table.insert().values(login=data.login,password=hashed_password)
         new_user = await database.execute(query)
         new_user = await self.get_user_by_id(new_user)
         return User(**dict(new_user)) if new_user else None

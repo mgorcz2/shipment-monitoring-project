@@ -28,8 +28,8 @@ async def lifespan(_: FastAPI) -> AsyncGenerator:
     await database.disconnect()
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(shipment_router, prefix="/shipment")
-app.include_router(user_router, prefix="/user")
+app.include_router(shipment_router)
+app.include_router(user_router)
 
 
 

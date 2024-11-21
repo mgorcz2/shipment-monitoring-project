@@ -7,7 +7,10 @@ from shipment_monitoring.infrastructure.dto.shipment import ShipmentDTO
 from shipment_monitoring.infrastructure.services.ishipment import IShipmentService
 from shipment_monitoring.container import Container
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/shipment",
+    tags=["shipment"],
+)
 
 @router.get("/all", response_model=Iterable[ShipmentDTO], status_code=200)
 @inject
