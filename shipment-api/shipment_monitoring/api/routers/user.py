@@ -8,11 +8,14 @@ from passlib.context import CryptContext
 from shipment_monitoring.core.domain.user import UserIn, User
 from shipment_monitoring.infrastructure.services.iuser import IUserService
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/user",
+    tags=["user"],
+)
 
-@router.post("/add", response_model=User, status_code=201)
+@router.post("/register", response_model=User, status_code=201)
 @inject
-async def add_user(
+async def register_user(
         new_user: UserIn,
         service: IUserService = Depends(Provide[Container.user_service]),
 ) -> dict:

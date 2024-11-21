@@ -7,7 +7,7 @@ from shipment_monitoring.core.domain.user import UserIn
 class IUserRepository(ABC):
 
     @abstractmethod
-    async def add_user(self, user: UserIn) -> None:
+    async def register_user(self, user: UserIn) -> None:
         pass
 
     @abstractmethod
