@@ -14,3 +14,4 @@ class Shipment(ShipmentIn):     #pelen obiekt
     id: int
 
     model_config = ConfigDict(from_attributes=True, extra='ignore')
+

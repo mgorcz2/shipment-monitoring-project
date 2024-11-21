@@ -23,6 +23,23 @@ shipment_table = sqlalchemy.Table(
     sqlalchemy.Column('status', sqlalchemy.String),
 )
 
+user_table = sqlalchemy.Table(
+    'user_table',
+    metadata,
+    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column('login', sqlalchemy.String),
+    sqlalchemy.Column('password', sqlalchemy.String),
+)
+
+token_table = sqlalchemy.Table(
+    'token_table',
+    metadata,
+    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column('access_token', sqlalchemy.String),
+    sqlalchemy.Column('token_type', sqlalchemy.String),
+)
+
+
 db_uri = (
     f"postgresql+asyncpg://{config.DB_USER}:{config.DB_PASSWORD}"
     f"@{config.DB_HOST}/{config.DB_NAME}"
