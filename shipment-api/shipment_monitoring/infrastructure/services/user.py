@@ -14,6 +14,9 @@ class UserService(IUserService):
 
     async def get_user_by_id(self, user_id) -> UserDTO | None:
         return await self._repository.get_user_by_id(user_id)
+    
+    async def get_user_by_login(self,login) -> UserDTO | None:
+        return await self._repository.get_user_by_login(login)
 
     async def login_user(self, login, password) -> UserDTO | None:
         return await self._repository.login_user(login,password)
