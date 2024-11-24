@@ -20,11 +20,11 @@ async def hash_password(password) -> str:
 class UserRepository(IUserRepository):
 
     async def register_user(self, data: UserIn) -> Any | None:
-        exist = await self.get_user_by_login(data.login)
+        exist = await self.get_user_by_username(data.username)
         if exist:
             return None
         hashed_password = await hash_password(data.password)
-        query = user_table.insert().values(login=data.login,password=hashed_password)
+        query = user_table.insert().values(login=data.username,password=hashed_password)
         new_user = await database.execute(query)
         new_user = await self.get_user_by_id(new_user)
         return UserDTO.from_record(new_user) if new_user else None
@@ -37,18 +37,18 @@ class UserRepository(IUserRepository):
         user = await database.fetch_one(query)
         return UserDTO.from_record(user) if user else None
     
-    async def get_user_by_login(self,login) -> Any | None:
+    async def get_user_by_username(self,username) -> Any | None:
         query = (
             select (user_table)
-            .where (user_table.c.login == login)
+            .where (user_table.c.username == username)
         )
         user = await database.fetch_one(query)
         return UserDTO.from_record(user) if user else None
 
-    async def login_user(self,login,password) -> Any | None:
+    async def login_user(self,username,password) -> Any | None:
         query = (
             select (user_table)
-            .where(user_table.c.login == login)
+            .where(user_table.c.username == username)
         )
         user = await database.fetch_one(query)
         if user:
