@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict
 
 class UserDTO(BaseModel):
     id: int
-    login: string
+    username: string
     password: string
 
     model_config = ConfigDict(
@@ -21,6 +21,6 @@ class UserDTO(BaseModel):
 
         return cls(
             id=record_dict.pop('id'),
-            login=record_dict.pop('login'),
+            username=record_dict.pop('username'),
             password=record_dict.pop('password'),
         )

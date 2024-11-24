@@ -12,7 +12,7 @@ class IUserService(ABC):
         pass
     
     @abstractmethod
-    async def get_user_by_login(self,login) -> User | None:
+    async def get_user_by_username(self,username) -> User | None:
         pass
     
     @abstractmethod

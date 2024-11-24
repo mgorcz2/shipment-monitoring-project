@@ -14,9 +14,9 @@ class IUserRepository(ABC):
     async def get_user_by_id(self, user_id: Any) -> Any | None:
         pass
     @abstractmethod
-    async def get_user_by_login(self,login) -> Any | None:
+    async def get_user_by_username(self,username) -> Any | None:
         pass
     
     @abstractmethod
-    async def login_user(self, login, password) -> Any | None:
+    async def login_user(self, username, password) -> Any | None:
         pass

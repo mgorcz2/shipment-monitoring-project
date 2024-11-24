@@ -27,7 +27,7 @@ user_table = sqlalchemy.Table(
     'user_table',
     metadata,
     sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column('login', sqlalchemy.String),
+    sqlalchemy.Column('username', sqlalchemy.String),
     sqlalchemy.Column('password', sqlalchemy.String),
 )
 
