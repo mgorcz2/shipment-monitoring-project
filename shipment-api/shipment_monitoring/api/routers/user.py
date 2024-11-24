@@ -29,21 +29,21 @@ async def register_user(
 @router.get("/login/{login}/{password}", status_code=200)
 @inject
 async def login_user(
-        login: str,
+        username: str,
         password: str,
         service: IUserService = Depends(Provide[Container.user_service]),
 ) -> dict:
-    user = await service.login_user(login, password)
+    user = await service.login_user(username, password)
     return {"message":"ISTNIEJE TAKI"} if user else {}
 
 @router.get("/get/{login}/", response_model=UserDTO, status_code=200)
 @inject
-async def get_user_by_login(
-    login: str,
+async def get_user_by_username(
+    username: str,
     service: IUserService = Depends(Provide[Container.user_service]),
 ) -> dict | None:
-    user = await service.get_user_by_login(login)
-    if user := await service.get_user_by_login(login):
+    user = await service.get_user_by_username(username)
+    if user := await service.get_user_by_username(username):
         return user.model_dump()
     raise HTTPException(status_code=404, detail="User not found")
         

@@ -24,7 +24,7 @@ class UserRepository(IUserRepository):
         if exist:
             return None
         hashed_password = await hash_password(data.password)
-        query = user_table.insert().values(login=data.username,password=hashed_password)
+        query = user_table.insert().values(username=data.username,password=hashed_password)
         new_user = await database.execute(query)
         new_user = await self.get_user_by_id(new_user)
         return UserDTO.from_record(new_user) if new_user else None
