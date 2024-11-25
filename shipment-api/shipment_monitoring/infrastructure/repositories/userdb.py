@@ -10,8 +10,6 @@ from shipment_monitoring.db import (
 from shipment_monitoring.infrastructure.dto.user import UserDTO
 from passlib.context import CryptContext
 
-
-
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 async def hash_password(password) -> str:
     return pwd_context.hash(password)
