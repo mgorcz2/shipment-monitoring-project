@@ -23,17 +23,6 @@ async def register_user(
     if new_user := await service.register_user(new_user):
         return new_user.model_dump()
     raise HTTPException(status_code=400, detail="Login already registered")
-    
-
-@router.get("/login/{login}/{password}", status_code=200)
-@inject
-async def login_user(
-        username: str,
-        password: str,
-        service: IUserService = Depends(Provide[Container.user_service]),
-) -> dict:
-    user = await service.login_user(username, password)
-    return {"message":"ISTNIEJE TAKI"} if user else {}
 
 @router.get("/get/{username}/", response_model=UserDTO, status_code=200)
 @inject
