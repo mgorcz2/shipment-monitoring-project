@@ -11,7 +11,7 @@ from asyncpg.exceptions import (    # type: ignore
 
 from shipment_monitoring.config import config
 
-metadata = sqlalchemy.MetaData()
+metadata = sqlalchemy.MetaData()    
 
 shipment_table = sqlalchemy.Table(
     'shipment_table',
@@ -29,6 +29,7 @@ user_table = sqlalchemy.Table(
     sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column('username', sqlalchemy.String),
     sqlalchemy.Column('password', sqlalchemy.String),
+    sqlalchemy.Column('role', sqlalchemy.String)
 )
 
 
