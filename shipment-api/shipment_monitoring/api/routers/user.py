@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from shipment_monitoring.api.security import auth
 from shipment_monitoring.container import Container
 from shipment_monitoring.api.security.token import Token
-
+from shipment_monitoring.api.security import utils
 from shipment_monitoring.core.domain.user import UserIn, User
 from shipment_monitoring.infrastructure.dto.user import UserDTO
 from shipment_monitoring.infrastructure.services.iuser import IUserService
@@ -20,10 +20,12 @@ async def register_user(
         new_user: UserIn,
         service: IUserService = Depends(Provide[Container.user_service]),
 ) -> dict:
-    if new_user := await service.register_user(new_user):
-        return new_user.model_dump()
-    raise HTTPException(status_code=400, detail="Login already registered")
-
+    try:    #lapanie bledow
+        user = await service.register_user(new_user)
+        return user.model_dump()
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error))
+    
 @router.get("/get/{username}/", response_model=UserDTO, status_code=200)
 @inject
 async def get_user_by_username(
@@ -51,7 +53,7 @@ async def login_for_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=utils.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = auth.create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
