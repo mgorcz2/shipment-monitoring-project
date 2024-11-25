@@ -7,14 +7,9 @@ from datetime import datetime, timedelta
 from fastapi import Depends, HTTPException, status
 from shipment_monitoring.infrastructure.services.iuser import IUserService
 from dependency_injector.wiring import Provide, inject
+from shipment_monitoring.api.security import utils
 
-SECRET_KEY = "SECRET_KEY"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-
-async def hash_password(password) -> str:
-    return pwd_context.hash(password)
 
 async def verify_password(user_password, crypt_password):
     if pwd_context.verify(user_password, crypt_password):
@@ -31,7 +26,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, utils.SECRET_KEY, algorithm=utils.ALGORITHM)
     return encoded_jwt
 
 @inject
@@ -46,7 +41,7 @@ async def get_current_user(
     )
     try:
         payload = jwt.decode(
-            token, SECRET_KEY, algorithms=[ALGORITHM]
+            token, utils.SECRET_KEY, algorithms=[utils.ALGORITHM]
         )
         username: str = payload.get("sub")
         if username is None:
