@@ -1,0 +1,5 @@
+# Ignore PyCharm settings
+.idea/
+
+# Ignore Visual Studio Code settings
+.vscode/
