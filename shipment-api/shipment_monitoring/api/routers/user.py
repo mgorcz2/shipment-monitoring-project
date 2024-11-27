@@ -44,8 +44,6 @@ async def login_for_access_token(
     service: IUserService = Depends(Provide[Container.user_service])
 ):
     user = await service.get_user_by_username(username=form_data.username)
-    print("Provided password:", form_data.password)
-    print("Stored password:", user.password if user else "No user")
     if not user or not auth.verify_password(form_data.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -54,6 +52,6 @@ async def login_for_access_token(
         )
     access_token_expires = timedelta(minutes=utils.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = auth.create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": str(user.id)}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}  
