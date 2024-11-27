@@ -8,7 +8,7 @@ from asyncpg.exceptions import (    # type: ignore
     CannotConnectNowError,
     ConnectionDoesNotExistError,
 )
-
+from sqlalchemy.dialects.postgresql import UUID
 from shipment_monitoring.config import config
 
 metadata = sqlalchemy.MetaData()    
@@ -26,7 +26,12 @@ shipment_table = sqlalchemy.Table(
 user_table = sqlalchemy.Table(
     'user_table',
     metadata,
-    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column(
+        'id', 
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=sqlalchemy.text("gen_random_uuid()")
+    ),
     sqlalchemy.Column('username', sqlalchemy.String),
     sqlalchemy.Column('password', sqlalchemy.String),
     sqlalchemy.Column('role', sqlalchemy.String)

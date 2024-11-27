@@ -14,7 +14,7 @@ router = APIRouter(
     tags=["user"],
 )
 
-@router.post("/register/", response_model=User, status_code=201)
+@router.post("/register/", response_model=UserDTO, status_code=201)
 @inject
 async def register_user(
         new_user: UserIn,
@@ -26,15 +26,14 @@ async def register_user(
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error))
     
-@router.get("/get/{username}/", response_model=UserDTO, status_code=200)
+@router.get("/get/{username}/", response_model=User, status_code=200)
 @inject
 async def get_user_by_username(
     username: str,
-    current_user: User = Depends(auth.get_current_user),
     service: IUserService = Depends(Provide[Container.user_service]),
 ) -> dict | None:
     if user := await service.get_user_by_username(username):
-        return user.model_dump()
+        return user
     raise HTTPException(status_code=404, detail="User not found")
         
     
@@ -45,9 +44,9 @@ async def login_for_access_token(
     service: IUserService = Depends(Provide[Container.user_service])
 ):
     user = await service.get_user_by_username(username=form_data.username)
-    if not user or not auth.verify_password(
-        form_data.password, user.password
-    ):
+    print("Provided password:", form_data.password)
+    print("Stored password:", user.password if user else "No user")
+    if not user or not auth.verify_password(form_data.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",

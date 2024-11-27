@@ -1,4 +1,5 @@
 from pydantic import BaseModel, ConfigDict
+from uuid import UUID
 class UserIn(BaseModel): #klasa ktora pomaga stworzyc obiekt w bazie danych (id samo sie incrementuje bo to klucz glowny)
     username: str
     password: str
@@ -6,6 +7,6 @@ class UserIn(BaseModel): #klasa ktora pomaga stworzyc obiekt w bazie danych (id 
     
 
 class User(UserIn):
-    id: int
+    id: UUID
     
     model_config = ConfigDict(from_attributes=True, extra='ignore')

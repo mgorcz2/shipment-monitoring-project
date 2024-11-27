@@ -9,7 +9,7 @@ from shipment_monitoring.db import (
     user_table, database
 )
 from shipment_monitoring.infrastructure.dto.user import UserDTO
-
+from uuid import UUID
 
 
 class UserRepository(IUserRepository):
@@ -20,7 +20,7 @@ class UserRepository(IUserRepository):
         new_user = await self.get_user_by_id(new_user)
         return UserDTO.from_record(new_user) if new_user else None
 
-    async def get_user_by_id(self, user_id: Any) -> UserDTO | None:
+    async def get_user_by_id(self, user_id: UUID) -> Any | None:
         query = (
             select(user_table)
             .where(user_table.c.id == user_id)
@@ -28,11 +28,11 @@ class UserRepository(IUserRepository):
         user = await database.fetch_one(query)
         return UserDTO.from_record(user) if user else None
     
-    async def get_user_by_username(self,username) -> Any | None:
+    async def get_user_by_username(self,username) -> User | None:
         query = (
             select (user_table)
             .where (user_table.c.username == username)
         )
         user = await database.fetch_one(query)
-        return UserDTO.from_record(user) if user else None
+        return user if user else None
 
