@@ -2,7 +2,7 @@ from typing import Any, Iterable
 
 from sqlalchemy import select
 
-from shipment_monitoring.api.security import utils
+from shipment_monitoring.api.utils import consts
 from shipment_monitoring.core.domain.user import UserIn, User
 from shipment_monitoring.core.repositories.iuser import IUserRepository
 from shipment_monitoring.db import (

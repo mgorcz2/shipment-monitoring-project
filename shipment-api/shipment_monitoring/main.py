@@ -16,7 +16,7 @@ container.wire(
     modules=[
         "shipment_monitoring.api.routers.shipment",
         "shipment_monitoring.api.routers.user",
-        "shipment_monitoring.api.security.auth"
+        "shipment_monitoring.api.utils.auth"
     ]
 )
 
