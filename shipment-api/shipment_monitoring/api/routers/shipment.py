@@ -7,7 +7,7 @@ from shipment_monitoring.infrastructure.dto.shipment import ShipmentDTO
 from shipment_monitoring.infrastructure.services.ishipment import IShipmentService
 from shipment_monitoring.container import Container
 from shipment_monitoring.core.domain.user import User
-from shipment_monitoring.api.security import auth
+from shipment_monitoring.api.utils import auth
 
 router = APIRouter(
     prefix="/shipment",

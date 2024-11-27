@@ -1,15 +1,14 @@
-from typing import Iterable
 from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from shipment_monitoring.api.security import auth
 from shipment_monitoring.container import Container
-from shipment_monitoring.api.security.token import Token
-from shipment_monitoring.api.security import utils
+from shipment_monitoring.api.utils.token import TokenDTO
 from shipment_monitoring.core.domain.user import UserIn, User
 from shipment_monitoring.infrastructure.dto.user import UserDTO
 from shipment_monitoring.infrastructure.services.iuser import IUserService
-from datetime import datetime, timedelta
+
+
+
 router = APIRouter(
     tags=["user"],
 )
@@ -37,21 +36,14 @@ async def get_user_by_username(
     raise HTTPException(status_code=404, detail="User not found")
         
     
-@router.post("/token", response_model=Token)
+@router.post("/token", response_model=TokenDTO)
 @inject
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     service: IUserService = Depends(Provide[Container.user_service])
 ):
-    user = await service.get_user_by_username(username=form_data.username)
-    if not user or not auth.verify_password(form_data.password, user.password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    access_token_expires = timedelta(minutes=utils.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = auth.create_access_token(
-        data={"sub": str(user.id)}, expires_delta=access_token_expires
-    )
-    return {"access_token": access_token, "token_type": "bearer"}  
+    try:
+        token = await service.login_for_access_token(form_data.username, form_data.password)
+        return token
+    except ValueError as error:
+        raise HTTPException(status_code=401, detail=str(error))
