@@ -11,7 +11,7 @@ from shipment_monitoring.api.security import utils
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
-async def verify_password(user_password, crypt_password):
+def verify_password(user_password, crypt_password):
     if pwd_context.verify(user_password, crypt_password):
         return True
     return False
