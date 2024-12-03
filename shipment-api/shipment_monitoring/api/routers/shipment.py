@@ -3,7 +3,7 @@ from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends, HTTPException
 
 from shipment_monitoring.core.domain.shipment import Shipment, ShipmentIn
-from shipment_monitoring.infrastructure.dto.shipment import ShipmentDTO
+from shipment_monitoring.infrastructure.dto.shipmentDTO import ShipmentDTO
 from shipment_monitoring.infrastructure.services.ishipment import IShipmentService
 from shipment_monitoring.container import Container
 from shipment_monitoring.core.domain.user import User

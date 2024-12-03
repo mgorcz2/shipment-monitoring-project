@@ -2,9 +2,9 @@ from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from shipment_monitoring.container import Container
-from shipment_monitoring.api.utils.token import TokenDTO
+from shipment_monitoring.infrastructure.dto.tokenDTO import TokenDTO
 from shipment_monitoring.core.domain.user import UserIn, User
-from shipment_monitoring.infrastructure.dto.user import UserDTO
+from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
 from shipment_monitoring.infrastructure.services.iuser import IUserService
 
 

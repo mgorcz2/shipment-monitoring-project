@@ -1,10 +1,10 @@
 from shipment_monitoring.core.domain.user import User
-from shipment_monitoring.infrastructure.dto.user import UserDTO
+from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
 from shipment_monitoring.infrastructure.services.iuser import IUserService
 from shipment_monitoring.core.repositories.iuser import IUserRepository
 from shipment_monitoring.api.utils import consts
 from shipment_monitoring.core.domain.user import UserIn
-from shipment_monitoring.api.utils.token import TokenDTO
+from shipment_monitoring.infrastructure.dto.tokenDTO import TokenDTO
 from shipment_monitoring.api.utils.token import create_access_token
 from datetime import datetime, timedelta
 from shipment_monitoring.api.utils import password_hashing

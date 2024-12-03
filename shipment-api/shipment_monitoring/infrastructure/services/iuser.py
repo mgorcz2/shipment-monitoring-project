@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from shipment_monitoring.core.domain.user import User,UserIn
-from shipment_monitoring.api.utils.token import TokenDTO
+from shipment_monitoring.infrastructure.dto.tokenDTO import TokenDTO
 from uuid import UUID
 class IUserService(ABC):
     @abstractmethod

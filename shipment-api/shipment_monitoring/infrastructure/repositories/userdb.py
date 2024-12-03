@@ -8,7 +8,7 @@ from shipment_monitoring.core.repositories.iuser import IUserRepository
 from shipment_monitoring.db import (
     user_table, database
 )
-from shipment_monitoring.infrastructure.dto.user import UserDTO
+from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
 from uuid import UUID
 
 
