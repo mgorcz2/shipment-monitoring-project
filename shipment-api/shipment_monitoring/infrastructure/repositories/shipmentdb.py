@@ -8,7 +8,7 @@ from shipment_monitoring.core.domain.shipment import Shipment, ShipmentIn
 from shipment_monitoring.db import (
     shipment_table, database
 )
-from shipment_monitoring.infrastructure.dto.shipment import ShipmentDTO
+from shipment_monitoring.infrastructure.dto.shipmentDTO import ShipmentDTO
 
 class ShipmentRepository(IShipmentRepository):
     async def get_all_shipments(self) -> Iterable[Any]:

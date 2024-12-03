@@ -2,7 +2,7 @@ from typing import Iterable, Any
 
 from shipment_monitoring.core.domain.shipment import Shipment
 from shipment_monitoring.core.repositories.ishipment import IShipmentRepository
-from shipment_monitoring.infrastructure.dto.shipment import ShipmentDTO
+from shipment_monitoring.infrastructure.dto.shipmentDTO import ShipmentDTO
 from shipment_monitoring.infrastructure.services.ishipment import IShipmentService
 
 class ShipmentService(IShipmentService):
