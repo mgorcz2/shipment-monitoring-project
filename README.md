@@ -20,4 +20,4 @@ A web-based application for tracking and managing courier shipments. This servic
 - API documentation (Swagger): http://localhost:8000/docs
 - Building the project using Docker: docker compose build (to refresh the cache: docker compose build --no-cache)
 - Running the project using Docker: docker compose up (to avoid cache issues: docker compose up --force-recreate)
-- To avoid connection issues with the external geopy service, configure the container to use the same network as the host: docker run --network host shipment-api-app  
+- To avoid connection issues with external geocoding services used by the Geopy library (e.g., Nominatim), we configure the container to use the same network as the host: docker run --network host shipment-api-app  
