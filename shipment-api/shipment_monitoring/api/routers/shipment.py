@@ -6,8 +6,9 @@ from shipment_monitoring.core.domain.shipment import Shipment, ShipmentIn
 from shipment_monitoring.infrastructure.dto.shipmentDTO import ShipmentDTO
 from shipment_monitoring.infrastructure.services.ishipment import IShipmentService
 from shipment_monitoring.container import Container
-from shipment_monitoring.core.domain.user import User
-from shipment_monitoring.api.utils import auth
+from shipment_monitoring.core.domain.user import User, UserRole
+from shipment_monitoring.api.utils.security import auth
+
 
 router = APIRouter(
     prefix="/shipment",
@@ -15,7 +16,7 @@ router = APIRouter(
 )
 
 @router.get("/all", response_model=Iterable[ShipmentDTO], status_code=200)
-@auth.role_required("courier")
+@auth.role_required(UserRole.COURIER)
 @inject
 async def get_shipments(
         current_user: User = Depends(auth.get_current_user),

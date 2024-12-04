@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException, status
 from shipment_monitoring.infrastructure.services.iuser import IUserService
 from dependency_injector.wiring import Provide, inject
-from shipment_monitoring.api.utils import consts
+from shipment_monitoring.api.utils.security import consts
 from shipment_monitoring.core.domain.user import User
 from functools import wraps
 

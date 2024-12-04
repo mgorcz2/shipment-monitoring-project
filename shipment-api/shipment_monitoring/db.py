@@ -10,6 +10,9 @@ from asyncpg.exceptions import (    # type: ignore
 )
 from sqlalchemy.dialects.postgresql import UUID
 from shipment_monitoring.config import config
+import enum
+from sqlalchemy import Enum
+from shipment_monitoring.api.utils.shared.UserRoleEnum import UserRole
 
 metadata = sqlalchemy.MetaData()    
 
@@ -34,7 +37,7 @@ user_table = sqlalchemy.Table(
     ),
     sqlalchemy.Column('username', sqlalchemy.String),
     sqlalchemy.Column('password', sqlalchemy.String),
-    sqlalchemy.Column('role', sqlalchemy.String)
+    sqlalchemy.Column('role', Enum(UserRole, name="user_roles"))
 )
 
 

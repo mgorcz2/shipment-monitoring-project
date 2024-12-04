@@ -19,7 +19,7 @@ async def register_user(
         new_user: UserIn,
         service: IUserService = Depends(Provide[Container.user_service]),
 ) -> dict:
-    try:    #lapanie bledow
+    try:
         user = await service.register_user(new_user)
         return user.model_dump()
     except ValueError as error:
