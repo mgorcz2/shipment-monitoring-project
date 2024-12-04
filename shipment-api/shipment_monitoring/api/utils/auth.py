@@ -5,6 +5,8 @@ from fastapi import Depends, HTTPException, status
 from shipment_monitoring.infrastructure.services.iuser import IUserService
 from dependency_injector.wiring import Provide, inject
 from shipment_monitoring.api.utils import consts
+from shipment_monitoring.core.domain.user import User
+from functools import wraps
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  #ktory endpoint przekazuje tokeny
 
@@ -12,7 +14,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  #ktory endpoint przekazu
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
     service: IUserService = Depends(Provide[Container.user_service])
-):
+    ):
+    '''Validates the JWT token and retrieves the authenticated user.'''
+    
+    
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -31,3 +36,23 @@ async def get_current_user(
     if user is None:
         raise credentials_exception
     return user
+
+from functools import wraps
+from fastapi import Depends, HTTPException, status
+
+def role_required(required_role: str):
+    
+    '''Decorator for verifying user roles before accessing an endpoint.'''
+    
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(*args, current_user: User = Depends(get_current_user), **kwargs):
+            if current_user.role != required_role:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="No permission to access this resource.",
+                )
+            # Użytkownik zostanie przekazany do endpointu
+            return await func(*args, current_user=current_user, **kwargs)
+        return wrapper
+    return decorator
