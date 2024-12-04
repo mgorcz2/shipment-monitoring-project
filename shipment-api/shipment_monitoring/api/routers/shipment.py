@@ -25,7 +25,7 @@ async def get_shipments(
     shipments = await service.get_all_shipments()
     return shipments
 
-@router.post("/add", response_model=Shipment, status_code=201)
+@router.post("/add", response_model=ShipmentDTO, status_code=201)
 @inject
 async def add_shipment(
         new_shipment: ShipmentIn,

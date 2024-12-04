@@ -14,5 +14,5 @@ class IShipmentRepository(ABC):
         '''abstract '''
 
     @abstractmethod
-    async def add_shipment(self, shipment: ShipmentIn) -> None:
+    async def add_shipment(self, shipment: ShipmentIn) -> Any | None:
         '''abstract '''

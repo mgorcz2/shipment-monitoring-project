@@ -20,10 +20,12 @@ shipment_table = sqlalchemy.Table(
     'shipment_table',
     metadata,
     sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column('origin', sqlalchemy.String),
-    sqlalchemy.Column('destination', sqlalchemy.String),
-    sqlalchemy.Column('weight', sqlalchemy.Float),
     sqlalchemy.Column('status', sqlalchemy.String),
+    sqlalchemy.Column('origin_latitude', sqlalchemy.Float),
+    sqlalchemy.Column('origin_longitude', sqlalchemy.Float),
+    sqlalchemy.Column('destination_latitude', sqlalchemy.Float),
+    sqlalchemy.Column('destination_longitude', sqlalchemy.Float),
+    sqlalchemy.Column('weight',sqlalchemy.Float)
 )
 
 user_table = sqlalchemy.Table(

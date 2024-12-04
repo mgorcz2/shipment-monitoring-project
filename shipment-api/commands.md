@@ -6,3 +6,4 @@
 - Dokumentacja API (Swagger): `http://localhost:8000/docs`
 - Zbudowanie projektu za pomocą Docker'a: `docker compose build` (w przypadku odświeżenia cache: `docker compose build --no-cache`)
 - Uruchomienie projektu za pomocą Docker'a: `docker compose up` (w przypadku nieodświeżonego cache: `docker compose up --force-recreate`)
+- Aby uniknąć problemów połączenia z zewnętrzną usługą geopy sprawiamy, że kontener używa tej samej sieci co host: `docker run --network host shipment-api-app`
