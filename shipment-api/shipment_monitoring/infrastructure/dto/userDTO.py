@@ -1,19 +1,19 @@
 import string
-
 from asyncpg import Record 
 from pydantic import BaseModel, ConfigDict
 from uuid import UUID
-
+from shipment_monitoring.api.utils.shared.UserRoleEnum import UserRole
 
 class UserDTO(BaseModel):
     id: UUID
     username: string
-    role: string
+    role: UserRole
         
     model_config = ConfigDict(
         from_attributes=True,
         extra="ignore",
         arbitrary_types_allowed=True,
+        use_enum_values = True
     )
 
     @classmethod
