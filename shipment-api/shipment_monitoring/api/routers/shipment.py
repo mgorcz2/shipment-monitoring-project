@@ -15,6 +15,7 @@ router = APIRouter(
 )
 
 @router.get("/all", response_model=Iterable[ShipmentDTO], status_code=200)
+@auth.role_required("courier")
 @inject
 async def get_shipments(
         current_user: User = Depends(auth.get_current_user),
