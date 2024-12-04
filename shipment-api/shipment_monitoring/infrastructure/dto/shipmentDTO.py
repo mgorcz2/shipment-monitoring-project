@@ -5,10 +5,10 @@ from pydantic import BaseModel, ConfigDict
 
 class ShipmentDTO(BaseModel):
     id: int
-    origin: str
-    destination: str
     weight: float
     status: str
+    origin_latitude: float
+    origin_longitude: float
 
     model_config = ConfigDict(
         from_attributes=True,
@@ -22,8 +22,8 @@ class ShipmentDTO(BaseModel):
 
         return cls(
             id=record_dict.pop('id'),
-            origin=record_dict.pop('origin'),
-            destination=record_dict.pop('destination'),
             weight=record_dict.pop('weight'),
-            status=record_dict.pop('status')
+            status=record_dict.pop('status'),
+            origin_latitude=record_dict.pop('origin_latitude'),
+            origin_longitude=record_dict.pop('origin_longitude')
         )

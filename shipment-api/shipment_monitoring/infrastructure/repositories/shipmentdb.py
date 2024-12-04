@@ -1,4 +1,4 @@
-from typing import Any, Iterable
+from typing import Any, Iterable, Tuple
 
 from asyncpg import Record  # type: ignore
 from sqlalchemy import select, join
@@ -9,6 +9,7 @@ from shipment_monitoring.db import (
     shipment_table, database
 )
 from shipment_monitoring.infrastructure.dto.shipmentDTO import ShipmentDTO
+
 
 class ShipmentRepository(IShipmentRepository):
     async def get_all_shipments(self) -> Iterable[Any]:
@@ -25,8 +26,16 @@ class ShipmentRepository(IShipmentRepository):
         shipment = await database.fetch_one(query)
         return ShipmentDTO.from_record(shipment) if shipment else None
 
-    async def add_shipment(self, data: ShipmentIn) -> Any | None:
-        query = shipment_table.insert().values(**data.model_dump())
+    async def add_shipment(self, data: ShipmentIn, origin_cords: Tuple[float, float], destination_coords: Tuple[float, float]) -> Any | None:
+        query = shipment_table.insert().values(
+            status=data.status,
+            origin_latitude=origin_cords[0],
+            origin_longitude=origin_cords[1],
+            destination_latitude=destination_coords[0],
+            destination_longitude=destination_coords[1],
+            weight=data.weight,
+            )
+        print(query)
         new_shipment_id = await database.execute(query)
         new_shipment = await self.get_by_id(new_shipment_id)
-        return Shipment(**dict(new_shipment)) if new_shipment else None
+        return new_shipment if new_shipment else None

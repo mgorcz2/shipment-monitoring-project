@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Iterable
 
 from shipment_monitoring.core.domain.shipment import ShipmentIn, Shipment
+from shipment_monitoring.infrastructure.dto.shipmentDTO import ShipmentDTO
 
 class IShipmentService(ABC):
     @abstractmethod
@@ -13,5 +14,5 @@ class IShipmentService(ABC):
         pass
 
     @abstractmethod
-    async def add_shipment(self, shipment: ShipmentIn) -> Shipment | None:
+    async def add_shipment(self, shipment: ShipmentIn) -> ShipmentDTO | None:
         pass
