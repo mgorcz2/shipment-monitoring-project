@@ -11,7 +11,6 @@ class ShipmentIn(BaseModel): #ShipmentIn zawiera tylko te dane, które sa wymaga
     #created_at: datetime
     status: str
     
-
     origin: Location
     destination: Location
 

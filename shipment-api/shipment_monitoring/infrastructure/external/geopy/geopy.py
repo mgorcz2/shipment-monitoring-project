@@ -9,9 +9,14 @@ async def get_coordinates(address: str) -> Optional[Tuple[float, float]]:
     return None
 
 def get_address(latitude: float, longitude: float) -> str | None:
-    location = str(geolocator.reverse([latitude, longitude]))
+    location = geolocator.reverse([latitude, longitude])
     if location:
-        address = location.split(',')
-        return ", ".join(address[i].strip() for i in [1,0,2,6])
+        address = location.raw.get('address', {})
+        street = address.get('road', 'N/A')
+        street_number = address.get('house_number', 'N/A')  # Numer ulicy
+        postal_code = address.get('postcode', 'N/A')
+        city = address.get('city', 'N/A')
+        
+        return f"Ulica: {street} {street_number}, Miejscowość: {city}, Kod pocztowy: {postal_code}".strip()
     return None
 
