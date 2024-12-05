@@ -12,6 +12,7 @@ from shipment_monitoring.config import config
 import enum
 from sqlalchemy import Enum
 from shipment_monitoring.core.shared.UserRoleEnum import UserRole
+from shipment_monitoring.core.shared.ShipmentStatusEnum import ShipmentStatus
 
 metadata = sqlalchemy.MetaData()    
 
@@ -19,7 +20,7 @@ shipment_table = sqlalchemy.Table(
     'shipment_table',
     metadata,
     sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column('status', sqlalchemy.String),
+    sqlalchemy.Column('status', Enum(ShipmentStatus, name="shipment_status")),
     sqlalchemy.Column('origin_latitude', sqlalchemy.Float),
     sqlalchemy.Column('origin_longitude', sqlalchemy.Float),
     sqlalchemy.Column('destination_latitude', sqlalchemy.Float),
