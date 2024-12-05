@@ -26,7 +26,7 @@ class ShipmentRepository(IShipmentRepository):
         shipment = await database.fetch_one(query)
         return shipment if shipment else None
 
-    async def add_shipment(self, data: ShipmentIn, origin_cords: Tuple[float, float], destination_coords: Tuple[float, float]) -> Any | None:
+    async def add_shipment(self, data: ShipmentIn, origin_cords: Tuple[float, float], destination_coords: Tuple[float, float]) -> Shipment | None:
         query = shipment_table.insert().values(
             status=data.status,
             origin_latitude=origin_cords[0],
@@ -35,7 +35,6 @@ class ShipmentRepository(IShipmentRepository):
             destination_longitude=destination_coords[1],
             weight=data.weight,
             )
-        print(query)
         new_shipment_id = await database.execute(query)
         new_shipment = await self.get_by_id(new_shipment_id)
         return new_shipment if new_shipment else None

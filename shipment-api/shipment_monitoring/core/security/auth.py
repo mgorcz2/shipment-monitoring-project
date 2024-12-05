@@ -47,13 +47,13 @@ def role_required(required_role: str):
     '''Decorator for verifying user roles before accessing an endpoint.'''
     
     def decorator(func):
-        @wraps(func)
+        @wraps(func)  #wraps some function
         async def wrapper(*args, current_user: User = Depends(get_current_user), **kwargs):
             if current_user.role != required_role:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="No permission to access this resource.",
                 )
-            return await func(*args, current_user=current_user, **kwargs)
+            return await func(*args, **kwargs)
         return wrapper
     return decorator
