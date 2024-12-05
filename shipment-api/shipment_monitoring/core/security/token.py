@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from jose import jwt
 from typing import Optional
-from shipment_monitoring.api.utils.security import consts
+from shipment_monitoring.core.security import consts
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):

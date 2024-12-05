@@ -2,7 +2,7 @@ import string
 from asyncpg import Record 
 from pydantic import BaseModel, ConfigDict
 from uuid import UUID
-from shipment_monitoring.api.utils.shared.UserRoleEnum import UserRole
+from shipment_monitoring.core.shared.UserRoleEnum import UserRole
 
 class UserDTO(BaseModel):
     id: UUID

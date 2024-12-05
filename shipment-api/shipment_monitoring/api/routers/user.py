@@ -13,7 +13,7 @@ router = APIRouter(
     tags=["user"],
 )
 
-@router.post("/register/", response_model=UserDTO, status_code=201)
+@router.post("/register/", response_model=UserDTO, status_code=status.HTTP_201_CREATED)
 @inject
 async def register_user(
         new_user: UserIn,
@@ -23,7 +23,7 @@ async def register_user(
         user = await service.register_user(new_user)
         return user.model_dump()
     except ValueError as error:
-        raise HTTPException(status_code=400, detail=str(error))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
     
 @router.get("/get/{username}/", response_model=User, status_code=200)
 @inject
@@ -33,7 +33,7 @@ async def get_user_by_username(
 ) -> dict | None:
     if user := await service.get_user_by_username(username):
         return user
-    raise HTTPException(status_code=404, detail="User not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
         
     
 @router.post("/token", response_model=TokenDTO)
@@ -46,4 +46,4 @@ async def login_for_access_token(
         token = await service.login_for_access_token(form_data.username, form_data.password)
         return token
     except ValueError as error:
-        raise HTTPException(status_code=401, detail=str(error))
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(error))
