@@ -1,5 +1,4 @@
 import asyncio
-
 import databases
 import sqlalchemy
 from sqlalchemy.exc import OperationalError, DatabaseError
@@ -12,7 +11,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from shipment_monitoring.config import config
 import enum
 from sqlalchemy import Enum
-from shipment_monitoring.api.utils.shared.UserRoleEnum import UserRole
+from shipment_monitoring.core.shared.UserRoleEnum import UserRole
 
 metadata = sqlalchemy.MetaData()    
 

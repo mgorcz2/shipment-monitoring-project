@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException, status
 from shipment_monitoring.infrastructure.services.iuser import IUserService
 from dependency_injector.wiring import Provide, inject
-from shipment_monitoring.api.utils.security import consts
+from shipment_monitoring.core.security import consts
 from shipment_monitoring.core.domain.user import User
 from functools import wraps
 
@@ -40,6 +40,8 @@ async def get_current_user(
 from functools import wraps
 from fastapi import Depends, HTTPException, status
 
+
+
 def role_required(required_role: str):
     
     '''Decorator for verifying user roles before accessing an endpoint.'''
@@ -52,7 +54,6 @@ def role_required(required_role: str):
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="No permission to access this resource.",
                 )
-            # Użytkownik zostanie przekazany do endpointu
             return await func(*args, current_user=current_user, **kwargs)
         return wrapper
     return decorator
