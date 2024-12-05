@@ -2,17 +2,19 @@
 from asyncpg import Record  # type: ignore
 from pydantic import BaseModel, ConfigDict
 from shipment_monitoring.infrastructure.external.geopy import geopy
+from shipment_monitoring.core.shared.ShipmentStatusEnum import ShipmentStatus
 
 class ShipmentDTO(BaseModel):
     id: int
     weight: float
-    status: str
+    status: ShipmentStatus
     origin : str
     destination: str
     model_config = ConfigDict(
         from_attributes=True,
         extra="ignore",
         arbitrary_types_allowed=True,
+        use_enum_values = True
     )
 
     @classmethod

@@ -28,7 +28,7 @@ class ShipmentRepository(IShipmentRepository):
 
     async def add_shipment(self, data: ShipmentIn, origin_cords: Tuple[float, float], destination_coords: Tuple[float, float]) -> Shipment | None:
         query = shipment_table.insert().values(
-            status=data.status,
+            status="ready_for_pickup",
             origin_latitude=origin_cords[0],
             origin_longitude=origin_cords[1],
             destination_latitude=destination_coords[0],
