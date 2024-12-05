@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 from pydantic import BaseModel, ConfigDict
+from shipment_monitoring.core.domain.location import Location
 
 
 class ShipmentIn(BaseModel): #ShipmentIn zawiera tylko te dane, które sa wymagane do stworzenia
@@ -10,15 +11,9 @@ class ShipmentIn(BaseModel): #ShipmentIn zawiera tylko te dane, które sa wymaga
     #created_at: datetime
     status: str
     
-    
-    origin_street: str
-    origin_street_number: str
-    origin_city: str
-    origin_postcode: str
-    destination_street: str
-    destination_street_number: str
-    destination_city: str
-    destination_postcode: str
+
+    origin: Location
+    destination: Location
 
     weight: float
 

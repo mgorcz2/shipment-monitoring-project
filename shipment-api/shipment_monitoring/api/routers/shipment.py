@@ -31,8 +31,8 @@ async def add_shipment(
         new_shipment: ShipmentIn,
         service: IShipmentService = Depends(Provide[Container.shipment_service]),
 ) -> dict:
-    new_shipment = await service.add_shipment(new_shipment)
     try:
+        new_shipment = await service.add_shipment(new_shipment)
         return new_shipment.model_dump() if new_shipment else {}
     except ValueError as error:
-        raise HTTPException(detail=str(error))
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,detail=str(error))

@@ -20,10 +20,10 @@ class ShipmentService(IShipmentService):
         return ShipmentDTO.from_record(shipment)
 
     async def add_shipment(self, data: ShipmentIn) -> ShipmentDTO | None:
-        origin_address = f"{data.origin_street}, {data.origin_street_number}, {data.origin_city}, {data.origin_postcode}"
+        origin_address = f"{data.origin.street}, {data.origin.street_number}, {data.origin.city}, {data.origin.postcode}"
         origin_coords = await geopy.get_coordinates(origin_address)
         
-        destination_address = f"{data.destination_street}, {data.destination_street_number}, {data.destination_city}, {data.destination_postcode}"
+        destination_address = f"{data.destination.street}, {data.destination.street_number}, {data.destination.city}, {data.destination.postcode}"
         destination_coords = await geopy.get_coordinates(destination_address)
         
         if not origin_coords or not destination_coords:
