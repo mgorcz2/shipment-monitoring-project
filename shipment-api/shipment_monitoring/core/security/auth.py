@@ -7,7 +7,7 @@ from dependency_injector.wiring import Provide, inject
 from shipment_monitoring.core.security import consts
 from shipment_monitoring.core.domain.user import User
 from functools import wraps
-
+from shipment_monitoring.core.shared.UserRoleEnum import UserRole
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  #ktory endpoint przekazuje tokeny
 
 @inject
@@ -49,7 +49,7 @@ def role_required(required_role: str):
     def decorator(func):
         @wraps(func)  #wraps some function
         async def wrapper(*args, current_user: User = Depends(get_current_user), **kwargs):
-            if current_user.role != required_role:
+            if current_user.role != required_role and current_user.role != UserRole.ADMIN:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="No permission to access this resource.",
