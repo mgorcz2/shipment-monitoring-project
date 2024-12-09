@@ -8,16 +8,18 @@ from shipment_monitoring.core.domain.shipment import Shipment, ShipmentIn
 from shipment_monitoring.db import (
     shipment_table, database
 )
-from shipment_monitoring.infrastructure.dto.shipmentDTO import ShipmentDTO
+from shipment_monitoring.infrastructure.dto.shipmentDTO import ShipmentDTO, ShipmentWithDistanceDTO
 
 
 class ShipmentRepository(IShipmentRepository):
     async def get_all_shipments(self) -> Iterable[Any]:
         query = select(shipment_table)
         shipments = await database.fetch_all(query)
-        return [ShipmentDTO.from_record(shipment) for shipment in shipments]
-
-    async def get_by_id(self, shipment_id: Any) -> Any | None:
+        return shipments
+    
+ 
+    
+    async def get_shipment_by_id(self, shipment_id: Any) -> Any | None:
 
         query = (
             select(shipment_table)
@@ -26,15 +28,13 @@ class ShipmentRepository(IShipmentRepository):
         shipment = await database.fetch_one(query)
         return shipment if shipment else None
 
-    async def add_shipment(self, data: ShipmentIn, origin_cords: Tuple[float, float], destination_coords: Tuple[float, float]) -> Shipment | None:
+    async def add_shipment(self, data: ShipmentIn, origin, destination) -> Shipment | None:   #sender create shipment so default status is ready for pickup
         query = shipment_table.insert().values(
-            status="ready_for_pickup",
-            origin_latitude=origin_cords[0],
-            origin_longitude=origin_cords[1],
-            destination_latitude=destination_coords[0],
-            destination_longitude=destination_coords[1],
-            weight=data.weight,
+            status="ready_for_pickup",  
+            origin=origin,
+            destination=destination,
+            weight=data.weight
             )
         new_shipment_id = await database.execute(query)
-        new_shipment = await self.get_by_id(new_shipment_id)
+        new_shipment = await self.get_shipment_by_id(new_shipment_id)
         return new_shipment if new_shipment else None
