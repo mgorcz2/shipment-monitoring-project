@@ -11,8 +11,8 @@ from shipment_monitoring.core.domain.user import User, UserRole
 from shipment_monitoring.core.security import auth
 
 router = APIRouter(
-    prefix="/shipment",
-    tags=["shipment"],
+    prefix="/shipments",
+    tags=["shipments"],
 )
 
 @router.get("/all", response_model=Iterable[ShipmentDTO], status_code=status.HTTP_200_OK)
@@ -25,16 +25,31 @@ async def get_shipments(
     shipments = await service.get_all_shipments()
     return shipments
 
-@router.post("/sort_all", response_model=Iterable[ShipmentWithDistanceDTO],status_code=status.HTTP_200_OK)
+@router.post("/sort_by_origin", response_model=Iterable[ShipmentWithDistanceDTO],status_code=status.HTTP_200_OK)
 @auth.role_required(UserRole.COURIER)
 @inject
-async def sort_by_distance(
+async def sort_by_origin_distance(
         location: Location,
         current_user: User = Depends(auth.get_current_user),
         service: IShipmentService = Depends(Provide[Container.shipment_service]),
 ) -> Iterable:
     try:
-        shipments = await service.sort_by_distance(location)
+        shipments = await service.sort_by_distance(location, "origin")
+    except ValueError as error:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,detail=str(error))    
+    return shipments
+
+
+@router.post("/sort_by_destination", response_model=Iterable[ShipmentWithDistanceDTO],status_code=status.HTTP_200_OK)
+@auth.role_required(UserRole.COURIER)
+@inject
+async def sort_by_destination_distance(
+        location: Location,
+        current_user: User = Depends(auth.get_current_user),
+        service: IShipmentService = Depends(Provide[Container.shipment_service]),
+) -> Iterable:
+    try:
+        shipments = await service.sort_by_distance(location, "destination")
     except ValueError as error:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,detail=str(error))    
     return shipments

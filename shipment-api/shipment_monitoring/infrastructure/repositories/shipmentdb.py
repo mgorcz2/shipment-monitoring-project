@@ -17,8 +17,6 @@ class ShipmentRepository(IShipmentRepository):
         shipments = await database.fetch_all(query)
         return shipments
     
- 
-    
     async def get_shipment_by_id(self, shipment_id: Any) -> Any | None:
 
         query = (

@@ -17,23 +17,24 @@ class ShipmentService(IShipmentService):
         return [ShipmentDTO.from_record(shipment) for shipment in shipments]
 
     
-    async def sort_by_distance(self, courier_location: Location) -> Iterable[ShipmentWithDistanceDTO]:
+    async def sort_by_distance(self, courier_location: Location, keyword) -> Iterable[ShipmentWithDistanceDTO]:
         shipments = await self._repository.get_all_shipments()
         courier_address = await geopy.get_address_from_location(courier_location)
         courier_coords = await geopy.get_coords(courier_address)
+        shipmentsDTOs = [ShipmentWithDistanceDTO.from_record(shipment) for shipment in shipments]
         
-        shipments_dtos=[]
-        for shipment in shipments:
-            shipment_coords = await geopy.get_coords(shipment.origin)
-            distance = await geopy.get_distance(courier_coords,shipment_coords)
-            shipment_dto = ShipmentWithDistanceDTO.from_record(shipment)
-            shipment_dto.distance = distance
-            shipments_dtos.append(shipment_dto)
-            
-        sorted_shipments = sorted(shipments_dtos, key=lambda x: x.distance)
-        
+        for shipment in shipmentsDTOs:
+            origin_coords = await geopy.get_coords(shipment.origin)
+            destination_coords = await geopy.get_coords(shipment.destination)
+            shipment.origin_distance = await geopy.get_distance(courier_coords,origin_coords)
+            shipment.destination_distance = await geopy.get_distance(courier_coords, destination_coords)
+        if keyword is "origin":
+            sorted_shipments = sorted(shipmentsDTOs, key=lambda x: x.origin_distance)
+        else:
+            sorted_shipments = sorted(shipmentsDTOs, key=lambda x: x.destination_distance)
         return sorted_shipments
-            
+    
+    
     
     async def get_shipment_by_id(self, shipment_id: int) -> ShipmentDTO | None:
         shipment = await self._repository.get_shipment_by_id(shipment_id)
