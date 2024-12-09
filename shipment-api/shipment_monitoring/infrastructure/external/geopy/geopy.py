@@ -4,7 +4,7 @@ from geopy.distance import geodesic
 from shipment_monitoring.core.domain.location import Location
 
 
-geolocator = Nominatim(user_agent="shipment_app", timeout=200)
+geolocator = Nominatim(user_agent="shipment_app", timeout=20)
 async def get_address(location: str) -> str:
     address = geolocator.geocode(location)
     if not address:

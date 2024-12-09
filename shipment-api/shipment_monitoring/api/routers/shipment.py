@@ -21,7 +21,7 @@ router = APIRouter(
 async def get_shipments(
         current_user: User = Depends(auth.get_current_user),
         service: IShipmentService = Depends(Provide[Container.shipment_service]),
-) -> Iterable:
+) -> Iterable[ShipmentDTO]:
     shipments = await service.get_all_shipments()
     return shipments
 
@@ -32,7 +32,7 @@ async def sort_by_origin_distance(
         location: Location,
         current_user: User = Depends(auth.get_current_user),
         service: IShipmentService = Depends(Provide[Container.shipment_service]),
-) -> Iterable:
+) -> Iterable[ShipmentDTO]:
     try:
         shipments = await service.sort_by_distance(location, "origin")
     except ValueError as error:
