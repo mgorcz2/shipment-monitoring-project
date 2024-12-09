@@ -37,7 +37,8 @@ class ShipmentWithDistanceDTO(BaseModel):
     status: ShipmentStatus
     origin: str
     destination: str
-    distance: float 
+    origin_distance: float = -99999999
+    destination_distance: float = -99999999
     
     @classmethod
     def from_record(cls,record: Record) -> 'ShipmentWithDistanceDTO':
@@ -49,5 +50,4 @@ class ShipmentWithDistanceDTO(BaseModel):
             status=record_dict.pop('status'),
             origin=record_dict.pop('origin'),
             destination=record_dict.pop('destination'),
-            distance=0
         )
