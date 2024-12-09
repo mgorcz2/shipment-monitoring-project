@@ -11,7 +11,6 @@ class ShipmentDTO(BaseModel):
     origin : str
     destination: str
     
-    
     model_config = ConfigDict(
         from_attributes=True,
         extra="ignore",
@@ -31,23 +30,8 @@ class ShipmentDTO(BaseModel):
             destination=record_dict.pop('destination'),
         )
         
-class ShipmentWithDistanceDTO(BaseModel):
-    id: int
-    weight: float
-    status: ShipmentStatus
-    origin: str
-    destination: str
+class ShipmentWithDistanceDTO(ShipmentDTO):
+
     origin_distance: float = -99999999
     destination_distance: float = -99999999
     
-    @classmethod
-    def from_record(cls,record: Record) -> 'ShipmentWithDistanceDTO':
-        record_dict=dict(record)
-        
-        return cls(
-            id=record_dict.pop('id'),
-            weight=record_dict.pop('weight'),
-            status=record_dict.pop('status'),
-            origin=record_dict.pop('origin'),
-            destination=record_dict.pop('destination'),
-        )
