@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Iterable
 
 from shipment_monitoring.core.domain.shipment import ShipmentIn
+from shipment_monitoring.core.domain.location import Location
 
 class IShipmentRepository(ABC):
 
@@ -10,7 +11,7 @@ class IShipmentRepository(ABC):
         '''abstract '''
 
     @abstractmethod
-    async def get_by_id(self, shipment_id: Any) -> Any | None:
+    async def get_shipment_by_id(self, shipment_id: Any) -> Any | None:
         '''abstract '''
 
     @abstractmethod

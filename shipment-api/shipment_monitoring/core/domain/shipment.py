@@ -10,7 +10,6 @@ class ShipmentIn(BaseModel): #ShipmentIn zawiera tylko te dane, które sa wymaga
     #courier_id: UUID
     #sender_id: UUID
     #created_at: datetime
-    #status: ShipmentStatus = "ready_for_pickup"
     origin: Location
     destination: Location
 

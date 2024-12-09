@@ -10,6 +10,8 @@ class ShipmentDTO(BaseModel):
     status: ShipmentStatus
     origin : str
     destination: str
+    
+    
     model_config = ConfigDict(
         from_attributes=True,
         extra="ignore",
@@ -21,12 +23,31 @@ class ShipmentDTO(BaseModel):
     def from_record(cls,record: Record) -> 'ShipmentDTO':
         record_dict=dict(record)
         
-        origin = geopy.get_address(record_dict.pop('origin_latitude'), record_dict.pop('origin_longitude')) or "Unknown Address"
-        destination = geopy.get_address(record_dict.pop('destination_latitude'), record_dict.pop('destination_longitude')) or "Uknown Address"
         return cls(
             id=record_dict.pop('id'),
             weight=record_dict.pop('weight'),
             status=record_dict.pop('status'),
-            origin=origin,
-            destination=destination
+            origin=record_dict.pop('origin'),
+            destination=record_dict.pop('destination'),
+        )
+        
+class ShipmentWithDistanceDTO(BaseModel):
+    id: int
+    weight: float
+    status: ShipmentStatus
+    origin: str
+    destination: str
+    distance: float 
+    
+    @classmethod
+    def from_record(cls,record: Record) -> 'ShipmentWithDistanceDTO':
+        record_dict=dict(record)
+        
+        return cls(
+            id=record_dict.pop('id'),
+            weight=record_dict.pop('weight'),
+            status=record_dict.pop('status'),
+            origin=record_dict.pop('origin'),
+            destination=record_dict.pop('destination'),
+            distance=0
         )
