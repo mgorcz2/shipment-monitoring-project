@@ -9,7 +9,7 @@ from shipment_monitoring.db import (
     shipment_table, database
 )
 from shipment_monitoring.infrastructure.dto.shipmentDTO import ShipmentDTO, ShipmentWithDistanceDTO
-
+from uuid import UUID
 
 class ShipmentRepository(IShipmentRepository):
     async def get_all_shipments(self) -> Iterable[Any]:
@@ -26,8 +26,9 @@ class ShipmentRepository(IShipmentRepository):
         shipment = await database.fetch_one(query)
         return shipment if shipment else None
 
-    async def add_shipment(self, data: ShipmentIn, origin, destination) -> Shipment | None:   #sender create shipment so default status is ready for pickup
+    async def add_shipment(self, data: ShipmentIn, origin, destination, user_id: UUID) -> Shipment | None:   #sender create shipment so default status is ready for pickup
         query = shipment_table.insert().values(
+            sender_id=user_id,
             status="ready_for_pickup",  
             origin=origin,
             destination=destination,

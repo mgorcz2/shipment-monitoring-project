@@ -7,6 +7,7 @@ from dependency_injector.wiring import Provide, inject
 from shipment_monitoring.core.security import consts
 from shipment_monitoring.core.domain.user import User
 from functools import wraps
+from uuid import UUID
 from shipment_monitoring.core.shared.UserRoleEnum import UserRole
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  #ktory endpoint przekazuje tokeny
 
@@ -37,15 +38,10 @@ async def get_current_user(
         raise credentials_exception
     return user
 
-from functools import wraps
-from fastapi import Depends, HTTPException, status
-
 
 
 def role_required(required_role: str):
-    
     '''Decorator for verifying user roles before accessing an endpoint.'''
-    
     def decorator(func):
         @wraps(func)  #wraps some function
         async def wrapper(*args, current_user: User = Depends(get_current_user), **kwargs):
@@ -54,6 +50,6 @@ def role_required(required_role: str):
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="No permission to access this resource.",
                 )
-            return await func(*args, **kwargs)
+            return await func(*args,current_user=current_user,**kwargs)
         return wrapper
     return decorator

@@ -17,9 +17,14 @@ from shipment_monitoring.core.shared.ShipmentStatusEnum import ShipmentStatus
 metadata = sqlalchemy.MetaData()    
 
 shipment_table = sqlalchemy.Table(
-    'shipment_table',
+    'shipments',
     metadata,
     sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column(
+        'sender_id', 
+        sqlalchemy.ForeignKey("users.id"),
+        nullable=False
+        ),
     sqlalchemy.Column('status', Enum(ShipmentStatus, name="shipment_status")),
     sqlalchemy.Column('origin', sqlalchemy.String),
     sqlalchemy.Column('destination', sqlalchemy.String),
@@ -27,7 +32,7 @@ shipment_table = sqlalchemy.Table(
 )
 
 user_table = sqlalchemy.Table(
-    'user_table',
+    'users',
     metadata,
     sqlalchemy.Column(
         'id', 

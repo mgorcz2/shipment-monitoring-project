@@ -56,13 +56,16 @@ async def sort_by_destination_distance(
 
 
 @router.post("/add", response_model=ShipmentDTO, status_code=status.HTTP_201_CREATED)
+@auth.role_required(UserRole.SENDER)
 @inject
 async def add_shipment(
         new_shipment: ShipmentIn,
+        current_user: User = Depends(auth.get_current_user),
         service: IShipmentService = Depends(Provide[Container.shipment_service]),
 ) -> dict:
     try:
-        new_shipment = await service.add_shipment(new_shipment)
+        sender_id = current_user.id
+        new_shipment = await service.add_shipment(new_shipment,sender_id)
     except ValueError as error:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,detail=str(error))    
     return new_shipment.model_dump() if new_shipment else {}

@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Iterable
+from uuid import UUID
+
 
 from shipment_monitoring.core.domain.shipment import ShipmentIn
 from shipment_monitoring.core.domain.location import Location
@@ -15,5 +17,5 @@ class IShipmentRepository(ABC):
         '''abstract '''
 
     @abstractmethod
-    async def add_shipment(self, shipment: ShipmentIn) -> Any | None:
+    async def add_shipment(self, shipment: ShipmentIn, user_id: UUID) -> Any | None:
         '''abstract '''
