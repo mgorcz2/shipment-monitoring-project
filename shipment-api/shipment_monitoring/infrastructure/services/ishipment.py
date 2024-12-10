@@ -2,9 +2,10 @@ from abc import ABC, abstractmethod
 from typing import Iterable
 
 from shipment_monitoring.core.domain.shipment import ShipmentIn, Shipment
+from shipment_monitoring.core.domain.user import User
 from shipment_monitoring.core.domain.location import Location
 from shipment_monitoring.infrastructure.dto.shipmentDTO import ShipmentDTO, ShipmentWithDistanceDTO
-
+from uuid import UUID
 class IShipmentService(ABC):
     @abstractmethod
     async def get_shipment_by_id(self, shipment_id: int) -> Shipment | None:
@@ -15,7 +16,7 @@ class IShipmentService(ABC):
         pass
 
     @abstractmethod
-    async def add_shipment(self, shipment: ShipmentIn) -> ShipmentDTO | None:
+    async def add_shipment(self, shipment: ShipmentIn, user_id: UUID) -> ShipmentDTO | None:
         pass
     
     @abstractmethod

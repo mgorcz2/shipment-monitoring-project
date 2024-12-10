@@ -3,9 +3,12 @@ from asyncpg import Record  # type: ignore
 from pydantic import BaseModel, ConfigDict
 from shipment_monitoring.infrastructure.external.geopy import geopy
 from shipment_monitoring.core.shared.ShipmentStatusEnum import ShipmentStatus
+from uuid import UUID
+
 
 class ShipmentDTO(BaseModel):
     id: int
+    sender_id: UUID
     weight: float
     status: ShipmentStatus
     origin : str
@@ -24,6 +27,7 @@ class ShipmentDTO(BaseModel):
         
         return cls(
             id=record_dict.pop('id'),
+            sender_id=record_dict.pop('sender_id'),
             weight=record_dict.pop('weight'),
             status=record_dict.pop('status'),
             origin=record_dict.pop('origin'),

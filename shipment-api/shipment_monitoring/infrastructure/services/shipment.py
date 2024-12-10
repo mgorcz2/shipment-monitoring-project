@@ -2,10 +2,14 @@ from typing import Iterable, Any
 from shipment_monitoring.core.domain.shipment import Shipment
 from shipment_monitoring.core.repositories.ishipment import IShipmentRepository
 from shipment_monitoring.infrastructure.dto.shipmentDTO import ShipmentDTO, ShipmentWithDistanceDTO
+from shipment_monitoring.core.domain.user import User
 from shipment_monitoring.core.domain.shipment import ShipmentIn
 from shipment_monitoring.infrastructure.services.ishipment import IShipmentService
 from shipment_monitoring.infrastructure.external.geopy import geopy
 from shipment_monitoring.core.domain.location import Location
+from uuid import UUID
+
+
 class ShipmentService(IShipmentService):
     _repository: IShipmentRepository
 
@@ -40,9 +44,9 @@ class ShipmentService(IShipmentService):
         shipment = await self._repository.get_shipment_by_id(shipment_id)
         return ShipmentDTO.from_record(shipment)
 
-    async def add_shipment(self, data: ShipmentIn) -> ShipmentDTO | None:
+    async def add_shipment(self, data: ShipmentIn, user_id: UUID) -> ShipmentDTO | None:
         origin= await geopy.get_address_from_location(data.origin)
         destination = await geopy.get_address_from_location(data.destination)
-        new_shipment = await self._repository.add_shipment(data, origin, destination)
+        new_shipment = await self._repository.add_shipment(data, origin, destination, user_id)
         return ShipmentDTO.from_record(dict(new_shipment))
         
