@@ -11,7 +11,9 @@ A web-based application for tracking and managing courier shipments. This servic
 ## Technology stack
 - Python 3.12.7
 - PostgreSQL 17.0
+- FastApi
 - Docker
+<img src="https://skillicons.dev/icons?i=python,postgres,fastapi,docker"/>
 
 ## Useful Commands
 - Installing production dependencies: pip install -r requirements.txt
