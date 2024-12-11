@@ -1,10 +1,12 @@
+"""A module containing DTO models for output users."""
 import string
 from asyncpg import Record 
 from pydantic import BaseModel, ConfigDict
 from uuid import UUID
-from shipment_monitoring.core.shared.UserRoleEnum import UserRole
+from shipment_monitoring.core.domain.user import UserRole
 
 class UserDTO(BaseModel):
+    """A model representing DTO for user data."""
     id: UUID
     username: string
     role: UserRole

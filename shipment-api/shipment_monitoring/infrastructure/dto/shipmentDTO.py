@@ -1,12 +1,12 @@
-
+"""A module containing DTO models for output shipments."""
 from asyncpg import Record  # type: ignore
 from pydantic import BaseModel, ConfigDict
-from shipment_monitoring.infrastructure.external.geopy import geopy
-from shipment_monitoring.core.shared.ShipmentStatusEnum import ShipmentStatus
+from shipment_monitoring.core.domain.shipment import ShipmentStatus
 from uuid import UUID
 
 
 class ShipmentDTO(BaseModel):
+    """A model representing DTO for shipment data."""
     id: int
     sender_id: UUID
     weight: float
@@ -32,17 +32,20 @@ class ShipmentDTO(BaseModel):
             status=record_dict.pop('status'),
             origin=record_dict.pop('origin'),
             destination=record_dict.pop('destination'),
-            origin_latitude=record_dict.pop('origin_latitude'),
-            origin_longitude = record_dict.pop('origin_longitude'),
-            destination_latitude = record_dict.pop('destination_latitude'),
-            destination_longitude = record_dict.pop('destination_longitude')
+            origin_coords=(
+                            record_dict.pop('origin_latitude'),
+                            record_dict.pop('origin_longitude')
+                          ),
+            destination_coords = (
+                                    record_dict.pop('destination_latitude'),
+                                    record_dict.pop('destination_longitude')
+                                 )
         )
         
 class ShipmentWithDistanceDTO(ShipmentDTO):
-    origin_latitude: float
-    origin_longitude: float
-    destination_latitude: float
-    destination_longitude: float
+    """A model representing DTO for shipment with distance data."""
+    origin_coords: tuple
+    destination_coords: tuple
     origin_distance: float = -99999999
     destination_distance: float = -99999999
     
