@@ -66,7 +66,7 @@ async def sort_by_destination_distance(
         location: Location,
         current_user: User = Depends(auth.get_current_user),
         service: IShipmentService = Depends(Provide[Container.shipment_service]),
-) -> Iterable:
+) -> Iterable[ShipmentWithDistanceDTO]:
     """An endpoint for sorting shipments by destination distance from courier.
 
     Args:
@@ -75,7 +75,7 @@ async def sort_by_destination_distance(
         service (IShipmentService): The injected service dependency.
 
     Returns:
-        Iterable[ShipmentDTO]: Shipments with distance sorted collection.
+        Iterable[ShipmentWithDistanceDTO]: Shipments with distance attribute sorted collection.
     """
     try:
         shipments = await service.sort_by_distance(location, "destination")
@@ -91,21 +91,21 @@ async def add_shipment(
         new_shipment: ShipmentIn,
         current_user: User = Depends(auth.get_current_user),
         service: IShipmentService = Depends(Provide[Container.shipment_service]),
-) -> dict:
+) -> ShipmentDTO:
     """An endpoint for adding a shipment.
 
     Args:
-        new_shipment (ShipmentIn): _description_
+        new_shipment (ShipmentIn): The shipment input data.
         current_user (User): The currently injected authenticated user.
         service (IShipmentService): The injected service dependency.
 
     Returns:
-        dict: _description_
+        ShipmentDTO: The shipment DTO details.
     """
     try:
         sender_id = current_user.id
         new_shipment = await service.add_shipment(new_shipment,sender_id)
     except ValueError as error:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,detail=str(error))    
-    return new_shipment.model_dump() if new_shipment else {}
+    return new_shipment
 

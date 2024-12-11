@@ -1,23 +1,40 @@
-from typing import Any, Iterable, Tuple
+"""Module containing shipment repository implementation."""
 
-from asyncpg import Record  # type: ignore
+from typing import Any, Iterable, Tuple
+from uuid import UUID
+
 from sqlalchemy import select, join
 
 from shipment_monitoring.core.repositories.ishipment import IShipmentRepository
 from shipment_monitoring.core.domain.shipment import Shipment, ShipmentIn
 from shipment_monitoring.db import (
-    shipment_table, database
+    shipment_table, 
+    database
 )
-from shipment_monitoring.infrastructure.dto.shipmentDTO import ShipmentDTO, ShipmentWithDistanceDTO
-from uuid import UUID
+
 
 class ShipmentRepository(IShipmentRepository):
+    """A class representing shipment DB repository."""
+    
     async def get_all_shipments(self) -> Iterable[Any]:
+        """The method getting all shipments from the data storage.
+
+        Returns:
+            Iterable[Any]: Shipments in the data storage.
+        """
         query = select(shipment_table)
         shipments = await database.fetch_all(query)
         return shipments
     
-    async def get_shipment_by_id(self, shipment_id: Any) -> Any | None:
+    async def get_shipment_by_id(self, shipment_id: int) -> Any | None:
+        """The method getting shipment by provided id.
+
+        Args:
+            shipment_id (int): The id of the shipment.
+
+        Returns:
+            Any | None: The shipment details if exists.
+        """
 
         query = (
             select(shipment_table)
@@ -26,7 +43,20 @@ class ShipmentRepository(IShipmentRepository):
         shipment = await database.fetch_one(query)
         return shipment if shipment else None
 
-    async def add_shipment(self, data: ShipmentIn, origin: str, destination: str, origin_coords: Tuple, destination_coords: Tuple, user_id: UUID) -> Shipment | None:   #sender create shipment so default status is ready for pickup
+    async def add_shipment(self, data: ShipmentIn, origin: str, destination: str, origin_coords: Tuple, destination_coords: Tuple, user_id: UUID) -> Shipment | None:
+        """The method adding new shipment to the data storage.
+
+        Args:
+            data (ShipmentIn): The shipment input data.
+            origin (str): The origin address of the shipment.
+            destination (str): The destination address of the shipment.
+            origin (Tuple): The origin coords of the shipment.
+            destination (Tuple): The destination coords of the shipment.
+            user_id (UUID): UUID of the user(sender)
+
+        Returns:
+            Shipment | None: The shipment object if created.
+        """
         query = shipment_table.insert().values(
             sender_id=user_id,
             status="ready_for_pickup",

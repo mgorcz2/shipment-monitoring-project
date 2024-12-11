@@ -1,3 +1,5 @@
+"""Module containing authentication and authorization methods."""
+
 from shipment_monitoring.container import Container
 from jose import jwt, JWTError
 from fastapi.security import OAuth2PasswordBearer
@@ -5,19 +7,27 @@ from fastapi import Depends, HTTPException, status
 from shipment_monitoring.infrastructure.services.iuser import IUserService
 from dependency_injector.wiring import Provide, inject
 from shipment_monitoring.core.security import consts
-from shipment_monitoring.core.domain.user import User
+from shipment_monitoring.core.domain.user import User, UserRole
 from functools import wraps
-from uuid import UUID
-from shipment_monitoring.core.shared.UserRoleEnum import UserRole
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  #ktory endpoint przekazuje tokeny
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 @inject
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
     service: IUserService = Depends(Provide[Container.user_service])
-    ):
-    '''Validates the JWT token and retrieves the authenticated user.'''
+    ) -> User:
+    """The method authenticating the user based on a JWT token.
     
+    Args:
+        token (str): JWT bearer token provided by the oauth2_scheme dependency.
+        service (IUserService):The injected service dependency.
+
+    Raises:
+        HTTPException: With status code 401 (Unauthorized)
+
+    Returns:
+        User: The user object if authenticated.
+    """
     
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -41,7 +51,11 @@ async def get_current_user(
 
 
 def role_required(required_role: str):
-    '''Decorator for verifying user roles before accessing an endpoint.'''
+    """ A decorator that enforces role-based access control for endpoint methods.
+
+    Args:
+        required_role (str): The role required to access the decorated endpoint.
+    """
     def decorator(func):
         @wraps(func)  #wraps some function
         async def wrapper(*args, current_user: User = Depends(get_current_user), **kwargs):

@@ -11,8 +11,8 @@ from sqlalchemy.dialects.postgresql import UUID
 from shipment_monitoring.config import config
 import enum
 from sqlalchemy import Enum
-from shipment_monitoring.core.shared.UserRoleEnum import UserRole
-from shipment_monitoring.core.shared.ShipmentStatusEnum import ShipmentStatus
+from shipment_monitoring.core.domain.user import UserRole
+from shipment_monitoring.core.domain.shipment import ShipmentStatus
 
 metadata = sqlalchemy.MetaData()    
 

@@ -18,22 +18,19 @@ router = APIRouter(
 async def register_user(
         new_user: UserIn,
         service: IUserService = Depends(Provide[Container.user_service]),
-) -> dict:
+) -> UserDTO:
     """An endpoint for registering new user.
 
     Args:
         new_user (UserIn): The user input data.
         service (IUserService): The injected user service.
 
-    Raises:
-        HTTPException: _description_
-
     Returns:
-        dict: The user DTO details.
+        UserDTO: The user DTO details.
     """
     try:
         user = await service.register_user(new_user)
-        return user.model_dump()
+        return user
     except ValueError as error:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
      
@@ -42,18 +39,15 @@ async def register_user(
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     service: IUserService = Depends(Provide[Container.user_service])
-):
+) -> TokenDTO:
     """An endpoint for authenticating users(creating token)
 
     Args:
         form_data (OAuth2PasswordRequestForm, optional): The user input data from request form.
         service (IUserService): The injected user service.
 
-    Raises:
-        HTTPException: _description_
-
     Returns:
-        _type_: _description_
+        TokenDTO: The token DTO details.
     """
     try:
         token = await service.login_for_access_token(form_data.username, form_data.password)
