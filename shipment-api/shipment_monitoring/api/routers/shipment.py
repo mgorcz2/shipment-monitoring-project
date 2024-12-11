@@ -22,6 +22,15 @@ async def get_shipments(
         current_user: User = Depends(auth.get_current_user),
         service: IShipmentService = Depends(Provide[Container.shipment_service]),
 ) -> Iterable[ShipmentDTO]:
+    """An endpoint for getting all shipments.
+
+    Args:
+        current_user (User): The currently injected authenticated user.
+        service (IShipmentService): The injected service dependency.
+
+    Returns:
+        Iterable[ShipmentDTO]: Shipments collection.
+    """
     shipments = await service.get_all_shipments()
     return shipments
 
@@ -32,7 +41,17 @@ async def sort_by_origin_distance(
         location: Location,
         current_user: User = Depends(auth.get_current_user),
         service: IShipmentService = Depends(Provide[Container.shipment_service]),
-) -> Iterable[ShipmentDTO]:
+) -> Iterable[ShipmentWithDistanceDTO]:
+    """An endpoint for sorting shipments by origin distance from courier.
+
+    Args:
+        location (Location): Location of courier
+        current_user (User): The currently injected authenticated user.
+        service (IShipmentService): The injected service dependency.
+
+    Returns:
+        Iterable[ShipmentDTO]: Shipments with distance sorted collection.
+    """
     try:
         shipments = await service.sort_by_distance(location, "origin")
     except ValueError as error:
@@ -48,6 +67,16 @@ async def sort_by_destination_distance(
         current_user: User = Depends(auth.get_current_user),
         service: IShipmentService = Depends(Provide[Container.shipment_service]),
 ) -> Iterable:
+    """An endpoint for sorting shipments by destination distance from courier.
+
+    Args:
+        location (Location): Location of courier
+        current_user (User): The currently injected authenticated user.
+        service (IShipmentService): The injected service dependency.
+
+    Returns:
+        Iterable[ShipmentDTO]: Shipments with distance sorted collection.
+    """
     try:
         shipments = await service.sort_by_distance(location, "destination")
     except ValueError as error:
@@ -63,6 +92,16 @@ async def add_shipment(
         current_user: User = Depends(auth.get_current_user),
         service: IShipmentService = Depends(Provide[Container.shipment_service]),
 ) -> dict:
+    """An endpoint for adding a shipment.
+
+    Args:
+        new_shipment (ShipmentIn): _description_
+        current_user (User): The currently injected authenticated user.
+        service (IShipmentService): The injected service dependency.
+
+    Returns:
+        dict: _description_
+    """
     try:
         sender_id = current_user.id
         new_shipment = await service.add_shipment(new_shipment,sender_id)
