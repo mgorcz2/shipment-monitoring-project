@@ -26,13 +26,17 @@ class ShipmentRepository(IShipmentRepository):
         shipment = await database.fetch_one(query)
         return shipment if shipment else None
 
-    async def add_shipment(self, data: ShipmentIn, origin, destination, user_id: UUID) -> Shipment | None:   #sender create shipment so default status is ready for pickup
+    async def add_shipment(self, data: ShipmentIn, origin: str, destination: str, origin_coords: Tuple, destination_coords: Tuple, user_id: UUID) -> Shipment | None:   #sender create shipment so default status is ready for pickup
         query = shipment_table.insert().values(
             sender_id=user_id,
-            status="ready_for_pickup",  
+            status="ready_for_pickup",
+            weight = data.weight,
             origin=origin,
             destination=destination,
-            weight=data.weight
+            origin_latitude = origin_coords[0],
+            origin_longitude = origin_coords[1],
+            destination_latitude = destination_coords[0],
+            destination_longitude = destination_coords[1]
             )
         new_shipment_id = await database.execute(query)
         new_shipment = await self.get_shipment_by_id(new_shipment_id)

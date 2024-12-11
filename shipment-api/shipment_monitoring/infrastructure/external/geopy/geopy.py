@@ -3,8 +3,10 @@ from typing import Tuple, Optional
 from geopy.distance import geodesic
 from shipment_monitoring.core.domain.location import Location
 
+from haversine import haversine
 
-geolocator = Nominatim(user_agent="shipment_app", timeout=1200)
+
+geolocator = Nominatim(user_agent="shipment_app", timeout=1)
 async def get_address(location: str) -> str:
     address = geolocator.geocode(location)
     if not address:
@@ -20,4 +22,4 @@ async def get_coords(address: str) -> tuple[float,float]:
     return (location.latitude, location.longitude) or None
 
 async def get_distance(courier_coords: tuple[float, float],shipment_coords: tuple[float,float]):
-    return geodesic(courier_coords, shipment_coords).kilometers
+    return haversine(courier_coords, shipment_coords)
