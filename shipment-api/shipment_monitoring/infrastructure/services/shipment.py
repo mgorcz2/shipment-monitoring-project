@@ -28,8 +28,8 @@ class ShipmentService(IShipmentService):
         shipmentsDTOs = [ShipmentWithDistanceDTO.from_record(shipment) for shipment in shipments]
         
         for shipment in shipmentsDTOs:
-            origin_coords = await geopy.get_coords(shipment.origin)
-            destination_coords = await geopy.get_coords(shipment.destination)
+            origin_coords = (shipment.origin_latitude, shipment.origin_longitude)
+            destination_coords = (shipment.destination_latitude, shipment.destination_longitude)
             shipment.origin_distance = await geopy.get_distance(courier_coords,origin_coords)
             shipment.destination_distance = await geopy.get_distance(courier_coords, destination_coords)
         if keyword is "origin":
@@ -47,6 +47,8 @@ class ShipmentService(IShipmentService):
     async def add_shipment(self, data: ShipmentIn, user_id: UUID) -> ShipmentDTO | None:
         origin= await geopy.get_address_from_location(data.origin)
         destination = await geopy.get_address_from_location(data.destination)
-        new_shipment = await self._repository.add_shipment(data, origin, destination, user_id)
+        origin_coords = await geopy.get_coords(origin)
+        destination_coords = await geopy.get_coords(destination)
+        new_shipment = await self._repository.add_shipment(data, origin, destination, origin_coords, destination_coords, user_id)
         return ShipmentDTO.from_record(dict(new_shipment))
         
