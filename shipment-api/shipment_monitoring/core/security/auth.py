@@ -9,7 +9,7 @@ from dependency_injector.wiring import Provide, inject
 from shipment_monitoring.core.security import consts
 from shipment_monitoring.core.domain.user import User, UserRole
 from functools import wraps
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")
 
 @inject
 async def get_current_user(

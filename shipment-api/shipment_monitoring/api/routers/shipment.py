@@ -34,7 +34,7 @@ async def get_shipments(
     shipments = await service.get_all_shipments()
     return shipments
 
-@router.post("/sort_by_origin", response_model=Iterable[ShipmentWithDistanceDTO],status_code=status.HTTP_200_OK)
+@router.post("/sort_by/origin", response_model=Iterable[ShipmentWithDistanceDTO],status_code=status.HTTP_200_OK)
 @auth.role_required(UserRole.COURIER)
 @inject
 async def sort_by_origin_distance(
@@ -59,7 +59,7 @@ async def sort_by_origin_distance(
     return shipments
 
 
-@router.post("/sort_by_destination", response_model=Iterable[ShipmentWithDistanceDTO],status_code=status.HTTP_200_OK)
+@router.post("/sort_by/destination", response_model=Iterable[ShipmentWithDistanceDTO],status_code=status.HTTP_200_OK)
 @auth.role_required(UserRole.COURIER)
 @inject
 async def sort_by_destination_distance(

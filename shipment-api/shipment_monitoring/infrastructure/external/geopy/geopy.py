@@ -1,4 +1,7 @@
-"""A module containing geolocation methods."""
+"""A module containing geolocation methods.
+For better performance and faster application functionality, a local instance of OpenStreetMap should be used.
+Enought for testing purposes.
+"""
 
 from geopy.geocoders import Nominatim
 from typing import Tuple, Optional
