@@ -16,6 +16,27 @@ from shipment_monitoring.db import (
 class ShipmentRepository(IShipmentRepository):
     """A class representing shipment DB repository."""
     
+    async def check_status(self, shipment_id: int, recipient_email: str) -> Any | None:
+        """The method getting shipment by provided id and Recipient email from the data storage.
+
+        Args:
+            shipment_id (int): The id of the shipment.
+            recipient_email (int): The recipient_email of the shipment.
+
+        Returns:
+            Any | None: The shipment details if exists.
+        """
+        query = (
+                select(shipment_table)
+                .where (
+                    (shipment_table.c.id == shipment_id) &
+                    (shipment_table.c.recipient_email == recipient_email)
+                )
+        )
+        shipment = await database.fetch_one(query)
+        return shipment
+
+    
     async def get_all_shipments(self) -> Iterable[Any]:
         """The method getting all shipments from the data storage.
 
@@ -37,8 +58,8 @@ class ShipmentRepository(IShipmentRepository):
         """
 
         query = (
-            select(shipment_table)
-            .where (shipment_table.c.id == shipment_id)
+                select(shipment_table)
+                .where (shipment_table.c.id == shipment_id)
         )
         shipment = await database.fetch_one(query)
         return shipment if shipment else None
@@ -61,6 +82,7 @@ class ShipmentRepository(IShipmentRepository):
             sender_id=user_id,
             status="ready_for_pickup",
             weight = data.weight,
+            recipient_email = None if "" else data.recipient_email,
             origin=origin,
             destination=destination,
             origin_latitude = origin_coords[0],

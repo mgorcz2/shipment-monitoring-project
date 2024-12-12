@@ -27,6 +27,7 @@ shipment_table = sqlalchemy.Table(
         ),
     sqlalchemy.Column('status', Enum(ShipmentStatus, name="shipment_status")),
     sqlalchemy.Column('weight',sqlalchemy.Float),
+    sqlalchemy.Column('recipient_email', sqlalchemy.String, nullable=True),
     sqlalchemy.Column('origin', sqlalchemy.String),
     sqlalchemy.Column('destination', sqlalchemy.String),
     sqlalchemy.Column('origin_latitude', sqlalchemy.Float),

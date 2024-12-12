@@ -10,6 +10,19 @@ from shipment_monitoring.core.domain.location import Location
 
 class IShipmentRepository(ABC):
     """An abstract class representing protocol of shipment repository."""
+    
+    @abstractmethod
+    async def check_status(self, shipment_id: int, recipient_email: str) -> Any | None:
+        """The abstract getting shipment by provided id and Recipient email.
+
+        Args:
+            shipment_id (int): The id of the shipment.
+            recipient_email (int): The recipient_email of the shipment.
+
+        Returns:
+            Any | None: The shipment details if exists.
+        """
+    
     @abstractmethod
     async def get_all_shipments(self) -> Iterable[Any]:
         """The abstract getting all shipments from data storage.

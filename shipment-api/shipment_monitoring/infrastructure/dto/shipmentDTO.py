@@ -3,6 +3,7 @@ from asyncpg import Record  # type: ignore
 from pydantic import BaseModel, ConfigDict
 from shipment_monitoring.core.domain.shipment import ShipmentStatus
 from uuid import UUID
+from typing import Optional
 
 
 class ShipmentDTO(BaseModel):
@@ -10,6 +11,8 @@ class ShipmentDTO(BaseModel):
     id: int
     sender_id: UUID
     weight: float
+    recipient_email: Optional[str]
+    
     status: ShipmentStatus
     origin : str
     destination: str
@@ -29,6 +32,7 @@ class ShipmentDTO(BaseModel):
             id=record_dict.pop('id'),
             sender_id=record_dict.pop('sender_id'),
             weight=record_dict.pop('weight'),
+            recipient_email=record_dict.pop('recipient_email'),
             status=record_dict.pop('status'),
             origin=record_dict.pop('origin'),
             destination=record_dict.pop('destination'),
