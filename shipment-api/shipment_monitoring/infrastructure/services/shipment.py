@@ -7,7 +7,7 @@ from shipment_monitoring.infrastructure.dto.shipmentDTO import ShipmentDTO, Ship
 from shipment_monitoring.core.domain.user import User
 from shipment_monitoring.core.domain.shipment import ShipmentIn
 from shipment_monitoring.infrastructure.services.ishipment import IShipmentService
-from shipment_monitoring.infrastructure.external.geopy import geopy
+from shipment_monitoring.infrastructure.external.geolocation import geopy
 from shipment_monitoring.core.domain.location import Location
 from uuid import UUID
 
@@ -19,6 +19,19 @@ class ShipmentService(IShipmentService):
     def __init__(self, repository: IShipmentRepository) -> None:
         self._repository = repository
 
+    async def check_status(self, shipment_id: int, recipient_email: str) -> ShipmentDTO | None:
+        """The method getting shipment by provided id and Recipient email from the repository.
+
+        Args:
+            shipment_id (int): The id of the shipment.
+            recipient_email (str): The email of the Recipient.
+
+        Returns:
+            ShipmentDTO | None: The shipment DTO details if exists.
+        """
+        shipment = await self._repository.check_status(shipment_id, recipient_email)
+        return ShipmentDTO.from_record(shipment) if shipment else None
+    
 
     async def get_shipment_by_id(self, shipment_id: int) -> ShipmentDTO | None:
         """The method getting shipment by provided id.
@@ -30,7 +43,7 @@ class ShipmentService(IShipmentService):
             ShipmentDTO | None: The shipment DTO details if exists.
         """
         shipment = await self._repository.get_shipment_by_id(shipment_id)
-        return ShipmentDTO.from_record(shipment)
+        return ShipmentDTO.from_record(shipment) if shipment else None
     
     async def get_all_shipments(self) -> Iterable[ShipmentDTO]:
         """The method getting all shipment from the repository.

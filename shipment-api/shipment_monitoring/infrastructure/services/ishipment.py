@@ -12,6 +12,19 @@ class IShipmentService(ABC):
     """An abstract class representing protocol of shipment service."""
     
     @abstractmethod
+    async def check_status(self, shipment_id: int, recipient_email: str) -> ShipmentDTO | None:
+        """The abstract getting shipment by provided id and Recipient email.
+
+        Args:
+            shipment_id (int): The id of the shipment.
+            recipient_email (str): The email of the Recipient.
+
+        Returns:
+            ShipmentDTO | None: The shipment DTO details if exists.
+        """
+    
+    
+    @abstractmethod
     async def get_shipment_by_id(self, shipment_id: int) -> ShipmentDTO | None:
         """The abstract getting shipment by provided id.
 

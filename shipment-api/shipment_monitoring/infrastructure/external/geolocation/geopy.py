@@ -4,8 +4,6 @@ Enought for testing purposes.
 """
 
 from geopy.geocoders import Nominatim
-from typing import Tuple, Optional
-from geopy.distance import geodesic
 from shipment_monitoring.core.domain.location import Location
 from haversine import haversine
 

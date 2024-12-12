@@ -1,6 +1,6 @@
 """A model containing shipment-related models."""
 
-
+from typing import Optional
 from datetime import datetime
 import enum
 from uuid import UUID
@@ -24,8 +24,8 @@ class ShipmentIn(BaseModel):
     #courier_id: UUID
     origin: Location
     destination: Location
-
     weight: float
+    recipient_email: Optional[str] = ""
 
 class Shipment(ShipmentIn):
     """The shipment model class"""
