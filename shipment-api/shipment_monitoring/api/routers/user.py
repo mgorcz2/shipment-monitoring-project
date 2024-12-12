@@ -10,10 +10,11 @@ from shipment_monitoring.infrastructure.services.iuser import IUserService
 
 
 router = APIRouter(
-    tags=["user"],
+    prefix="/users",
+    tags=["users"],
 )
 
-@router.post("/register/", response_model=UserDTO, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=UserDTO, status_code=status.HTTP_201_CREATED)
 @inject
 async def register_user(
         new_user: UserIn,
