@@ -10,6 +10,7 @@ class ShipmentDTO(BaseModel):
     """A model representing DTO for shipment data."""
     id: int
     sender_id: UUID
+    courier_id: Optional[UUID]
     weight: float
     recipient_email: Optional[str]
     
@@ -28,11 +29,14 @@ class ShipmentDTO(BaseModel):
     def from_record(cls,record: Record) -> 'ShipmentDTO':
         record_dict=dict(record)
         
+        courier_id = record_dict.pop('courier_id', None)
+        recipient_email = record_dict.pop('recipient_email', None)
         return cls(
             id=record_dict.pop('id'),
             sender_id=record_dict.pop('sender_id'),
+            courier_id=courier_id,
             weight=record_dict.pop('weight'),
-            recipient_email=record_dict.pop('recipient_email'),
+            recipient_email=recipient_email,
             status=record_dict.pop('status'),
             origin=record_dict.pop('origin'),
             destination=record_dict.pop('destination'),

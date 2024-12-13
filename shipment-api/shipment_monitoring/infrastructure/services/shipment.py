@@ -1,11 +1,9 @@
 """Module containing shipment service implementation."""
 
 from typing import Iterable, Any
-from shipment_monitoring.core.domain.shipment import Shipment
+from shipment_monitoring.core.domain.shipment import ShipmentStatus, ShipmentIn
 from shipment_monitoring.core.repositories.ishipment import IShipmentRepository
 from shipment_monitoring.infrastructure.dto.shipmentDTO import ShipmentDTO, ShipmentWithDistanceDTO
-from shipment_monitoring.core.domain.user import User
-from shipment_monitoring.core.domain.shipment import ShipmentIn
 from shipment_monitoring.infrastructure.services.ishipment import IShipmentService
 from shipment_monitoring.infrastructure.external.geolocation import geopy
 from shipment_monitoring.core.domain.location import Location
@@ -18,6 +16,35 @@ class ShipmentService(IShipmentService):
 
     def __init__(self, repository: IShipmentRepository) -> None:
         self._repository = repository
+        
+        
+    async def assign_shipment_to_courier(self, shipment_id: int, courier_id: UUID) -> ShipmentDTO| None:
+        """The method assigning shipment to courier in the repository.
+
+        Args:
+            courier_id (int): The id of the courier.
+            shipment_id (int): The id of the shipment.
+
+        Returns:
+            ShipmentDTO | None: The shipment DTO details if updated.
+        """                     
+        shipment = await self._repository.assign_shipment_to_courier(shipment_id, courier_id)
+        return ShipmentDTO.from_record(shipment) if shipment else None
+    
+    async def update_status(self, courier_id: UUID, shipment_id: int, new_status: ShipmentStatus) -> ShipmentDTO | None:
+        """The method changing shipment status by provided id in the repository.
+        
+        Args:
+            courier_id (int): The id of the courier.
+            shipment_id (int): The id of the shipment.
+            new_status (ShipmentStatus): The new status.
+
+        Returns:
+            ShipmentDTO | None: The shipment DTO details if updated.
+        """
+        shipment = await self._repository.update_status(courier_id, shipment_id, new_status)
+        return ShipmentDTO.from_record(shipment) if shipment else None
+        
 
     async def check_status(self, shipment_id: int, recipient_email: str) -> ShipmentDTO | None:
         """The method getting shipment by provided id and Recipient email from the repository.
@@ -55,7 +82,7 @@ class ShipmentService(IShipmentService):
         return [ShipmentDTO.from_record(shipment) for shipment in shipments]
 
     
-    async def sort_by_distance(self, courier_location: Location, keyword) -> Iterable[ShipmentWithDistanceDTO]:
+    async def sort_by_distance(self, courier_id: UUID, courier_location: Location, keyword) -> Iterable[ShipmentWithDistanceDTO]:
         """The method sorting shipments by destination distance from courier.
 
         Args:
@@ -69,7 +96,7 @@ class ShipmentService(IShipmentService):
         shipments = await self._repository.get_all_shipments()
         courier_address = await geopy.get_address_from_location(courier_location)
         courier_coords = await geopy.get_coords(courier_address)
-        shipmentsDTOs = [ShipmentWithDistanceDTO.from_record(shipment) for shipment in shipments]
+        shipmentsDTOs = [ShipmentWithDistanceDTO.from_record(shipment) for shipment in shipments if shipment.courier_id == courier_id]
         
         for shipment in shipmentsDTOs:
             origin_coords = shipment.origin_coords
