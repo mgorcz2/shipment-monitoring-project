@@ -25,6 +25,11 @@ shipment_table = sqlalchemy.Table(
         sqlalchemy.ForeignKey("users.id"),
         nullable=False
         ),
+    sqlalchemy.Column(
+        'courier_id', 
+        sqlalchemy.ForeignKey("users.id"),
+        nullable=True
+        ),
     sqlalchemy.Column('status', Enum(ShipmentStatus, name="shipment_status")),
     sqlalchemy.Column('weight',sqlalchemy.Float),
     sqlalchemy.Column('recipient_email', sqlalchemy.String, nullable=True),

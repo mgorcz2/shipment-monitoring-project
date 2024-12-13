@@ -5,11 +5,36 @@ from typing import Any, Iterable, Tuple
 from uuid import UUID
 
 
-from shipment_monitoring.core.domain.shipment import ShipmentIn
+from shipment_monitoring.core.domain.shipment import ShipmentIn, ShipmentStatus
 from shipment_monitoring.core.domain.location import Location
 
 class IShipmentRepository(ABC):
     """An abstract class representing protocol of shipment repository."""
+    
+    @abstractmethod
+    async def assign_shipment_to_courier(self, shipment_id: int, courier_id: UUID) -> Any | None:
+        """The abstract assigning shipment to courier.
+
+        Args:
+            courier_id (int): The id of the courier.
+            shipment_id (int): The id of the shipment.
+
+        Returns:
+            Any | None: The shipment details if updated.
+        """    
+    @abstractmethod
+    async def update_status(self, courier_id: UUID, shipment_id: int, new_status: ShipmentStatus) -> Any | None:
+        """The abstract changing shipment status by provided id and courier id.
+
+        Args:
+            courier_id (int): The id of the courier.
+            shipment_id (int): The id of the shipment.
+            new_status (ShipmentStatus): The new status.
+
+        Returns:
+            Any | None: The shipment details if updated.
+        """
+    
     
     @abstractmethod
     async def check_status(self, shipment_id: int, recipient_email: str) -> Any | None:

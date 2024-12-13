@@ -21,7 +21,6 @@ class ShipmentStatus(str, enum.Enum):
 
 class ShipmentIn(BaseModel):
     """An input shipment model"""
-    #courier_id: UUID
     origin: Location
     destination: Location
     weight: float
@@ -31,6 +30,7 @@ class Shipment(ShipmentIn):
     """The shipment model class"""
     id: int
     sender_id: UUID
+    courier_id: Optional[UUID] = None
     status: ShipmentStatus
     created_at: datetime
     model_config = ConfigDict(from_attributes=True, extra='ignore')
