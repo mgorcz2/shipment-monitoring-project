@@ -26,7 +26,8 @@ class ShipmentRepository(IShipmentRepository):
 
         Returns:
             Any | None: The shipment details if updated.
-        """    
+        """
+        
         query = (
                 update(shipment_table)
                 .where (shipment_table.c.id==shipment_id)
@@ -106,7 +107,13 @@ class ShipmentRepository(IShipmentRepository):
         shipment = await database.fetch_one(query)
         return shipment if shipment else None
 
-    async def add_shipment(self, data: ShipmentIn, origin: str, destination: str, origin_coords: Tuple, destination_coords: Tuple, user_id: UUID) -> Shipment | None:
+    async def add_shipment(self, 
+                           data: ShipmentIn, 
+                           origin: str, 
+                           destination: str, 
+                           origin_coords: Tuple, 
+                           destination_coords: Tuple, 
+                           user_id: UUID) -> Any | None:
         """The method adding new shipment to the data storage.
 
         Args:
@@ -118,7 +125,7 @@ class ShipmentRepository(IShipmentRepository):
             user_id (UUID): UUID of the user(sender)
 
         Returns:
-            Shipment | None: The shipment object if created.
+            Any | None: The shipment object if created.
         """
         query = shipment_table.insert().values(
             sender_id=user_id,
@@ -135,3 +142,49 @@ class ShipmentRepository(IShipmentRepository):
         new_shipment_id = await database.execute(query)
         new_shipment = await self.get_shipment_by_id(new_shipment_id)
         return new_shipment if new_shipment else None
+#
+    async def update_shipment(self,
+                              shipment_id: int,
+                              old_shipment: Shipment,
+                              data: ShipmentIn, 
+                              origin: str, 
+                              destination: str, 
+                              origin_coords: Tuple, 
+                              destination_coords: Tuple
+                              ) -> Any | None:
+        """The method updating shipment data in the data storage.
+
+        Args:
+            shipment_id (int): The id of the shipment.
+            old_shipment: The old shipment object.
+            data (ShipmentIn): The updated shipment details.
+            origin (str): The origin address of the shipment.
+            destination (str): The destination address of the shipment.
+            origin (Tuple): The origin coords of the shipment.
+            destination (Tuple): The destination coords of the shipment.
+
+        Returns:
+            Any | None: The updated shipment if updated.
+        """
+        
+        query = (
+            update(shipment_table)
+            .where(shipment_table.c.id == shipment_id)
+            .values(
+                    sender_id=old_shipment.sender_id,
+                    courier_id=old_shipment.courier_id,
+                    status=old_shipment.status,
+                    weight = data.weight,
+                    recipient_email = None if data.recipient_email == "" else data.recipient_email,
+                    origin=origin,
+                    destination=destination,
+                    origin_latitude = origin_coords[0],
+                    origin_longitude = origin_coords[1],
+                    destination_latitude = destination_coords[0],
+                    destination_longitude = destination_coords[1]
+                    )
+            .returning(shipment_table)
+        )
+        shipment = await database.fetch_one(query)
+        return shipment if shipment else None
+        

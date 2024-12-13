@@ -82,7 +82,7 @@ class ShipmentService(IShipmentService):
         return [ShipmentDTO.from_record(shipment) for shipment in shipments]
 
     
-    async def sort_by_distance(self, courier_id: UUID, courier_location: Location, keyword) -> Iterable[ShipmentWithDistanceDTO]:
+    async def sort_by_distance(self, courier_id: UUID, courier_location: Location, keyword: str) -> Iterable[ShipmentWithDistanceDTO]:
         """The method sorting shipments by destination distance from courier.
 
         Args:
@@ -103,7 +103,7 @@ class ShipmentService(IShipmentService):
             destination_coords = shipment.destination_coords
             shipment.origin_distance = await geopy.get_distance(courier_coords,origin_coords)
             shipment.destination_distance = await geopy.get_distance(courier_coords, destination_coords)
-        if keyword is "origin":
+        if keyword == "origin":
             sorted_shipments = sorted(shipmentsDTOs, key=lambda x: x.origin_distance)
         else:
             sorted_shipments = sorted(shipmentsDTOs, key=lambda x: x.destination_distance)
@@ -119,10 +119,29 @@ class ShipmentService(IShipmentService):
         Returns:
             ShipmentDTO | None: The newly added shipment if added.
         """
-        origin= await geopy.get_address_from_location(data.origin)
+        origin = await geopy.get_address_from_location(data.origin)
         destination = await geopy.get_address_from_location(data.destination)
         origin_coords = await geopy.get_coords(origin)
         destination_coords = await geopy.get_coords(destination)
         new_shipment = await self._repository.add_shipment(data, origin, destination, origin_coords, destination_coords, user_id)
         return ShipmentDTO.from_record(new_shipment) if new_shipment else None
         
+
+    async def update_shipment(self, shipment_id: int, data: ShipmentIn) -> ShipmentDTO | None:
+        """The method updating shipment data in the reposistory.
+
+        Args:
+            shipment_id (int): The id of the shipment.
+            data (ShipmentIn): The updated shipment details.
+
+        Returns:
+            ShipmentDTO | None: The updated shipment DTO details if updated.
+        """
+        origin = await geopy.get_address_from_location(data.origin)
+        destination = await geopy.get_address_from_location(data.destination)
+        origin_coords = await geopy.get_coords(origin)
+        destination_coords = await geopy.get_coords(destination)
+        if old_shipment := await self._repository.get_shipment_by_id(shipment_id):
+            shipment = await self._repository.update_shipment(shipment_id, old_shipment, data, origin, destination, origin_coords, destination_coords)
+            return ShipmentDTO.from_record(shipment) if shipment else None
+        return None
