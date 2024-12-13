@@ -77,7 +77,7 @@ class IShipmentService(ABC):
             user_id (UUID): UUID of the user(sender).
 
         Returns:
-            ShipmentDTO | None: The newly added shipment if added.
+            ShipmentDTO | None: The newly added shipment DTO details if added.
         """
     @abstractmethod
     async def sort_by_distance(self, courier_id: UUID, courier_location: Location, keyword: str) -> Iterable[ShipmentWithDistanceDTO]:
@@ -91,4 +91,14 @@ class IShipmentService(ABC):
             Iterable[ShipmentWithDistanceDTO]: Shipments with distance attribute sorted collection.
         """
 
-  
+    @abstractmethod
+    async def update_shipment(self, shipment_id: int, data: ShipmentIn) -> ShipmentDTO | None:
+        """The abstract updating shipment data in the reposistory.
+
+        Args:
+            shipment_id (int): The id of the shipment.
+            data (ShipmentIn): The updated shipment details.
+
+        Returns:
+            ShipmentDTO | None: The updated shipment DTO details if updated.
+        """

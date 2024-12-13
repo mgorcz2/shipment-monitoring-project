@@ -5,7 +5,7 @@ from typing import Any, Iterable, Tuple
 from uuid import UUID
 
 
-from shipment_monitoring.core.domain.shipment import ShipmentIn, ShipmentStatus
+from shipment_monitoring.core.domain.shipment import ShipmentIn, ShipmentStatus, Shipment
 from shipment_monitoring.core.domain.location import Location
 
 class IShipmentRepository(ABC):
@@ -82,4 +82,31 @@ class IShipmentRepository(ABC):
 
         Returns:
             Any | None: The shipment object if created.
+        """
+        
+    @abstractmethod
+    async def update_shipment(self,
+                              shipment_id: int,
+                              old_shipment: Shipment,
+                              data: ShipmentIn, 
+                              origin: str, 
+                              destination: str, 
+                              origin_coords: Tuple, 
+                              destination_coords: Tuple
+                              ) -> Any | None:
+        """The abstract updating shipment data.
+
+        Args:
+            shipment_id (int): The id of the shipment.
+            old_shipment: The old shipment object.
+            data (ShipmentIn): The updated shipment details.
+            origin (str): The origin address of the shipment.
+            destination (str): The destination address of the shipment.
+            origin (Tuple): The origin coords of the shipment.
+            destination (Tuple): The destination coords of the shipment.
+
+            
+
+        Returns:
+            Any | None: The updated shipment details if updated.
         """
