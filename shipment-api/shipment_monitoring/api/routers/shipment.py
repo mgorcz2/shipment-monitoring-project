@@ -87,7 +87,7 @@ async def check_status(
     """
     if shipment := await service.check_status(shipment_id, recipient_email):
         return shipment
-    raise HTTPException(status_code=404, detail="Shipment not found")
+    raise HTTPException(status_code=404, detail="Shipment not found or wrong recipient email")
         
 
 
@@ -109,6 +109,50 @@ async def get_shipments(
     """
     shipments = await service.get_all_shipments()
     return shipments
+
+@router.get("/get/{shipment_id}", response_model=ShipmentDTO, status_code=status.HTTP_200_OK)
+@auth.role_required(UserRole.COURIER)
+@inject
+async def get_shipment(
+        shipment_id: int,
+        current_user: User = Depends(auth.get_current_user),
+        service: IShipmentService = Depends(Provide[Container.shipment_service])
+    ) -> ShipmentDTO:
+    """An endpoint for getting shipment by provided id.
+
+    Args:
+        shipment_id (int): The id of the shipment.
+        current_user (User): The currently injected authenticated user.
+        service (IShipmentService): The injected service dependency.
+
+    Returns:
+        ShipmentDTO: The shipment object if exists.
+    """
+    if shipment := await service.get_shipment_by_id(shipment_id):
+        return shipment
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No shipment found with the provided ID.")
+
+
+@router.delete("/delete/{shipment_id}", status_code=status.HTTP_200_OK)
+@auth.role_required(UserRole.COURIER)
+@inject
+async def delete_shipment(
+        shipment_id: int,
+        current_user: User = Depends(auth.get_current_user),
+        service: IShipmentService = Depends(Provide[Container.shipment_service])
+        ) -> dict:
+    """The method deleting shipment by provided id.
+
+     Args:
+        shipment_id (int): The id of the shipment.
+        service (IShipmentService): The injected service dependency.
+
+    Returns:
+        Any: The shipment object if deleted.
+    """
+    if shipment := await service.delete_shipment(shipment_id):
+        return dict(shipment)
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No shipment found with the provided ID. Try again.")
 
 @router.post("/sort_by/origin", response_model=Iterable[ShipmentWithDistanceDTO],status_code=status.HTTP_200_OK)
 @auth.role_required(UserRole.COURIER)

@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from typing import Iterable
 
-from shipment_monitoring.core.domain.shipment import ShipmentIn, ShipmentStatus
+from shipment_monitoring.core.domain.shipment import ShipmentIn, ShipmentStatus, Shipment
 from shipment_monitoring.core.domain.location import Location
 from shipment_monitoring.infrastructure.dto.shipmentDTO import ShipmentDTO, ShipmentWithDistanceDTO
 from uuid import UUID
@@ -89,6 +89,16 @@ class IShipmentService(ABC):
 
         Returns:
             Iterable[ShipmentWithDistanceDTO]: Shipments with distance attribute sorted collection.
+        """
+    @abstractmethod
+    async def delete_shipment(self, shipment_id: int) -> dict | None:
+        """The abstract deleting shipment by provided id.
+
+        Args:
+            shipment_id (int): The id of the shipment.
+
+        Returns:
+            dict | None: The shipment object from repository if deleted.
         """
 
     @abstractmethod
