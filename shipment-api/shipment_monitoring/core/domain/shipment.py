@@ -32,6 +32,8 @@ class Shipment(ShipmentIn):
     sender_id: UUID
     courier_id: Optional[UUID] = None
     status: ShipmentStatus
+    created_at: datetime
+    last_updated: datetime
     model_config = ConfigDict(from_attributes=True, extra='ignore')
 
 

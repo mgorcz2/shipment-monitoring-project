@@ -3,7 +3,7 @@
 from typing import Any, Iterable, Tuple
 from uuid import UUID
 
-from sqlalchemy import select, join, update
+from sqlalchemy import select, join, update, delete
 
 from shipment_monitoring.core.repositories.ishipment import IShipmentRepository
 from shipment_monitoring.core.domain.shipment import Shipment, ShipmentIn, ShipmentStatus
@@ -106,6 +106,24 @@ class ShipmentRepository(IShipmentRepository):
         )
         shipment = await database.fetch_one(query)
         return shipment if shipment else None
+
+    
+    async def delete_shipment(self, shipment_id: int) -> Any | None:
+        """The method deleting shipment by provided id.
+
+        Args:
+            shipment_id (int): The id of the shipment.
+
+        Returns:
+            Any | None: The shipment object from database if deleted.
+        """
+        query = (
+            delete(shipment_table)
+            .where (shipment_table.c.id == shipment_id)
+            .returning(shipment_table)
+        )
+        deleted_shipment = await database.fetch_one(query)
+        return deleted_shipment if deleted_shipment else None
 
     async def add_shipment(self, 
                            data: ShipmentIn, 

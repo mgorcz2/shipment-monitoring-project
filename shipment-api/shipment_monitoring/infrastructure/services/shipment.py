@@ -1,7 +1,7 @@
 """Module containing shipment service implementation."""
 
 from typing import Iterable, Any
-from shipment_monitoring.core.domain.shipment import ShipmentStatus, ShipmentIn
+from shipment_monitoring.core.domain.shipment import ShipmentStatus, ShipmentIn, Shipment
 from shipment_monitoring.core.repositories.ishipment import IShipmentRepository
 from shipment_monitoring.infrastructure.dto.shipmentDTO import ShipmentDTO, ShipmentWithDistanceDTO
 from shipment_monitoring.infrastructure.services.ishipment import IShipmentService
@@ -71,6 +71,18 @@ class ShipmentService(IShipmentService):
         """
         shipment = await self._repository.get_shipment_by_id(shipment_id)
         return ShipmentDTO.from_record(shipment) if shipment else None
+    
+    async def delete_shipment(self, shipment_id: int) -> dict | None:
+        """The method deleting shipment by provided id.
+
+        Args:
+            shipment_id (int): The id of the shipment.
+
+        Returns:
+            dict | None: The shipment object from repository if deleted.
+        """
+        deleted_shipment = await self._repository.delete_shipment(shipment_id)
+        return deleted_shipment if deleted_shipment else None
     
     async def get_all_shipments(self) -> Iterable[ShipmentDTO]:
         """The method getting all shipment from the repository.

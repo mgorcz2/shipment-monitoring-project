@@ -1,6 +1,8 @@
 import asyncio
 import databases
 import sqlalchemy
+from sqlalchemy.sql import func
+from datetime import datetime
 from sqlalchemy.exc import OperationalError, DatabaseError
 from sqlalchemy.ext.asyncio import create_async_engine
 from asyncpg.exceptions import (    # type: ignore
@@ -9,7 +11,6 @@ from asyncpg.exceptions import (    # type: ignore
 )
 from sqlalchemy.dialects.postgresql import UUID
 from shipment_monitoring.config import config
-import enum
 from sqlalchemy import Enum
 from shipment_monitoring.core.domain.user import UserRole
 from shipment_monitoring.core.domain.shipment import ShipmentStatus
@@ -24,15 +25,28 @@ shipment_table = sqlalchemy.Table(
         'sender_id', 
         sqlalchemy.ForeignKey("users.id"),
         nullable=False
-        ),
+                    ),
     sqlalchemy.Column(
         'courier_id', 
         sqlalchemy.ForeignKey("users.id"),
         nullable=True
-        ),
+                    ),
     sqlalchemy.Column('status', Enum(ShipmentStatus, name="shipment_status")),
     sqlalchemy.Column('weight',sqlalchemy.Float),
     sqlalchemy.Column('recipient_email', sqlalchemy.String, nullable=True),
+    sqlalchemy.Column(
+        'created_at',
+        sqlalchemy.DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now()
+                      ),
+    sqlalchemy.Column(
+        'last_updated',
+        sqlalchemy.DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now() 
+                    ),
     sqlalchemy.Column('origin', sqlalchemy.String),
     sqlalchemy.Column('destination', sqlalchemy.String),
     sqlalchemy.Column('origin_latitude', sqlalchemy.Float),
@@ -49,7 +63,7 @@ user_table = sqlalchemy.Table(
         UUID(as_uuid=True),
         primary_key=True,
         server_default=sqlalchemy.text("gen_random_uuid()")
-    ),
+                    ),
     sqlalchemy.Column('username', sqlalchemy.String),
     sqlalchemy.Column('password', sqlalchemy.String),
     sqlalchemy.Column('role', Enum(UserRole, name="user_roles"))

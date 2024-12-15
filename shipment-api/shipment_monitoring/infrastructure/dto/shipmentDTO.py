@@ -4,7 +4,7 @@ from pydantic import BaseModel, ConfigDict
 from shipment_monitoring.core.domain.shipment import ShipmentStatus
 from uuid import UUID
 from typing import Optional
-
+from datetime import datetime
 
 class ShipmentDTO(BaseModel):
     """A model representing DTO for shipment data."""
@@ -13,10 +13,11 @@ class ShipmentDTO(BaseModel):
     courier_id: Optional[UUID]
     weight: float
     recipient_email: Optional[str]
-    
     status: ShipmentStatus
     origin : str
     destination: str
+    created_at: datetime
+    last_updated: datetime
     
     model_config = ConfigDict(
         from_attributes=True,
@@ -47,7 +48,9 @@ class ShipmentDTO(BaseModel):
             destination_coords = (
                                     record_dict.pop('destination_latitude'),
                                     record_dict.pop('destination_longitude')
-                                 )
+                                 ),
+            created_at=record_dict.pop('created_at'),
+            last_updated=record_dict.pop('last_updated'),
         )
         
 class ShipmentWithDistanceDTO(ShipmentDTO):

@@ -66,6 +66,17 @@ class IShipmentRepository(ABC):
         Returns:
             Any | None: The shipment details if exists.
         """
+        
+    @abstractmethod
+    async def delete_shipment(self, shipment_id: int) -> Any | None:
+        """The abstract deleting shipment by provided id.
+
+        Args:
+            shipment_id (int): The id of the shipment.
+
+        Returns:
+            Any | None: The shipment details if deleted.
+        """
 
     @abstractmethod
     async def add_shipment(self, data: ShipmentIn, origin: str, destination: str, origin_coords: Tuple, destination_coords: Tuple, user_id: UUID) -> Any | None:
