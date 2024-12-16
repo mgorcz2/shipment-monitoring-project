@@ -47,9 +47,10 @@ class UserService(IUserService):
         Returns:
             User | None: The user DTO details if exists.
         """
-        return await self._repository.get_user_by_id(user_id)
+        user = await self._repository.get_user_by_id(user_id)
+        return UserDTO.from_record(user) if user else None
     
-    async def get_user_by_username(self,username) -> User | None:
+    async def get_user_by_username(self,username) -> UserDTO | None:
         """The method getting user by provided username from repository.
 
         Args:
@@ -58,8 +59,45 @@ class UserService(IUserService):
         Returns:
             User | None: The user object if exists.
         """
-        return await self._repository.get_user_by_username(username)
+        user = await self._repository.get_user_by_username(username)
+        return UserDTO.from_record(user) if user else None
 
+    async def detele_user(self, username: str) -> dict | None:
+        """The method deleting user by provided username.
+
+        Args:
+            username (str): The username of the user.
+
+        Returns:
+            User | None: The deleted user object from repository.
+        """
+        deleted_user = await self._repository.detele_user(username)
+        return deleted_user if deleted_user else None
+    
+    async def update_user(self, username: str, data: User) -> dict | None:
+        """The abstract updating user by provided username.
+
+        Args:
+            username (str): The username of the user.
+            data (User): The updated user details.
+
+        Returns:
+            dict | None: The user object if updated.
+        """
+        existing_user = await self._repository.get_user_by_username(username)
+        if not existing_user:
+            raise ValueError("No user found with the provided username. Try again.")
+        existing_user = await self._repository.get_user_by_username(data.username)
+        if existing_user:
+            raise ValueError("User with that username already registered.")
+        existing_user = await self._repository.get_user_by_id(data.id)
+        if existing_user:
+            raise ValueError("User with that id already registered.")
+        data.password = password_hashing.hash_password(data.password)
+        updated_user = await self._repository.update_user(username, data)
+        return updated_user if updated_user else None
+            
+        
     async def login_for_access_token(self, username: str, password: str) -> TokenDTO | None:
         """The method for user authentication to get an access token.
 

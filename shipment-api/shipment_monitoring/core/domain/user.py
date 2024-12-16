@@ -20,5 +20,4 @@ class UserIn(BaseModel):
 class User(UserIn):
     """The user model class"""
     id: UUID
-    
     model_config = ConfigDict(from_attributes=True, extra='ignore')

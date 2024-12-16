@@ -40,4 +40,26 @@ class IUserRepository(ABC):
         Returns:
             Any | None: The user object if exists.
         """
- 
+        
+    @abstractmethod
+    async def detele_user(self, username: str) -> Any | None:
+        """The abstract deleting user by provided username.
+
+        Args:
+            username (str): The username of the user.
+
+        Returns:
+            Any | None: The user object if deleted.
+        """
+        
+    @abstractmethod
+    async def update_user(self, username: str, data: User) -> Any | None:
+        """The abstract updating user by provided username.
+
+        Args:
+            username (str): The username of the user.
+            data (User): The updated user details.
+
+        Returns:
+            Any | None: The user object if updated.
+        """
