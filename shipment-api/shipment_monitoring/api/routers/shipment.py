@@ -26,7 +26,7 @@ async def assign_shipment_to_courier(
     current_user: User = Depends(auth.get_current_user),
     shipment_service: IShipmentService = Depends(Provide[Container.shipment_service]),
     user_service: IUserService = Depends(Provide[Container.user_service])
-    ) -> ShipmentDTO | None:
+    ) -> ShipmentDTO:
     """The endpoint assigning shipment to courier.
 
     Args:
@@ -37,7 +37,7 @@ async def assign_shipment_to_courier(
         
 
     Returns:
-        ShipmentDTO | None: The shipment details if updated.
+        ShipmentDTO: The shipment details if updated.
     """
     if await user_service.get_user_by_id(courier_id):
         if shipment := await shipment_service.assign_shipment_to_courier(shipment_id, courier_id):
@@ -52,7 +52,7 @@ async def update_status(
     new_status: ShipmentStatus,
     current_user: User = Depends(auth.get_current_user),
     service: IShipmentService = Depends(Provide[Container.shipment_service])
-    ) -> ShipmentDTO | None:
+    ) -> ShipmentDTO:
     """The abstract changing shipment status by provided id in the data storage.
 
     Args:
@@ -74,7 +74,7 @@ async def check_status(
     shipment_id: int,
     recipient_email: str,
     service: IShipmentService = Depends(Provide[Container.shipment_service])
-    )-> ShipmentDTO | None:
+    )-> ShipmentDTO:
     """An endpoint getting shipment by provided id and Recipient email.
 
     Args:
@@ -83,7 +83,7 @@ async def check_status(
         service (IShipmentService): The injected service dependency.
 
     Returns:
-        Any | None: The shipment details if exists.
+       ShipmentDTO: The shipment details if exists.
     """
     if shipment := await service.check_status(shipment_id, recipient_email):
         return shipment
@@ -107,8 +107,9 @@ async def get_shipments(
     Returns:
         Iterable[ShipmentDTO]: Shipments collection.
     """
-    shipments = await service.get_all_shipments()
-    return shipments
+    if shipments := await service.get_all_shipments():
+        return shipments
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No shipments found.")
 
 @router.get("/get/{shipment_id}", response_model=ShipmentDTO, status_code=status.HTTP_200_OK)
 @auth.role_required(UserRole.COURIER)
@@ -148,7 +149,7 @@ async def delete_shipment(
         service (IShipmentService): The injected service dependency.
 
     Returns:
-        Any: The shipment object if deleted.
+        dict: The shipment object if deleted.
     """
     if shipment := await service.delete_shipment(shipment_id):
         return dict(shipment)
@@ -237,7 +238,7 @@ async def add_shipment(
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,detail=str(error))    
 
 
-@router.post("/update", response_model=ShipmentDTO, status_code=status.HTTP_200_OK)
+@router.put("/update/{shipment_id}", response_model=ShipmentDTO, status_code=status.HTTP_200_OK)
 @auth.role_required(UserRole.ADMIN)
 @inject
 async def update_shipment(
@@ -260,6 +261,6 @@ async def update_shipment(
         try:
             if shipment := await service.update_shipment(shipment_id, data):
                 return shipment
-            raise HTTPException(status_code=404, detail="Shipment not found or invalid data")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Shipment not found or invalid data")
         except ValueError as error:
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,detail=str(error))

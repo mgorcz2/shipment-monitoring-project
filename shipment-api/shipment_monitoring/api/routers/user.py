@@ -3,10 +3,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from shipment_monitoring.container import Container
 from shipment_monitoring.infrastructure.dto.tokenDTO import TokenDTO
-from shipment_monitoring.core.domain.user import UserIn, User
+from shipment_monitoring.core.domain.user import UserIn, UserRole, User
 from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
 from shipment_monitoring.infrastructure.services.iuser import IUserService
-
+from shipment_monitoring.core.security import auth
 
 
 router = APIRouter(
@@ -38,8 +38,8 @@ async def register_user(
 @router.post("/token", response_model=TokenDTO)
 @inject
 async def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    service: IUserService = Depends(Provide[Container.user_service])
+        form_data: OAuth2PasswordRequestForm = Depends(),
+        service: IUserService = Depends(Provide[Container.user_service])
 ) -> TokenDTO:
     """An endpoint for authenticating users(creating token)
 
@@ -55,3 +55,70 @@ async def login_for_access_token(
         return token
     except ValueError as error:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(error))
+
+
+
+@router.get("/get/{username}", response_model=UserDTO, status_code=status.HTTP_200_OK)
+@auth.role_required(UserRole.ADMIN)
+@inject
+async def get_user_by_username(
+        username: str,
+        current_user: User = Depends(auth.get_current_user),
+        service: IUserService = Depends(Provide[Container.user_service])
+) -> UserDTO:
+    """The endpoint getting user by provided username.
+
+    Args:
+        username (str): The username of the user.
+
+    Returns:
+        UserDTO: The user DTO details if exists.
+    """
+    if user := await service.get_user_by_username(username):
+        return user
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No user found with the provided username.")
+    
+@router.delete("/delete/{username}", status_code=status.HTTP_200_OK)
+@auth.role_required(UserRole.ADMIN)
+@inject
+async def delete_user(
+        username: str,
+        current_user: User = Depends(auth.get_current_user),
+        service: IUserService = Depends(Provide[Container.user_service])
+) -> dict:
+    """The endpoint deleting user by provided username.
+
+    Args:
+        username (str): The username of the user.
+
+    Returns:
+        dict: The deleted user object.
+    """
+    if user := await service.detele_user(username):
+        return dict(user)
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No user found with the provided username. Try again.")
+
+@router.put("/update/{username}", status_code=status.HTTP_200_OK)
+@auth.role_required(UserRole.ADMIN)
+@inject
+async def update_user(
+        username: str,
+        data: User,
+        current_user: User = Depends(auth.get_current_user),
+        service: IUserService = Depends(Provide[Container.user_service])
+) -> dict:
+    """The endpoint updating user by provided username.
+
+    Args:
+        username (str): The username of the user.
+        data (User): The updated user details.
+
+    Returns:
+        dict: The updated user object if updated.
+    """
+    try:
+        if user:=await service.update_user(username, data):
+            return dict(user)
+    except ValueError as error:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
+

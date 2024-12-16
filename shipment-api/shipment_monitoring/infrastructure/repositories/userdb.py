@@ -2,7 +2,7 @@
 
 from typing import Any, Iterable
 
-from sqlalchemy import select
+from sqlalchemy import select, delete, update
 
 from shipment_monitoring.core.domain.user import UserIn, User
 from shipment_monitoring.core.repositories.iuser import IUserRepository
@@ -16,7 +16,7 @@ from uuid import UUID
 class UserRepository(IUserRepository):
     """A class representing user DB repository."""
     
-    async def register_user(self, data: UserIn) -> UserDTO | None:
+    async def register_user(self, data: UserIn) -> Any | None:
         """The method registering new user.
 
         Args:
@@ -30,7 +30,7 @@ class UserRepository(IUserRepository):
         new_user = await self.get_user_by_id(new_user)
         return UserDTO.from_record(new_user) if new_user else None
 
-    async def get_user_by_id(self, user_id: UUID) -> UserDTO | None:
+    async def get_user_by_id(self, user_id: UUID) -> Any | None:
         """The method getting user by provided id.
 
         Args:
@@ -44,9 +44,9 @@ class UserRepository(IUserRepository):
             .where(user_table.c.id == user_id)
         )
         user = await database.fetch_one(query)
-        return UserDTO.from_record(user) if user else None
+        return user if user else None
     
-    async def get_user_by_username(self,username) -> User | None:
+    async def get_user_by_username(self,username) -> Any | None:
         """The method getting user by provided username.
 
         Args:
@@ -62,4 +62,39 @@ class UserRepository(IUserRepository):
         )
         user = await database.fetch_one(query)
         return user if user else None
+    
+    async def detele_user(self, username: str) -> Any | None:
+        """The abstract deleting user by provided username.
 
+        Args:
+            username (str): The username of the user.
+
+        Returns:
+            Any | None: The user object if deleted.
+        """
+        query = (
+            delete(user_table)
+            .where (user_table.c.username == username)
+            .returning(user_table)
+        )
+        deleted_user = await database.fetch_one(query)
+        return deleted_user if deleted_user else None
+    
+    async def update_user(self, username: str, data: User) -> Any | None:
+        """The abstract updating user by provided username.
+
+        Args:
+            username (str): The username of the user.
+            data (User): The updated user details.
+
+        Returns:
+            Any | None: The user object if updated.
+        """
+        query = (
+            update(user_table)
+            .where (user_table.c.username == username)
+            .values(data.model_dump())
+            .returning(user_table)
+        )
+        updated_user = await database.fetch_one(query)
+        return updated_user if updated_user else None
