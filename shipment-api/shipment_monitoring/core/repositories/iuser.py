@@ -63,3 +63,10 @@ class IUserRepository(ABC):
         Returns:
             Any | None: The user object if updated.
         """
+        
+    async def get_all_users(self) -> Iterable[Any] | None:
+        """The abstract getting all users.
+
+        Returns:
+            Iterable[Any] | None: The user objects.
+        """

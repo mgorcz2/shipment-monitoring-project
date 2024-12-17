@@ -94,33 +94,43 @@ class ShipmentService(IShipmentService):
         return [ShipmentDTO.from_record(shipment) for shipment in shipments]
 
     
-    async def sort_by_distance(self, courier_id: UUID, courier_location: Location, keyword: str) -> Iterable[ShipmentWithDistanceDTO]:
+    async def sort_by_distance(self, courier_id: UUID, courier_location: Location) -> Iterable[ShipmentWithDistanceDTO] | None:
         """The method sorting shipments by destination distance from courier.
 
         Args:
             courier_location (Location): Location of courier.
-            keyword (str): Sorting key.
 
         Returns:
             Iterable[ShipmentWithDistanceDTO]: Shipments with distance attribute sorted collection.
         """
 
-        shipments = await self._repository.get_all_shipments()
-        courier_address = await geopy.get_address_from_location(courier_location)
-        courier_coords = await geopy.get_coords(courier_address)
-        shipmentsDTOs = [ShipmentWithDistanceDTO.from_record(shipment) for shipment in shipments if shipment.courier_id == courier_id]
+        if shipments := await self._repository.get_all_shipments():
+            courier_address = await geopy.get_address_from_location(courier_location)
+            courier_coords = await geopy.get_coords(courier_address)
+            shipmentsDTOs = [ShipmentWithDistanceDTO.from_record(shipment) 
+                            for shipment in shipments 
+                            if shipment.courier_id == courier_id]
         
-        for shipment in shipmentsDTOs:
-            origin_coords = shipment.origin_coords
-            destination_coords = shipment.destination_coords
-            shipment.origin_distance = await geopy.get_distance(courier_coords,origin_coords)
-            shipment.destination_distance = await geopy.get_distance(courier_coords, destination_coords)
-        if keyword == "origin":
-            sorted_shipments = sorted(shipmentsDTOs, key=lambda x: x.origin_distance)
-        else:
-            sorted_shipments = sorted(shipmentsDTOs, key=lambda x: x.destination_distance)
-        return sorted_shipments
-    
+            sorted_shipments = []
+        
+            for shipment in shipmentsDTOs:
+                if shipment.status in ["ready_for_pickup" , "returned_to_sender"]:
+                    origin_coords = shipment.origin_coords
+                    shipment.origin_distance = await geopy.get_distance(courier_coords,origin_coords)
+                    sorted_shipments.append(shipment)
+                elif shipment.status in ["out_for_delivery", "failed_attempt"]:
+                    destination_coords = shipment.destination_coords
+                    shipment.destination_distance = await geopy.get_distance(courier_coords, destination_coords)
+                    sorted_shipments.append(shipment)
+                sorted_shipments = sorted(
+                    sorted_shipments,
+                    key=lambda x: x.origin_distance if x.status in ["ready_for_pickup", "returned_to_sender"]
+                    else x.destination_distance
+                    )
+            return sorted_shipments
+        return None
+                
+                
     async def add_shipment(self, data: ShipmentIn, user_id: UUID) -> ShipmentDTO | None:
         """The method adding a shipment to the repository.
         

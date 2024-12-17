@@ -1,3 +1,4 @@
+from typing import Iterable
 from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
@@ -12,14 +13,14 @@ from shipment_monitoring.core.security import auth
 router = APIRouter(
     prefix="/users",
     tags=["users"],
-)
+    )
 
 @router.post("/register", response_model=UserDTO, status_code=status.HTTP_201_CREATED)
 @inject
 async def register_user(
         new_user: UserIn,
         service: IUserService = Depends(Provide[Container.user_service]),
-) -> UserDTO:
+    ) -> UserDTO:
     """An endpoint for registering new user.
 
     Args:
@@ -40,7 +41,7 @@ async def register_user(
 async def login_for_access_token(
         form_data: OAuth2PasswordRequestForm = Depends(),
         service: IUserService = Depends(Provide[Container.user_service])
-) -> TokenDTO:
+    ) -> TokenDTO:
     """An endpoint for authenticating users(creating token)
 
     Args:
@@ -65,11 +66,13 @@ async def get_user_by_username(
         username: str,
         current_user: User = Depends(auth.get_current_user),
         service: IUserService = Depends(Provide[Container.user_service])
-) -> UserDTO:
+    ) -> UserDTO:
     """The endpoint getting user by provided username.
 
     Args:
         username (str): The username of the user.
+        current_user (User): The currently injected authenticated user.
+        service (IUserService): The injected user service.
 
     Returns:
         UserDTO: The user DTO details if exists.
@@ -85,12 +88,14 @@ async def delete_user(
         username: str,
         current_user: User = Depends(auth.get_current_user),
         service: IUserService = Depends(Provide[Container.user_service])
-) -> dict:
+    ) -> dict:
     """The endpoint deleting user by provided username.
 
     Args:
         username (str): The username of the user.
-
+        current_user (User): The currently injected authenticated user.
+        service (IUserService): The injected user service.
+        
     Returns:
         dict: The deleted user object.
     """
@@ -106,13 +111,15 @@ async def update_user(
         data: User,
         current_user: User = Depends(auth.get_current_user),
         service: IUserService = Depends(Provide[Container.user_service])
-) -> dict:
+    ) -> dict:
     """The endpoint updating user by provided username.
 
     Args:
         username (str): The username of the user.
         data (User): The updated user details.
-
+        current_user (User): The currently injected authenticated user.
+        service (IUserService): The injected user service.
+        
     Returns:
         dict: The updated user object if updated.
     """
@@ -122,3 +129,24 @@ async def update_user(
     except ValueError as error:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
 
+
+@router.get("/all", status_code=status.HTTP_200_OK)
+@auth.role_required(UserRole.ADMIN)
+@inject    
+async def get_all_users(
+        current_user: User = Depends(auth.get_current_user),
+        service: IUserService = Depends(Provide[Container.user_service])
+    ) -> Iterable[UserDTO]:
+    """The endpoint getting all users.
+
+    Args:
+    current_user (User): The currently injected authenticated user.
+    service (IUserService): The injected user service.
+    
+    Returns:
+         Iterable[UserDTO]: The user objects DTO details.
+    """
+    if users := await service.get_all_users():
+        return users
+    raise HTTPException(status_code=404, detail="Users not found")
+        

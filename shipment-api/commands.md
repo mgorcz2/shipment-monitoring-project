@@ -8,4 +8,5 @@
 - Uruchomienie projektu za pomocą Docker'a: `docker compose up` (w przypadku nieodświeżonego cache: `docker compose up --force-recreate`)
 - Aby uniknąć problemów z połączeniem z zewnętrznymi usługami geokodowania używanymi przez bibliotekę Geopy (np. Nominatim), konfigurujemy kontener tak, aby używał tej samej sieci co host: `docker run --network host shipment-api-app`
 
-
+docker-compose  exec db psql -U postgres -d app
+INSERT INTO users (username,password,role) VALUES ('test','test','ADMIN');
