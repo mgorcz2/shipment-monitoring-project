@@ -57,6 +57,6 @@ class ShipmentWithDistanceDTO(ShipmentDTO):
     """A model representing DTO for shipment with distance data."""
     origin_coords: tuple
     destination_coords: tuple
-    origin_distance: float = -99999999
-    destination_distance: float = -99999999
+    origin_distance: Optional[float] = None
+    destination_distance: Optional[float] = None
     

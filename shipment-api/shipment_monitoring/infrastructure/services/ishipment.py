@@ -80,12 +80,11 @@ class IShipmentService(ABC):
             ShipmentDTO | None: The newly added shipment DTO details if added.
         """
     @abstractmethod
-    async def sort_by_distance(self, courier_id: UUID, courier_location: Location, keyword: str) -> Iterable[ShipmentWithDistanceDTO]:
+    async def sort_by_distance(self, courier_id: UUID, courier_location: Location) -> Iterable[ShipmentWithDistanceDTO]:
         """The abstract sorting shipments by destination distance from courier.
 
         Args:
             courier_location (Location): Location of courier.
-            keyword (str): Sorting key.
 
         Returns:
             Iterable[ShipmentWithDistanceDTO]: Shipments with distance attribute sorted collection.

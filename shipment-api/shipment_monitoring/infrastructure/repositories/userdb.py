@@ -98,3 +98,13 @@ class UserRepository(IUserRepository):
         )
         updated_user = await database.fetch_one(query)
         return updated_user if updated_user else None
+    
+    async def get_all_users(self) -> Iterable[Any] | None:
+        """The method getting all users from database.
+
+        Returns:
+            Iterable[Any] | None: The user objects.
+        """
+        query = select(user_table)
+        users = await database.fetch_all(query)
+        return users

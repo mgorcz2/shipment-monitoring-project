@@ -1,6 +1,7 @@
 """Module containing user service implementation."""
 
 
+from typing import Iterable
 from shipment_monitoring.core.domain.user import User, UserIn
 from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
 from shipment_monitoring.infrastructure.services.iuser import IUserService
@@ -120,4 +121,12 @@ class UserService(IUserService):
             data={"sub": str(user.id)}, expires_delta=access_token_expires
         )
         return {"access_token": access_token, "token_type": "bearer"}  
-            
+     
+    async def get_all_users(self) -> Iterable[UserDTO] | None:
+        """The method getting all users from repository.
+
+        Returns:
+            Iterable[UserDTO] | None: The user objects DTO details.
+        """
+        users = await self._repository.get_all_users()
+        return [UserDTO.from_record(user) for user in users]

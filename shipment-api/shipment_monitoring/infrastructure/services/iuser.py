@@ -1,6 +1,7 @@
 """Module containing user service abstractions."""
 
 from abc import ABC, abstractmethod
+from typing import Iterable
 from shipment_monitoring.core.domain.user import User,UserIn
 from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
 from shipment_monitoring.infrastructure.dto.tokenDTO import TokenDTO
@@ -76,3 +77,10 @@ class IUserService(ABC):
             TokenDTO | None: A token DTO if login is successful, None otherwise.
         """
     
+        
+    async def get_all_users(self) -> Iterable[UserDTO] | None:
+        """The abstract getting all users.
+
+        Returns:
+            Iterable[UserDTO] | None: The user objects DTO details.
+        """

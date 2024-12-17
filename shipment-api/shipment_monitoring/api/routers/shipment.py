@@ -42,7 +42,7 @@ async def assign_shipment_to_courier(
     if await user_service.get_user_by_id(courier_id):
         if shipment := await shipment_service.assign_shipment_to_courier(shipment_id, courier_id):
             return shipment
-    raise HTTPException(status_code=404, detail="Shipment not found or wrong courier id")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Shipment not found or wrong courier id")
 
 @router.put("/update_status", response_model=ShipmentDTO, status_code=status.HTTP_200_OK)
 @auth.role_required(UserRole.COURIER)
@@ -65,7 +65,7 @@ async def update_status(
     """
     if shipment := await service.update_status(current_user.id, shipment_id, new_status):
         return shipment
-    raise HTTPException(status_code=404, detail="Shipment not found or not assigned to this courier")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Shipment not found or not assigned to this courier")
 
 
 @router.get("/check_status", response_model=ShipmentDTO, status_code=status.HTTP_200_OK)
@@ -87,14 +87,13 @@ async def check_status(
     """
     if shipment := await service.check_status(shipment_id, recipient_email):
         return shipment
-    raise HTTPException(status_code=404, detail="Shipment not found or wrong recipient email")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Shipment not found or wrong recipient email")
         
 
 
 @router.get("/all", response_model=Iterable[ShipmentDTO], status_code=status.HTTP_200_OK)
-@auth.role_required(UserRole.COURIER)
 @inject
-async def get_shipments(
+async def get_all_shipments(
         current_user: User = Depends(auth.get_current_user),
         service: IShipmentService = Depends(Provide[Container.shipment_service])
     ) -> Iterable[ShipmentDTO]:
@@ -108,7 +107,12 @@ async def get_shipments(
         Iterable[ShipmentDTO]: Shipments collection.
     """
     if shipments := await service.get_all_shipments():
-        return shipments
+        if current_user.role == "admin":
+            return shipments
+        if current_user.role == "courier":
+            return [shipment for shipment in shipments if shipment.courier_id==current_user.id]
+        if current_user.role == "sender":
+            return [shipment for shipment in shipments if shipment.sender_id==current_user.id]
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No shipments found.")
 
 @router.get("/get/{shipment_id}", response_model=ShipmentDTO, status_code=status.HTTP_200_OK)
@@ -155,14 +159,14 @@ async def delete_shipment(
         return dict(shipment)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No shipment found with the provided ID. Try again.")
 
-@router.post("/sort_by/origin", response_model=Iterable[ShipmentWithDistanceDTO],status_code=status.HTTP_200_OK)
+@router.post("/sort_by/distance",status_code=status.HTTP_200_OK)
 @auth.role_required(UserRole.COURIER)
 @inject
-async def sort_by_origin_distance(
+async def sort_by_distance(
         location: Location,
         current_user: User = Depends(auth.get_current_user),
         service: IShipmentService = Depends(Provide[Container.shipment_service])
-    ) -> Iterable[ShipmentWithDistanceDTO]:
+    ) -> Iterable[ShipmentWithDistanceDTO] | None:
     """An endpoint for sorting shipments by origin distance from courier.
 
     Args:
@@ -174,35 +178,12 @@ async def sort_by_origin_distance(
         Iterable[ShipmentDTO]: Shipments with distance sorted collection.
     """
     try:
-        shipments = await service.sort_by_distance(current_user.id, location, "origin")
+        shipments = await service.sort_by_distance(current_user.id, location)
     except ValueError as error:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,detail=str(error))    
-    return shipments
-
-
-@router.post("/sort_by/destination", response_model=Iterable[ShipmentWithDistanceDTO],status_code=status.HTTP_200_OK)
-@auth.role_required(UserRole.COURIER)
-@inject
-async def sort_by_destination_distance(
-        location: Location,
-        current_user: User = Depends(auth.get_current_user),
-        service: IShipmentService = Depends(Provide[Container.shipment_service])
-    ) -> Iterable[ShipmentWithDistanceDTO]:
-    """An endpoint for sorting shipments by destination distance from courier.
-
-    Args:
-        location (Location): Location of courier
-        current_user (User): The currently injected authenticated user.
-        service (IShipmentService): The injected service dependency.
-
-    Returns:
-        Iterable[ShipmentWithDistanceDTO]: Shipments with distance attribute sorted collection.
-    """
-    try:
-        shipments = await service.sort_by_distance(current_user.id, location, "destination")
-    except ValueError as error:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,detail=str(error))    
-    return shipments
+    if shipments:
+        return shipments
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No shipments found with this courier.")
 
 
 @router.post("/add", response_model=ShipmentDTO, status_code=status.HTTP_201_CREATED)
@@ -212,7 +193,7 @@ async def add_shipment(
         new_shipment: ShipmentIn,
         current_user: User = Depends(auth.get_current_user),
         service: IShipmentService = Depends(Provide[Container.shipment_service])
-    ) -> ShipmentDTO | None:
+    ) -> ShipmentDTO:
     """An endpoint for adding a shipment and sending information to the recipient.
 
     Args:
@@ -246,7 +227,7 @@ async def update_shipment(
     data: ShipmentIn,
     current_user: User = Depends(auth.get_current_user),
     service: IShipmentService = Depends(Provide[Container.shipment_service])
-    ) -> ShipmentDTO | None:
+    ) -> ShipmentDTO:
         """An endpoint for updating shipment data in the reposistory.
 
         Args:
@@ -256,7 +237,7 @@ async def update_shipment(
             service (IShipmentService): The injected service dependency.
 
         Returns:
-            ShipmentDTO | None: The updated shipment DTO details if updated.
+            ShipmentDTO: The updated shipment DTO details if updated.
         """
         try:
             if shipment := await service.update_shipment(shipment_id, data):
