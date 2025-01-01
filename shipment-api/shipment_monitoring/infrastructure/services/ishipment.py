@@ -62,6 +62,7 @@ class IShipmentService(ABC):
             ShipmentDTO | None: The shipment DTO details if exists.
         """
 
+
     @abstractmethod
     async def get_all_shipments(self) -> Iterable[ShipmentDTO]:
         """The abstract getting all shipment from the repository.
@@ -69,6 +70,8 @@ class IShipmentService(ABC):
         Returns:
             Iterable[ShipmentDTO]: The collection of the shipments.
         """
+
+
     @abstractmethod
     async def add_shipment(self, shipment: ShipmentIn, user_id: UUID) -> ShipmentDTO | None:
         """The abstract adding a shipment to the repository.
@@ -79,6 +82,8 @@ class IShipmentService(ABC):
         Returns:
             ShipmentDTO | None: The newly added shipment DTO details if added.
         """
+
+
     @abstractmethod
     async def sort_by_distance(self, courier_id: UUID, courier_location: Location) -> Iterable[ShipmentWithDistanceDTO]:
         """The abstract sorting shipments by destination distance from courier.
@@ -89,6 +94,8 @@ class IShipmentService(ABC):
         Returns:
             Iterable[ShipmentWithDistanceDTO]: Shipments with distance attribute sorted collection.
         """
+
+
     @abstractmethod
     async def delete_shipment(self, shipment_id: int) -> dict | None:
         """The abstract deleting shipment by provided id.
@@ -99,6 +106,7 @@ class IShipmentService(ABC):
         Returns:
             dict | None: The shipment object from repository if deleted.
         """
+
 
     @abstractmethod
     async def update_shipment(self, shipment_id: int, data: ShipmentIn) -> ShipmentDTO | None:

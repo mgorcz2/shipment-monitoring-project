@@ -27,6 +27,7 @@ async def get_address(location: str) -> str:
         raise ValueError(f"Address not found: {location}")
     return str(address)
 
+
 async def get_address_from_location(location: Location) -> str:
     """Getting a full adress from a Location object.
 
@@ -39,6 +40,7 @@ async def get_address_from_location(location: Location) -> str:
     location = f"{location.street}, {location.street_number}, {location.city}, {location.postcode}"
     return await get_address(location)
 
+
 async def get_coords(address: str) -> tuple[float,float] | None:
     """Convert an adress to coordinates.
 
@@ -50,6 +52,7 @@ async def get_coords(address: str) -> tuple[float,float] | None:
     """
     location = geolocator.geocode(address)
     return (location.latitude, location.longitude) or None
+
 
 async def get_distance(courier_coords: tuple[float, float],shipment_coords: tuple[float,float]) -> float:
     """Calculate the distance between two geographical coordinates.

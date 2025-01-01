@@ -6,7 +6,10 @@ from shipment_monitoring.infrastructure.services.iuser import IUserService
 from shipment_monitoring.seed.test_data import USERS, SHIPMENTS
 from shipment_monitoring.core.domain.user import User, UserRole
 from shipment_monitoring.core.security import auth
+
+
 router = APIRouter(tags=["seed"])
+
 
 @router.post("/seed-data", status_code=status.HTTP_201_CREATED)
 @auth.role_required(UserRole.COURIER)

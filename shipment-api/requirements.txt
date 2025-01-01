@@ -13,3 +13,4 @@ python-multipart==0.0.17
 geopy~=2.4.1
 haversine==2.9.0
 fastapi-mail==1.4.2
+dotenv==0.0.5

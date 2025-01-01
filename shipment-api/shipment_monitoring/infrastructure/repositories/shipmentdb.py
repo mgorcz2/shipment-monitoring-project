@@ -13,10 +13,10 @@ from shipment_monitoring.db import (
 )
 
 
+
 class ShipmentRepository(IShipmentRepository):
     """A class representing shipment DB repository."""
     
-
     async def assign_shipment_to_courier(self, shipment_id: int, courier_id: UUID) -> Any | None:
         """The method assigning shipment to courier in the data storage.
 
@@ -36,6 +36,7 @@ class ShipmentRepository(IShipmentRepository):
         )
         shipment = await database.fetch_one(query)
         return shipment
+
 
     async def update_status(self, courier_id: UUID, shipment_id: int, new_status: ShipmentStatus) -> Any | None:
         """The method changing shipment status by provided id in the data storage.
@@ -60,6 +61,7 @@ class ShipmentRepository(IShipmentRepository):
         shipment = await database.fetch_one(query)
         return shipment
     
+
     async def check_status(self, shipment_id: int, recipient_email: str) -> Any | None:
         """The method getting shipment by provided id and Recipient email from the data storage.
 
@@ -80,6 +82,7 @@ class ShipmentRepository(IShipmentRepository):
         shipment = await database.fetch_one(query)
         return shipment
      
+     
     async def get_all_shipments(self) -> Iterable[Any]:
         """The method getting all shipments from the data storage.
 
@@ -90,6 +93,7 @@ class ShipmentRepository(IShipmentRepository):
         shipments = await database.fetch_all(query)
         return shipments
     
+
     async def get_shipment_by_id(self, shipment_id: int) -> Any | None:
         """The method getting shipment by provided id.
 
@@ -124,6 +128,7 @@ class ShipmentRepository(IShipmentRepository):
         )
         deleted_shipment = await database.fetch_one(query)
         return deleted_shipment if deleted_shipment else None
+
 
     async def add_shipment(self, 
                            data: ShipmentIn, 
@@ -160,7 +165,8 @@ class ShipmentRepository(IShipmentRepository):
         new_shipment_id = await database.execute(query)
         new_shipment = await self.get_shipment_by_id(new_shipment_id)
         return new_shipment if new_shipment else None
-#
+
+
     async def update_shipment(self,
                               shipment_id: int,
                               old_shipment: Shipment,
@@ -184,7 +190,6 @@ class ShipmentRepository(IShipmentRepository):
         Returns:
             Any | None: The updated shipment if updated.
         """
-        
         query = (
             update(shipment_table)
             .where(shipment_table.c.id == shipment_id)

@@ -17,7 +17,6 @@ class ShipmentService(IShipmentService):
     def __init__(self, repository: IShipmentRepository) -> None:
         self._repository = repository
         
-        
     async def assign_shipment_to_courier(self, shipment_id: int, courier_id: UUID) -> ShipmentDTO| None:
         """The method assigning shipment to courier in the repository.
 
@@ -30,6 +29,7 @@ class ShipmentService(IShipmentService):
         """                     
         shipment = await self._repository.assign_shipment_to_courier(shipment_id, courier_id)
         return ShipmentDTO.from_record(shipment) if shipment else None
+    
     
     async def update_status(self, courier_id: UUID, shipment_id: int, new_status: ShipmentStatus) -> ShipmentDTO | None:
         """The method changing shipment status by provided id in the repository.
@@ -72,6 +72,7 @@ class ShipmentService(IShipmentService):
         shipment = await self._repository.get_shipment_by_id(shipment_id)
         return ShipmentDTO.from_record(shipment) if shipment else None
     
+
     async def delete_shipment(self, shipment_id: int) -> dict | None:
         """The method deleting shipment by provided id.
 
@@ -84,6 +85,7 @@ class ShipmentService(IShipmentService):
         deleted_shipment = await self._repository.delete_shipment(shipment_id)
         return deleted_shipment if deleted_shipment else None
     
+
     async def get_all_shipments(self) -> Iterable[ShipmentDTO]:
         """The method getting all shipment from the repository.
 
@@ -103,7 +105,6 @@ class ShipmentService(IShipmentService):
         Returns:
             Iterable[ShipmentWithDistanceDTO]: Shipments with distance attribute sorted collection.
         """
-
         if shipments := await self._repository.get_all_shipments():
             courier_address = await geopy.get_address_from_location(courier_location)
             courier_coords = await geopy.get_coords(courier_address)
@@ -167,3 +168,4 @@ class ShipmentService(IShipmentService):
             shipment = await self._repository.update_shipment(shipment_id, old_shipment, data, origin, destination, origin_coords, destination_coords)
             return ShipmentDTO.from_record(shipment) if shipment else None
         return None
+    

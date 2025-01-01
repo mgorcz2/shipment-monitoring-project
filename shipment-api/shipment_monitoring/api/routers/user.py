@@ -15,6 +15,7 @@ router = APIRouter(
     tags=["users"],
     )
 
+
 @router.post("/register", response_model=UserDTO, status_code=status.HTTP_201_CREATED)
 @inject
 async def register_user(
@@ -36,6 +37,7 @@ async def register_user(
     except ValueError as error:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
      
+
 @router.post("/token", response_model=TokenDTO)
 @inject
 async def login_for_access_token(
@@ -56,7 +58,6 @@ async def login_for_access_token(
         return token
     except ValueError as error:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(error))
-
 
 
 @router.get("/get/{username}", response_model=UserDTO, status_code=status.HTTP_200_OK)
@@ -81,6 +82,7 @@ async def get_user_by_username(
         return user
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No user found with the provided username.")
     
+
 @router.delete("/delete/{username}", status_code=status.HTTP_200_OK)
 @auth.role_required(UserRole.ADMIN)
 @inject
@@ -102,6 +104,7 @@ async def delete_user(
     if user := await service.detele_user(username):
         return dict(user)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No user found with the provided username. Try again.")
+
 
 @router.put("/update/{username}", status_code=status.HTTP_200_OK)
 @auth.role_required(UserRole.ADMIN)
@@ -149,4 +152,3 @@ async def get_all_users(
     if users := await service.get_all_users():
         return users
     raise HTTPException(status_code=404, detail="Users not found")
-        

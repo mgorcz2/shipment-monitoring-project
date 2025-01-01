@@ -60,3 +60,4 @@ class ShipmentWithDistanceDTO(ShipmentDTO):
     origin_distance: Optional[float] = None
     destination_distance: Optional[float] = None
     
+    

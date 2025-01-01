@@ -20,6 +20,7 @@ class IUserService(ABC):
             UserDTO | None: The registered user object if successful, None otherwise.
         """
 
+
     @abstractmethod
     async def get_user_by_id(self, user_id:UUID) -> UserDTO | None:
         """The abstract getting user by provided id from repository.
@@ -31,6 +32,7 @@ class IUserService(ABC):
             UserDTO | None: The user object if exists.
         """
     
+
     @abstractmethod
     async def get_user_by_username(self,username) -> UserDTO | None:
         """The abstract getting user by provided username from repository.
@@ -41,6 +43,7 @@ class IUserService(ABC):
         Returns:
             User | None: The user object if exists.
         """
+
         
     @abstractmethod
     async def detele_user(self, username: str) -> dict | None:
@@ -53,6 +56,7 @@ class IUserService(ABC):
             dict | None: The deleted user object.
         """
         
+
     @abstractmethod
     async def update_user(self, username: str, data: User) -> dict | None:
         """The abstract updating user by provided username.
@@ -64,6 +68,7 @@ class IUserService(ABC):
         Returns:
             dict | None: The user object if updated.
         """
+        
         
     @abstractmethod
     async def login_for_access_token(self, username: str, password: str) -> TokenDTO | None:
