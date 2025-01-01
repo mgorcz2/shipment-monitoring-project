@@ -12,6 +12,7 @@ from shipment_monitoring.core.domain.user import User, UserRole
 from shipment_monitoring.core.security import auth
 from shipment_monitoring.infrastructure.external.email import email_service
 from uuid import UUID
+
 router = APIRouter(
     prefix="/shipments",
     tags=["shipments"],
@@ -43,6 +44,7 @@ async def assign_shipment_to_courier(
         if shipment := await shipment_service.assign_shipment_to_courier(shipment_id, courier_id):
             return shipment
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Shipment not found or wrong courier id")
+
 
 @router.put("/update_status", response_model=ShipmentDTO, status_code=status.HTTP_200_OK)
 @auth.role_required(UserRole.COURIER)
@@ -90,7 +92,6 @@ async def check_status(
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Shipment not found or wrong recipient email")
         
 
-
 @router.get("/all", response_model=Iterable[ShipmentDTO], status_code=status.HTTP_200_OK)
 @inject
 async def get_all_shipments(
@@ -114,6 +115,7 @@ async def get_all_shipments(
         if current_user.role == "sender":
             return [shipment for shipment in shipments if shipment.sender_id==current_user.id]
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No shipments found.")
+
 
 @router.get("/get/{shipment_id}", response_model=ShipmentDTO, status_code=status.HTTP_200_OK)
 @auth.role_required(UserRole.COURIER)
@@ -158,6 +160,7 @@ async def delete_shipment(
     if shipment := await service.delete_shipment(shipment_id):
         return dict(shipment)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No shipment found with the provided ID. Try again.")
+
 
 @router.post("/sort_by/distance",status_code=status.HTTP_200_OK)
 @auth.role_required(UserRole.COURIER)
@@ -207,14 +210,23 @@ async def add_shipment(
     try:
         sender_id = current_user.id
         if new_shipment := await service.add_shipment(new_shipment,sender_id):
-            return new_shipment
-        #    recipient_email = new_shipment.recipient_email
-        #    if recipient_email is not None:
-        #        await email_service.send_email(new_shipment.id, "Nadano przesylke do ciebie", recipient_email, "Sprawdz jej status na stronie <url>")
-        # The email sending function works, but this section is commented out
-        # to protect sensitive configuration data (e.g., email credentials).
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,detail=str(error))           
-                
+            recipient_email = new_shipment.recipient_email
+            if recipient_email is not None:
+                await email_service.send_email(
+                    new_shipment.id, 
+                    subject="Powiadomienie: Nadano Twoją przesyłkę", 
+                    recipient=recipient_email, 
+                    body=f"""
+                        <h2>Twoja przesyłka została nadana!</h2>
+                        <p>Przesyłka o numerze <strong>{new_shipment.id}</strong> została nadana i jest w drodze do Ciebie.</p>
+                        <p>Aby sprawdzić jej aktualny status, odwiedź poniższy link:</p>
+                        <p><a href="https://example.com/track/{new_shipment.id}" target="_blank">Śledź przesyłkę</a></p>
+                        <p>Dziękujemy za skorzystanie z naszych usług!</p>
+                        <hr>
+                        <p>Jeśli masz pytania, skontaktuj się z naszym działem obsługi klienta.</p>
+                        """
+                    )
+        return new_shipment
     except ValueError as error:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,detail=str(error))    
 

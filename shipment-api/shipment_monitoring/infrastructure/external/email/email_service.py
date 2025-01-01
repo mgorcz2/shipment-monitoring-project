@@ -12,3 +12,4 @@ async def send_email(shipment_id: int, subject: str, recipient: str, body: str):
         subtype="html"
     )
     await mail.send_message(message)
+    

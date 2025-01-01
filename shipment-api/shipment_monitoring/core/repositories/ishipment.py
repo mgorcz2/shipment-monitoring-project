@@ -22,6 +22,8 @@ class IShipmentRepository(ABC):
         Returns:
             Any | None: The shipment details if updated.
         """    
+
+
     @abstractmethod
     async def update_status(self, courier_id: UUID, shipment_id: int, new_status: ShipmentStatus) -> Any | None:
         """The abstract changing shipment status by provided id and courier id.
@@ -48,6 +50,7 @@ class IShipmentRepository(ABC):
             Any | None: The shipment details if exists.
         """
     
+
     @abstractmethod
     async def get_all_shipments(self) -> Iterable[Any]:
         """The abstract getting all shipments from data storage.
@@ -55,6 +58,7 @@ class IShipmentRepository(ABC):
         Returns:
             Iterable[Any]: Aiports in the data storage.
         """
+
 
     @abstractmethod
     async def get_shipment_by_id(self, shipment_id: int) -> Any | None:
@@ -67,6 +71,7 @@ class IShipmentRepository(ABC):
             Any | None: The shipment details if exists.
         """
         
+
     @abstractmethod
     async def delete_shipment(self, shipment_id: int) -> Any | None:
         """The abstract deleting shipment by provided id.
@@ -77,6 +82,7 @@ class IShipmentRepository(ABC):
         Returns:
             Any | None: The shipment details if deleted.
         """
+
 
     @abstractmethod
     async def add_shipment(self, data: ShipmentIn, origin: str, destination: str, origin_coords: Tuple, destination_coords: Tuple, user_id: UUID) -> Any | None:
@@ -95,6 +101,7 @@ class IShipmentRepository(ABC):
             Any | None: The shipment object if created.
         """
         
+
     @abstractmethod
     async def update_shipment(self,
                               shipment_id: int,
@@ -121,3 +128,4 @@ class IShipmentRepository(ABC):
         Returns:
             Any | None: The updated shipment details if updated.
         """
+        

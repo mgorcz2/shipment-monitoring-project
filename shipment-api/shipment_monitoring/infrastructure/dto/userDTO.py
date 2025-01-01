@@ -27,3 +27,4 @@ class UserDTO(BaseModel):
             username=record_dict.pop('username'),
             role=record_dict.pop('role')
         )
+    

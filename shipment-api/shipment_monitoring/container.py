@@ -21,3 +21,4 @@ class Container(DeclarativeContainer):
         UserService,
         repository=user_repository,
     )
+    

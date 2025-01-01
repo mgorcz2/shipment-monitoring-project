@@ -9,6 +9,8 @@ from dependency_injector.wiring import Provide, inject
 from shipment_monitoring.core.security import consts
 from shipment_monitoring.core.domain.user import User, UserRole
 from functools import wraps
+
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")
 
 @inject
@@ -29,6 +31,7 @@ async def get_current_user(
         User: The user object if authenticated.
     """
     
+
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -47,7 +50,6 @@ async def get_current_user(
     if user is None:
         raise credentials_exception
     return user
-
 
 
 def role_required(required_role: str):

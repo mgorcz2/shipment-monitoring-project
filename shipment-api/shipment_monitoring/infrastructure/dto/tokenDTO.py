@@ -10,3 +10,4 @@ class TokenDTO(BaseModel):
         from_attributes=True,
         extra="ignore",
     )
+    

@@ -30,6 +30,7 @@ class UserRepository(IUserRepository):
         new_user = await self.get_user_by_id(new_user)
         return UserDTO.from_record(new_user) if new_user else None
 
+
     async def get_user_by_id(self, user_id: UUID) -> Any | None:
         """The method getting user by provided id.
 
@@ -46,6 +47,7 @@ class UserRepository(IUserRepository):
         user = await database.fetch_one(query)
         return user if user else None
     
+
     async def get_user_by_username(self,username) -> Any | None:
         """The method getting user by provided username.
 
@@ -63,6 +65,7 @@ class UserRepository(IUserRepository):
         user = await database.fetch_one(query)
         return user if user else None
     
+
     async def detele_user(self, username: str) -> Any | None:
         """The abstract deleting user by provided username.
 
@@ -80,6 +83,7 @@ class UserRepository(IUserRepository):
         deleted_user = await database.fetch_one(query)
         return deleted_user if deleted_user else None
     
+
     async def update_user(self, username: str, data: User) -> Any | None:
         """The abstract updating user by provided username.
 
@@ -99,6 +103,7 @@ class UserRepository(IUserRepository):
         updated_user = await database.fetch_one(query)
         return updated_user if updated_user else None
     
+    
     async def get_all_users(self) -> Iterable[Any] | None:
         """The method getting all users from database.
 
@@ -108,3 +113,4 @@ class UserRepository(IUserRepository):
         query = select(user_table)
         users = await database.fetch_all(query)
         return users
+    
