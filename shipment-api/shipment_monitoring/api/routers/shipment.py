@@ -220,7 +220,7 @@ async def add_shipment(
                         <h2>Twoja przesyłka została nadana!</h2>
                         <p>Przesyłka o numerze <strong>{new_shipment.id}</strong> została nadana i jest w drodze do Ciebie.</p>
                         <p>Aby sprawdzić jej aktualny status, odwiedź poniższy link:</p>
-                        <p><a href="https://example.com/track/{new_shipment.id}" target="_blank">Śledź przesyłkę</a></p>
+                        <p><a href="http://localhost:8000/shipments/check_status?shipment_id={new_shipment.id}&recipient_email={recipient_email}" target="_blank">Śledź przesyłkę</a></p>
                         <p>Dziękujemy za skorzystanie z naszych usług!</p>
                         <hr>
                         <p>Jeśli masz pytania, skontaktuj się z naszym działem obsługi klienta.</p>

@@ -54,7 +54,8 @@ async def get_coords(address: str) -> tuple[float,float] | None:
     return (location.latitude, location.longitude) or None
 
 
-async def get_distance(courier_coords: tuple[float, float],shipment_coords: tuple[float,float]) -> float:
+async def get_distance(courier_coords: tuple[float, float],
+                       shipment_coords: tuple[float,float]) -> float:
     """Calculate the distance between two geographical coordinates.
 
     Args:
