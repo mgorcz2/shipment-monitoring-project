@@ -9,7 +9,7 @@ from dependency_injector.wiring import Provide, inject
 from shipment_monitoring.core.security import consts
 from shipment_monitoring.core.domain.user import User, UserRole
 from functools import wraps
-
+from shipment_monitoring.config import config
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")
 
@@ -39,7 +39,7 @@ async def get_current_user(
     )
     try:
         payload = jwt.decode(
-            token, consts.SECRET_KEY, algorithms=[consts.ALGORITHM]
+            token, config.SECRET_KEY, algorithms=[consts.ALGORITHM]
         )
         id: str = payload.get("sub")
         if id is None:
