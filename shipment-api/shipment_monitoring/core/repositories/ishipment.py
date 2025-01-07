@@ -85,7 +85,8 @@ class IShipmentRepository(ABC):
 
 
     @abstractmethod
-    async def add_shipment(self, data: ShipmentIn, origin: str, destination: str, origin_coords: Tuple, destination_coords: Tuple, user_id: UUID) -> Any | None:
+    async def add_shipment(self, data: ShipmentIn, origin: str, destination: str,
+                            origin_coords: Tuple, destination_coords: Tuple, user_id: UUID) -> Any | None:
         """The abstract adding new shipment to the data storage.
 
         Args:

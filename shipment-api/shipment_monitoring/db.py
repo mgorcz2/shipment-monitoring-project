@@ -70,7 +70,6 @@ user_table = sqlalchemy.Table(
 )
 
 
-
 db_uri = (
     f"postgresql+asyncpg://{config.DB_USER}:{config.DB_PASSWORD}"
     f"@{config.DB_HOST}/{config.DB_NAME}"
