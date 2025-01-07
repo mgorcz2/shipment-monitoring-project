@@ -2,7 +2,6 @@ import asyncio
 import databases
 import sqlalchemy
 from sqlalchemy.sql import func
-from datetime import datetime
 from sqlalchemy.exc import OperationalError, DatabaseError
 from sqlalchemy.ext.asyncio import create_async_engine
 from asyncpg.exceptions import (    # type: ignore

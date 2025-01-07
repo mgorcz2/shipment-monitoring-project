@@ -12,6 +12,12 @@ services:
       - DB_NAME=app
       - DB_USER=postgres
       - DB_PASSWORD=pass
+      - MAIL_USERNAME=mail@example.com
+      - MAIL_PASSWORD=password
+      - MAIL_PORT=587
+      - MAIL_SERVER=smtp.example.com
+      - MAIL_FROM=mail@example.com
+      - SECRET_KEY=SECRET_KEY
     depends_on:
       - db
     networks:

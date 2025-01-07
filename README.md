@@ -24,12 +24,8 @@ A web-based application for tracking and managing courier shipments. This servic
 - Running the project using Docker: docker compose up (to avoid cache issues: docker compose up --force-recreate)
  
 ## Setup
-Before running the project, you need to create a `.env` file in the root directory of the project ("shipment_monitoring")
-
-### Example of `.env` file
-Create a `.env` file with the following variables:
+To ensure email sending works correctly, set the following variables in the Docker container configuration("docker-compose.yml")
 MAIL_USERNAME=your_email@example.com 
 MAIL_PASSWORD=your_email_password 
 MAIL_FROM=your_email@example.com 
-MAIL_PORT=587 
-MAIL_SERVER=smtp.gmail.com
+MAIL_SERVER=smtp.example.com
