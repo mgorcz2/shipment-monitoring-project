@@ -25,7 +25,7 @@ A web-based application for tracking and managing courier shipments. This servic
  
 ## Setup
 To ensure email sending works correctly, set the following variables in the Docker container configuration("docker-compose.yml")
-MAIL_USERNAME=your_email@example.com 
-MAIL_PASSWORD=your_email_password 
-MAIL_FROM=your_email@example.com 
-MAIL_SERVER=smtp.example.com
+- MAIL_USERNAME=your_email@example.com 
+- MAIL_PASSWORD=your_email_password 
+- MAIL_FROM=your_email@example.com 
+- MAIL_SERVER=smtp.example.com
