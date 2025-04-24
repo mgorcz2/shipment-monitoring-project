@@ -4,15 +4,21 @@ from abc import ABC, abstractmethod
 from typing import Any, Iterable, Tuple
 from uuid import UUID
 
-
-from shipment_monitoring.core.domain.shipment import ShipmentIn, ShipmentStatus, Shipment
 from shipment_monitoring.core.domain.location import Location
+from shipment_monitoring.core.domain.shipment import (
+    Shipment,
+    ShipmentIn,
+    ShipmentStatus,
+)
+
 
 class IShipmentRepository(ABC):
     """An abstract class representing protocol of shipment repository."""
-    
+
     @abstractmethod
-    async def assign_shipment_to_courier(self, shipment_id: int, courier_id: UUID) -> Any | None:
+    async def assign_shipment_to_courier(
+        self, shipment_id: int, courier_id: UUID
+    ) -> Any | None:
         """The abstract assigning shipment to courier.
 
         Args:
@@ -21,11 +27,12 @@ class IShipmentRepository(ABC):
 
         Returns:
             Any | None: The shipment details if updated.
-        """    
-
+        """
 
     @abstractmethod
-    async def update_status(self, courier_id: UUID, shipment_id: int, new_status: ShipmentStatus) -> Any | None:
+    async def update_status(
+        self, courier_id: UUID, shipment_id: int, new_status: ShipmentStatus
+    ) -> Any | None:
         """The abstract changing shipment status by provided id and courier id.
 
         Args:
@@ -36,8 +43,7 @@ class IShipmentRepository(ABC):
         Returns:
             Any | None: The shipment details if updated.
         """
-    
-    
+
     @abstractmethod
     async def check_status(self, shipment_id: int, recipient_email: str) -> Any | None:
         """The abstract getting shipment by provided id and Recipient email.
@@ -49,7 +55,6 @@ class IShipmentRepository(ABC):
         Returns:
             Any | None: The shipment details if exists.
         """
-    
 
     @abstractmethod
     async def get_all_shipments(self) -> Iterable[Any]:
@@ -58,7 +63,6 @@ class IShipmentRepository(ABC):
         Returns:
             Iterable[Any]: Aiports in the data storage.
         """
-
 
     @abstractmethod
     async def get_shipment_by_id(self, shipment_id: int) -> Any | None:
@@ -70,7 +74,6 @@ class IShipmentRepository(ABC):
         Returns:
             Any | None: The shipment details if exists.
         """
-        
 
     @abstractmethod
     async def delete_shipment(self, shipment_id: int) -> Any | None:
@@ -83,10 +86,16 @@ class IShipmentRepository(ABC):
             Any | None: The shipment details if deleted.
         """
 
-
     @abstractmethod
-    async def add_shipment(self, data: ShipmentIn, origin: str, destination: str,
-                            origin_coords: Tuple, destination_coords: Tuple, user_id: UUID) -> Any | None:
+    async def add_shipment(
+        self,
+        data: ShipmentIn,
+        origin: str,
+        destination: str,
+        origin_coords: Tuple,
+        destination_coords: Tuple,
+        user_id: UUID,
+    ) -> Any | None:
         """The abstract adding new shipment to the data storage.
 
         Args:
@@ -96,23 +105,23 @@ class IShipmentRepository(ABC):
             origin (Tuple): The origin coords of the shipment.
             destination (Tuple): The destination coords of the shipment.
             user_id (UUID): UUID of the user(sender)
-            
+
 
         Returns:
             Any | None: The shipment object if created.
         """
-        
 
     @abstractmethod
-    async def update_shipment(self,
-                              shipment_id: int,
-                              old_shipment: Shipment,
-                              data: ShipmentIn, 
-                              origin: str, 
-                              destination: str, 
-                              origin_coords: Tuple, 
-                              destination_coords: Tuple
-                              ) -> Any | None:
+    async def update_shipment(
+        self,
+        shipment_id: int,
+        old_shipment: Shipment,
+        data: ShipmentIn,
+        origin: str,
+        destination: str,
+        origin_coords: Tuple,
+        destination_coords: Tuple,
+    ) -> Any | None:
         """The abstract updating shipment data.
 
         Args:
@@ -124,9 +133,8 @@ class IShipmentRepository(ABC):
             origin (Tuple): The origin coords of the shipment.
             destination (Tuple): The destination coords of the shipment.
 
-            
+
 
         Returns:
             Any | None: The updated shipment details if updated.
         """
-        

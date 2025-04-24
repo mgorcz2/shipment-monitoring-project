@@ -18,9 +18,10 @@ container.wire(
         "shipment_monitoring.api.routers.shipment",
         "shipment_monitoring.api.routers.user",
         "shipment_monitoring.core.security.auth",
-        "shipment_monitoring.api.routers.seed"
+        "shipment_monitoring.api.routers.seed",
     ]
 )
+
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncGenerator:
@@ -30,11 +31,11 @@ async def lifespan(_: FastAPI) -> AsyncGenerator:
     yield
     await database.disconnect()
 
+
 app = FastAPI(lifespan=lifespan)
 app.include_router(shipment_router)
 app.include_router(user_router)
 app.include_router(seed_router)
-
 
 
 @app.exception_handler(HTTPException)

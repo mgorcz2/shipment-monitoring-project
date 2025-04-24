@@ -6,18 +6,20 @@ from uuid import UUID
 from sqlalchemy import select, join, update, delete
 
 from shipment_monitoring.core.repositories.ishipment import IShipmentRepository
-from shipment_monitoring.core.domain.shipment import Shipment, ShipmentIn, ShipmentStatus
-from shipment_monitoring.db import (
-    shipment_table, 
-    database
+from shipment_monitoring.core.domain.shipment import (
+    Shipment,
+    ShipmentIn,
+    ShipmentStatus,
 )
-
+from shipment_monitoring.db import shipment_table, database
 
 
 class ShipmentRepository(IShipmentRepository):
     """A class representing shipment DB repository."""
-    
-    async def assign_shipment_to_courier(self, shipment_id: int, courier_id: UUID) -> Any | None:
+
+    async def assign_shipment_to_courier(
+        self, shipment_id: int, courier_id: UUID
+    ) -> Any | None:
         """The method assigning shipment to courier in the data storage.
 
         Args:
@@ -27,18 +29,19 @@ class ShipmentRepository(IShipmentRepository):
         Returns:
             Any | None: The shipment details if updated.
         """
-        
+
         query = (
-                update(shipment_table)
-                .where (shipment_table.c.id==shipment_id)
-                .values(courier_id=courier_id)
-                .returning(shipment_table)
+            update(shipment_table)
+            .where(shipment_table.c.id == shipment_id)
+            .values(courier_id=courier_id)
+            .returning(shipment_table)
         )
         shipment = await database.fetch_one(query)
         return shipment
 
-
-    async def update_status(self, courier_id: UUID, shipment_id: int, new_status: ShipmentStatus) -> Any | None:
+    async def update_status(
+        self, courier_id: UUID, shipment_id: int, new_status: ShipmentStatus
+    ) -> Any | None:
         """The method changing shipment status by provided id in the data storage.
 
         Args:
@@ -50,17 +53,16 @@ class ShipmentRepository(IShipmentRepository):
             Any | None: The shipment details if updated.
         """
         query = (
-                update(shipment_table)
-                .where (
-                    (shipment_table.c.id == shipment_id) &
-                    (shipment_table.c.courier_id == courier_id)
-                )
-                .values(status=new_status)
-                .returning(shipment_table)
+            update(shipment_table)
+            .where(
+                (shipment_table.c.id == shipment_id)
+                & (shipment_table.c.courier_id == courier_id)
+            )
+            .values(status=new_status)
+            .returning(shipment_table)
         )
         shipment = await database.fetch_one(query)
         return shipment
-    
 
     async def check_status(self, shipment_id: int, recipient_email: str) -> Any | None:
         """The method getting shipment by provided id and Recipient email from the data storage.
@@ -72,17 +74,13 @@ class ShipmentRepository(IShipmentRepository):
         Returns:
             Any | None: The shipment details if exists.
         """
-        query = (
-                select(shipment_table)
-                .where (
-                    (shipment_table.c.id == shipment_id) &
-                    (shipment_table.c.recipient_email == recipient_email)
-                )
+        query = select(shipment_table).where(
+            (shipment_table.c.id == shipment_id)
+            & (shipment_table.c.recipient_email == recipient_email)
         )
         shipment = await database.fetch_one(query)
         return shipment
-     
-     
+
     async def get_all_shipments(self) -> Iterable[Any]:
         """The method getting all shipments from the data storage.
 
@@ -92,7 +90,6 @@ class ShipmentRepository(IShipmentRepository):
         query = select(shipment_table)
         shipments = await database.fetch_all(query)
         return shipments
-    
 
     async def get_shipment_by_id(self, shipment_id: int) -> Any | None:
         """The method getting shipment by provided id.
@@ -104,14 +101,10 @@ class ShipmentRepository(IShipmentRepository):
             Any | None: The shipment details if exists.
         """
 
-        query = (
-                select(shipment_table)
-                .where (shipment_table.c.id == shipment_id)
-        )
+        query = select(shipment_table).where(shipment_table.c.id == shipment_id)
         shipment = await database.fetch_one(query)
         return shipment if shipment else None
 
-    
     async def delete_shipment(self, shipment_id: int) -> Any | None:
         """The method deleting shipment by provided id.
 
@@ -123,20 +116,21 @@ class ShipmentRepository(IShipmentRepository):
         """
         query = (
             delete(shipment_table)
-            .where (shipment_table.c.id == shipment_id)
+            .where(shipment_table.c.id == shipment_id)
             .returning(shipment_table)
         )
         deleted_shipment = await database.fetch_one(query)
         return deleted_shipment if deleted_shipment else None
 
-
-    async def add_shipment(self, 
-                           data: ShipmentIn, 
-                           origin: str, 
-                           destination: str, 
-                           origin_coords: Tuple, 
-                           destination_coords: Tuple, 
-                           user_id: UUID) -> Any | None:
+    async def add_shipment(
+        self,
+        data: ShipmentIn,
+        origin: str,
+        destination: str,
+        origin_coords: Tuple,
+        destination_coords: Tuple,
+        user_id: UUID,
+    ) -> Any | None:
         """The method adding new shipment to the data storage.
 
         Args:
@@ -153,29 +147,31 @@ class ShipmentRepository(IShipmentRepository):
         query = shipment_table.insert().values(
             sender_id=user_id,
             status="ready_for_pickup",
-            weight = data.weight,
-            recipient_email = None if data.recipient_email == "" else data.recipient_email,
+            weight=data.weight,
+            recipient_email=(
+                None if data.recipient_email == "" else data.recipient_email
+            ),
             origin=origin,
             destination=destination,
-            origin_latitude = origin_coords[0],
-            origin_longitude = origin_coords[1],
-            destination_latitude = destination_coords[0],
-            destination_longitude = destination_coords[1]
-            )
+            origin_latitude=origin_coords[0],
+            origin_longitude=origin_coords[1],
+            destination_latitude=destination_coords[0],
+            destination_longitude=destination_coords[1],
+        )
         new_shipment_id = await database.execute(query)
         new_shipment = await self.get_shipment_by_id(new_shipment_id)
         return new_shipment if new_shipment else None
 
-
-    async def update_shipment(self,
-                              shipment_id: int,
-                              old_shipment: Shipment,
-                              data: ShipmentIn, 
-                              origin: str, 
-                              destination: str, 
-                              origin_coords: Tuple, 
-                              destination_coords: Tuple
-                              ) -> Any | None:
+    async def update_shipment(
+        self,
+        shipment_id: int,
+        old_shipment: Shipment,
+        data: ShipmentIn,
+        origin: str,
+        destination: str,
+        origin_coords: Tuple,
+        destination_coords: Tuple,
+    ) -> Any | None:
         """The method updating shipment data in the data storage.
 
         Args:
@@ -194,20 +190,21 @@ class ShipmentRepository(IShipmentRepository):
             update(shipment_table)
             .where(shipment_table.c.id == shipment_id)
             .values(
-                    sender_id=old_shipment.sender_id,
-                    courier_id=old_shipment.courier_id,
-                    status=old_shipment.status,
-                    weight = data.weight,
-                    recipient_email = None if data.recipient_email == "" else data.recipient_email,
-                    origin=origin,
-                    destination=destination,
-                    origin_latitude = origin_coords[0],
-                    origin_longitude = origin_coords[1],
-                    destination_latitude = destination_coords[0],
-                    destination_longitude = destination_coords[1]
-                    )
+                sender_id=old_shipment.sender_id,
+                courier_id=old_shipment.courier_id,
+                status=old_shipment.status,
+                weight=data.weight,
+                recipient_email=(
+                    None if data.recipient_email == "" else data.recipient_email
+                ),
+                origin=origin,
+                destination=destination,
+                origin_latitude=origin_coords[0],
+                origin_longitude=origin_coords[1],
+                destination_latitude=destination_coords[0],
+                destination_longitude=destination_coords[1],
+            )
             .returning(shipment_table)
         )
         shipment = await database.fetch_one(query)
         return shipment if shipment else None
-        

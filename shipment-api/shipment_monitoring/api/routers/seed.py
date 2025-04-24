@@ -22,13 +22,15 @@ async def seed_data(
     try:
         for user in USERS:
             await user_service.register_user(user)
-            
+
         sender = await user_service.get_user_by_username("sender")
         courier = await user_service.get_user_by_username("courier")
         for shipment in SHIPMENTS:
             await shipment_service.add_shipment(shipment, sender.id)
         for shipment in await shipment_service.get_all_shipments():
             await shipment_service.assign_shipment_to_courier(shipment.id, courier.id)
-        return {"message:" : "Data seeded."}
+        return {"message:": "Data seeded."}
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+        )

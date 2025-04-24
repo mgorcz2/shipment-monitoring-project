@@ -1,7 +1,9 @@
 """Module containing secure hashing of passwords."""
 
 from passlib.context import CryptContext
-pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 def verify_password(user_password: str, crypt_password: str) -> bool:
     """Verify if provided password matches the stored hashed password.
@@ -14,6 +16,7 @@ def verify_password(user_password: str, crypt_password: str) -> bool:
         bool: True if the password match, False otherwise.
     """
     return pwd_context.verify(user_password, crypt_password)
+
 
 def hash_password(password: str) -> str:
     """Generate a secure hash for the given password.
