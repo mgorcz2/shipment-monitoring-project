@@ -13,13 +13,14 @@ from shipment_monitoring.config import config
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")
 
+
 @inject
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
-    service: IUserService = Depends(Provide[Container.user_service])
-    ) -> User:
+    service: IUserService = Depends(Provide[Container.user_service]),
+) -> User:
     """The method authenticating the user based on a JWT token.
-    
+
     Args:
         token (str): JWT bearer token provided by the oauth2_scheme dependency.
         service (IUserService):The injected service dependency.
@@ -30,7 +31,6 @@ async def get_current_user(
     Returns:
         User: The user object if authenticated.
     """
-    
 
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -38,9 +38,7 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(
-            token, config.SECRET_KEY, algorithms=[consts.ALGORITHM]
-        )
+        payload = jwt.decode(token, config.SECRET_KEY, algorithms=[consts.ALGORITHM])
         id: str = payload.get("sub")
         if id is None:
             raise credentials_exception
@@ -53,19 +51,27 @@ async def get_current_user(
 
 
 def role_required(required_role: str):
-    """ A decorator that enforces role-based access control for endpoint methods.
+    """A decorator that enforces role-based access control for endpoint methods.
 
     Args:
         required_role (str): The role required to access the decorated endpoint.
     """
+
     def decorator(func):
-        @wraps(func)  #wraps some function
-        async def wrapper(*args, current_user: User = Depends(get_current_user), **kwargs):
-            if current_user.role != required_role and current_user.role != UserRole.ADMIN:
+        @wraps(func)  # wraps some function
+        async def wrapper(
+            *args, current_user: User = Depends(get_current_user), **kwargs
+        ):
+            if (
+                current_user.role != required_role
+                and current_user.role != UserRole.ADMIN
+            ):
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="No permission to access this resource.",
                 )
-            return await func(*args,current_user=current_user,**kwargs)
+            return await func(*args, current_user=current_user, **kwargs)
+
         return wrapper
+
     return decorator

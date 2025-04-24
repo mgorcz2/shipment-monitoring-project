@@ -1,15 +1,15 @@
 """Module containing user repository abstractions."""
 
-
 from abc import ABC, abstractmethod
 from typing import Any, Iterable
-
-from shipment_monitoring.core.domain.user import UserIn, User
 from uuid import UUID
+
+from shipment_monitoring.core.domain.user import User, UserIn
+
 
 class IUserRepository(ABC):
     """An abstract repository class for user."""
-    
+
     @abstractmethod
     async def register_user(self, user: UserIn) -> Any | None:
         """The abstract registering new user.
@@ -20,7 +20,6 @@ class IUserRepository(ABC):
         Returns:
             Any | None: The new user object if registered.
         """
-
 
     @abstractmethod
     async def get_user_by_id(self, user_id: UUID) -> Any | None:
@@ -33,7 +32,6 @@ class IUserRepository(ABC):
             Any | None: The user object if exists._
         """
 
-
     @abstractmethod
     async def get_user_by_username(self, username: str) -> Any | None:
         """The abstract getting user by provided username.
@@ -44,7 +42,6 @@ class IUserRepository(ABC):
         Returns:
             Any | None: The user object if exists.
         """
-        
 
     @abstractmethod
     async def detele_user(self, username: str) -> Any | None:
@@ -56,7 +53,6 @@ class IUserRepository(ABC):
         Returns:
             Any | None: The user object if deleted.
         """
-        
 
     @abstractmethod
     async def update_user(self, username: str, data: User) -> Any | None:
@@ -69,12 +65,11 @@ class IUserRepository(ABC):
         Returns:
             Any | None: The user object if updated.
         """
-        
 
+    @abstractmethod
     async def get_all_users(self) -> Iterable[Any] | None:
         """The abstract getting all users.
 
         Returns:
             Iterable[Any] | None: The user objects.
         """
-

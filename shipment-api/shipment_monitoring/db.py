@@ -4,7 +4,7 @@ import sqlalchemy
 from sqlalchemy.sql import func
 from sqlalchemy.exc import OperationalError, DatabaseError
 from sqlalchemy.ext.asyncio import create_async_engine
-from asyncpg.exceptions import (    # type: ignore
+from asyncpg.exceptions import (  # type: ignore
     CannotConnectNowError,
     ConnectionDoesNotExistError,
 )
@@ -14,58 +14,50 @@ from sqlalchemy import Enum
 from shipment_monitoring.core.domain.user import UserRole
 from shipment_monitoring.core.domain.shipment import ShipmentStatus
 
-metadata = sqlalchemy.MetaData()    
+metadata = sqlalchemy.MetaData()
 
 shipment_table = sqlalchemy.Table(
-    'shipments',
+    "shipments",
     metadata,
-    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("sender_id", sqlalchemy.ForeignKey("users.id"), nullable=False),
+    sqlalchemy.Column("courier_id", sqlalchemy.ForeignKey("users.id"), nullable=True),
+    sqlalchemy.Column("status", Enum(ShipmentStatus, name="shipment_status")),
+    sqlalchemy.Column("weight", sqlalchemy.Float),
+    sqlalchemy.Column("recipient_email", sqlalchemy.String, nullable=True),
     sqlalchemy.Column(
-        'sender_id', 
-        sqlalchemy.ForeignKey("users.id"),
-        nullable=False
-                    ),
-    sqlalchemy.Column(
-        'courier_id', 
-        sqlalchemy.ForeignKey("users.id"),
-        nullable=True
-                    ),
-    sqlalchemy.Column('status', Enum(ShipmentStatus, name="shipment_status")),
-    sqlalchemy.Column('weight',sqlalchemy.Float),
-    sqlalchemy.Column('recipient_email', sqlalchemy.String, nullable=True),
-    sqlalchemy.Column(
-        'created_at',
-        sqlalchemy.DateTime(timezone=True),
-        nullable=False,
-        server_default=func.now()
-                      ),
-    sqlalchemy.Column(
-        'last_updated',
+        "created_at",
         sqlalchemy.DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
-        onupdate=func.now() 
-                    ),
-    sqlalchemy.Column('origin', sqlalchemy.String),
-    sqlalchemy.Column('destination', sqlalchemy.String),
-    sqlalchemy.Column('origin_latitude', sqlalchemy.Float),
-    sqlalchemy.Column('origin_longitude', sqlalchemy.Float),
-    sqlalchemy.Column('destination_latitude', sqlalchemy.Float),
-    sqlalchemy.Column('destination_longitude', sqlalchemy.Float),
+    ),
+    sqlalchemy.Column(
+        "last_updated",
+        sqlalchemy.DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    ),
+    sqlalchemy.Column("origin", sqlalchemy.String),
+    sqlalchemy.Column("destination", sqlalchemy.String),
+    sqlalchemy.Column("origin_latitude", sqlalchemy.Float),
+    sqlalchemy.Column("origin_longitude", sqlalchemy.Float),
+    sqlalchemy.Column("destination_latitude", sqlalchemy.Float),
+    sqlalchemy.Column("destination_longitude", sqlalchemy.Float),
 )
 
 user_table = sqlalchemy.Table(
-    'users',
+    "users",
     metadata,
     sqlalchemy.Column(
-        'id', 
+        "id",
         UUID(as_uuid=True),
         primary_key=True,
-        server_default=sqlalchemy.text("gen_random_uuid()")
-                    ),
-    sqlalchemy.Column('username', sqlalchemy.String),
-    sqlalchemy.Column('password', sqlalchemy.String),
-    sqlalchemy.Column('role', Enum(UserRole, name="user_roles"))
+        server_default=sqlalchemy.text("gen_random_uuid()"),
+    ),
+    sqlalchemy.Column("username", sqlalchemy.String),
+    sqlalchemy.Column("password", sqlalchemy.String),
+    sqlalchemy.Column("role", Enum(UserRole, name="user_roles")),
 )
 
 
@@ -83,6 +75,8 @@ database = databases.Database(
     db_uri,
     force_rollback=True,
 )
+
+
 async def init_db(retries: int = 5, delay: int = 5) -> None:
     """Function initializing the DB.
 

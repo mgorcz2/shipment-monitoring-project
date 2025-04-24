@@ -10,6 +10,7 @@ from haversine import haversine
 
 geolocator = Nominatim(user_agent="shipment_app", timeout=1000)
 
+
 async def get_address(location: str) -> str:
     """Geocode a location string to standarized address.
 
@@ -41,7 +42,7 @@ async def get_address_from_location(location: Location) -> str:
     return await get_address(location)
 
 
-async def get_coords(address: str) -> tuple[float,float] | None:
+async def get_coords(address: str) -> tuple[float, float] | None:
     """Convert an adress to coordinates.
 
     Args:
@@ -54,8 +55,9 @@ async def get_coords(address: str) -> tuple[float,float] | None:
     return (location.latitude, location.longitude) or None
 
 
-async def get_distance(courier_coords: tuple[float, float],
-                       shipment_coords: tuple[float,float]) -> float:
+async def get_distance(
+    courier_coords: tuple[float, float], shipment_coords: tuple[float, float]
+) -> float:
     """Calculate the distance between two geographical coordinates.
 
     Args:

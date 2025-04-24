@@ -1,6 +1,5 @@
 """Module containing user service implementation."""
 
-
 from typing import Iterable
 from shipment_monitoring.core.domain.user import User, UserIn
 from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
@@ -14,8 +13,10 @@ from shipment_monitoring.core.security import password_hashing
 
 from uuid import UUID
 
+
 class UserService(IUserService):
     """A class representing implementation of user-related services."""
+
     _repository: IUserRepository
 
     def __init__(self, repository: IUserRepository):
@@ -29,7 +30,7 @@ class UserService(IUserService):
 
         Returns:
             UserDTO | None: The user DTO details if exists.
-        
+
         Raises:
             ValueError: If the username is already registered.
         """
@@ -39,8 +40,7 @@ class UserService(IUserService):
         user.password = password_hashing.hash_password(user.password)
         return await self._repository.register_user(user)
 
-
-    async def get_user_by_id(self, user_id:UUID) -> UserDTO | None:
+    async def get_user_by_id(self, user_id: UUID) -> UserDTO | None:
         """The method getting user by provided id from repository.
 
         Args:
@@ -51,9 +51,8 @@ class UserService(IUserService):
         """
         user = await self._repository.get_user_by_id(user_id)
         return UserDTO.from_record(user) if user else None
-    
 
-    async def get_user_by_username(self,username) -> UserDTO | None:
+    async def get_user_by_username(self, username) -> UserDTO | None:
         """The method getting user by provided username from repository.
 
         Args:
@@ -65,7 +64,6 @@ class UserService(IUserService):
         user = await self._repository.get_user_by_username(username)
         return UserDTO.from_record(user) if user else None
 
-    
     async def detele_user(self, username: str) -> dict | None:
         """The method deleting user by provided username.
 
@@ -77,8 +75,7 @@ class UserService(IUserService):
         """
         deleted_user = await self._repository.detele_user(username)
         return deleted_user if deleted_user else None
-    
-    
+
     async def update_user(self, username: str, data: User) -> dict | None:
         """The abstract updating user by provided username.
 
@@ -101,9 +98,10 @@ class UserService(IUserService):
         data.password = password_hashing.hash_password(data.password)
         updated_user = await self._repository.update_user(username, data)
         return updated_user if updated_user else None
-            
-        
-    async def login_for_access_token(self, username: str, password: str) -> TokenDTO | None:
+
+    async def login_for_access_token(
+        self, username: str, password: str
+    ) -> TokenDTO | None:
         """The method for user authentication to get an access token.
 
         Args:
@@ -112,7 +110,7 @@ class UserService(IUserService):
 
         Returns:
             TokenDTO | None: A token DTO if login is successful, None otherwise.
-            
+
         Raises:
             ValueError: If the users data is invalid.
         """
@@ -124,9 +122,8 @@ class UserService(IUserService):
         access_token = create_access_token(
             data={"sub": str(user.id)}, expires_delta=access_token_expires
         )
-        return {"access_token": access_token, "token_type": "bearer"}  
-     
-    
+        return {"access_token": access_token, "token_type": "bearer"}
+
     async def get_all_users(self) -> Iterable[UserDTO] | None:
         """The method getting all users from repository.
 
@@ -135,4 +132,3 @@ class UserService(IUserService):
         """
         users = await self._repository.get_all_users()
         return [UserDTO.from_record(user) for user in users]
-    

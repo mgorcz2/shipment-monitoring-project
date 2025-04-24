@@ -3,16 +3,26 @@
 from abc import ABC, abstractmethod
 from typing import Iterable
 
-from shipment_monitoring.core.domain.shipment import ShipmentIn, ShipmentStatus, Shipment
+from shipment_monitoring.core.domain.shipment import (
+    ShipmentIn,
+    ShipmentStatus,
+    Shipment,
+)
 from shipment_monitoring.core.domain.location import Location
-from shipment_monitoring.infrastructure.dto.shipmentDTO import ShipmentDTO, ShipmentWithDistanceDTO
+from shipment_monitoring.infrastructure.dto.shipmentDTO import (
+    ShipmentDTO,
+    ShipmentWithDistanceDTO,
+)
 from uuid import UUID
+
 
 class IShipmentService(ABC):
     """An abstract class representing protocol of shipment service."""
-    
+
     @abstractmethod
-    async def assign_shipment_to_courier(shipment_id: int, courier_id: UUID) -> ShipmentDTO | None:
+    async def assign_shipment_to_courier(
+        shipment_id: int, courier_id: UUID
+    ) -> ShipmentDTO | None:
         """The abstract assigning shipment to courier.
 
         Args:
@@ -21,11 +31,12 @@ class IShipmentService(ABC):
 
         Returns:
             ShipmentDTO | None: The shipment  DTO details if updated.
-        """    
-    
-    
+        """
+
     @abstractmethod
-    async def update_status(self, courier_id: UUID, shipment_id: int, new_status: ShipmentStatus) -> ShipmentDTO | None:
+    async def update_status(
+        self, courier_id: UUID, shipment_id: int, new_status: ShipmentStatus
+    ) -> ShipmentDTO | None:
         """The abstract changing shipment status by provided id.
 
         Args:
@@ -36,10 +47,11 @@ class IShipmentService(ABC):
         Returns:
             ShipmentDTO | None: The shipment DTO details if updated.
         """
-        
-    
+
     @abstractmethod
-    async def check_status(self, shipment_id: int, recipient_email: str) -> ShipmentDTO | None:
+    async def check_status(
+        self, shipment_id: int, recipient_email: str
+    ) -> ShipmentDTO | None:
         """The abstract getting shipment by provided id and recipient email.
 
         Args:
@@ -49,8 +61,7 @@ class IShipmentService(ABC):
         Returns:
             ShipmentDTO | None: The shipment DTO details if exists.
         """
-    
-    
+
     @abstractmethod
     async def get_shipment_by_id(self, shipment_id: int) -> ShipmentDTO | None:
         """The abstract getting shipment by provided id.
@@ -62,7 +73,6 @@ class IShipmentService(ABC):
             ShipmentDTO | None: The shipment DTO details if exists.
         """
 
-
     @abstractmethod
     async def get_all_shipments(self) -> Iterable[ShipmentDTO]:
         """The abstract getting all shipment from the repository.
@@ -71,9 +81,10 @@ class IShipmentService(ABC):
             Iterable[ShipmentDTO]: The collection of the shipments.
         """
 
-
     @abstractmethod
-    async def add_shipment(self, shipment: ShipmentIn, user_id: UUID) -> ShipmentDTO | None:
+    async def add_shipment(
+        self, shipment: ShipmentIn, user_id: UUID
+    ) -> ShipmentDTO | None:
         """The abstract adding a shipment to the repository.
         Args:
             shipment (ShipmentIn): The shipment input data.
@@ -83,9 +94,10 @@ class IShipmentService(ABC):
             ShipmentDTO | None: The newly added shipment DTO details if added.
         """
 
-
     @abstractmethod
-    async def sort_by_distance(self, courier_id: UUID, courier_location: Location) -> Iterable[ShipmentWithDistanceDTO]:
+    async def sort_by_distance(
+        self, courier_id: UUID, courier_location: Location
+    ) -> Iterable[ShipmentWithDistanceDTO]:
         """The abstract sorting shipments by destination distance from courier.
 
         Args:
@@ -94,7 +106,6 @@ class IShipmentService(ABC):
         Returns:
             Iterable[ShipmentWithDistanceDTO]: Shipments with distance attribute sorted collection.
         """
-
 
     @abstractmethod
     async def delete_shipment(self, shipment_id: int) -> dict | None:
@@ -107,9 +118,10 @@ class IShipmentService(ABC):
             dict | None: The shipment object from repository if deleted.
         """
 
-
     @abstractmethod
-    async def update_shipment(self, shipment_id: int, data: ShipmentIn) -> ShipmentDTO | None:
+    async def update_shipment(
+        self, shipment_id: int, data: ShipmentIn
+    ) -> ShipmentDTO | None:
         """The abstract updating shipment data in the reposistory.
 
         Args:
