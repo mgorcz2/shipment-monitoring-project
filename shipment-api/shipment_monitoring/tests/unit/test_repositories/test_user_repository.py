@@ -21,9 +21,9 @@ async def prepare_database():
 @pytest.mark.anyio
 async def test_user_repository_crud():
     repo = UserRepository()
-    assert await repo.get_user_by_username("alice") is None
-    alice = UserIn(username="alice", password="pwd", role="sender")
+    assert await repo.get_user_by_email("alice@example.com") is None
+    alice = UserIn(email="alice@example.com", password="pwd", role="sender")
     created = await repo.register_user(alice)
-    assert created.username == "alice"
-    fetched = await repo.get_user_by_username("alice")
-    assert fetched.username == "alice"
+    assert created.email == "alice@example.com"
+    fetched = await repo.get_user_by_email("alice@example.com")
+    assert fetched.email == "alice@example.com"

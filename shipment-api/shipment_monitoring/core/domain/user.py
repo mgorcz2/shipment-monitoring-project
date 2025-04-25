@@ -1,8 +1,9 @@
 """A model containing user-related models."""
 
-from pydantic import BaseModel, ConfigDict
-from uuid import UUID
 import enum
+from uuid import UUID
+
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class UserRole(str, enum.Enum):
@@ -16,9 +17,9 @@ class UserRole(str, enum.Enum):
 class UserIn(BaseModel):
     """An input user model"""
 
-    username: str
+    email: EmailStr
     password: str
-    role: UserRole = "admin"
+    role: UserRole = "sender"
 
 
 class User(UserIn):

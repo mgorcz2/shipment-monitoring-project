@@ -33,33 +33,33 @@ class IUserRepository(ABC):
         """
 
     @abstractmethod
-    async def get_user_by_username(self, username: str) -> Any | None:
-        """The abstract getting user by provided username.
+    async def get_user_by_email(self, email: str) -> Any | None:
+        """The abstract getting user by provided email.
 
         Args:
-            username (str): The username of the user.
+            email (str): The email of the user.
 
         Returns:
             Any | None: The user object if exists.
         """
 
     @abstractmethod
-    async def detele_user(self, username: str) -> Any | None:
-        """The abstract deleting user by provided username.
+    async def detele_user(self, email: str) -> Any | None:
+        """The abstract deleting user by provided email.
 
         Args:
-            username (str): The username of the user.
+            email (str): The email of the user.
 
         Returns:
             Any | None: The user object if deleted.
         """
 
     @abstractmethod
-    async def update_user(self, username: str, data: User) -> Any | None:
-        """The abstract updating user by provided username.
+    async def update_user(self, email: str, data: User) -> Any | None:
+        """The abstract updating user by provided email.
 
         Args:
-            username (str): The username of the user.
+            email (str): The email of the user.
             data (User): The updated user details.
 
         Returns:
