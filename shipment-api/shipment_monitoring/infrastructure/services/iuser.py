@@ -2,10 +2,11 @@
 
 from abc import ABC, abstractmethod
 from typing import Iterable
-from shipment_monitoring.core.domain.user import User, UserIn
-from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
-from shipment_monitoring.infrastructure.dto.tokenDTO import TokenDTO
 from uuid import UUID
+
+from shipment_monitoring.core.domain.user import User, UserIn
+from shipment_monitoring.infrastructure.dto.tokenDTO import TokenDTO
+from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
 
 
 class IUserService(ABC):
@@ -34,33 +35,33 @@ class IUserService(ABC):
         """
 
     @abstractmethod
-    async def get_user_by_username(self, username) -> UserDTO | None:
-        """The abstract getting user by provided username from repository.
+    async def get_user_by_email(self, email) -> UserDTO | None:
+        """The abstract getting user by provided email from repository.
 
         Args:
-            username (str): The username of the user.
+            email (str): The email of the user.
 
         Returns:
             User | None: The user object if exists.
         """
 
     @abstractmethod
-    async def detele_user(self, username: str) -> dict | None:
-        """The abstract deleting user by provided username.
+    async def detele_user(self, email: str) -> dict | None:
+        """The abstract deleting user by provided email.
 
         Args:
-            username (str): The username of the user.
+            email (str): The email of the user.
 
         Returns:
             dict | None: The deleted user object.
         """
 
     @abstractmethod
-    async def update_user(self, username: str, data: User) -> dict | None:
-        """The abstract updating user by provided username.
+    async def update_user(self, email: str, data: User) -> dict | None:
+        """The abstract updating user by provided email.
 
         Args:
-            username (str): The username of the user.
+            email (str): The email of the user.
             data (User): The updated user details.
 
         Returns:
@@ -69,12 +70,12 @@ class IUserService(ABC):
 
     @abstractmethod
     async def login_for_access_token(
-        self, username: str, password: str
+        self, email: str, password: str
     ) -> TokenDTO | None:
         """The abstract method for user authentication to get an access token.
 
         Args:
-            username (str): The login identifier for the user
+            email (str): The login identifier for the user
             password (str): The user's password for authentication.
 
         Returns:

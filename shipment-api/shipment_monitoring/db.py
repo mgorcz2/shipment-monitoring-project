@@ -1,18 +1,20 @@
 import asyncio
+
 import databases
 import sqlalchemy
-from sqlalchemy.sql import func
-from sqlalchemy.exc import OperationalError, DatabaseError
-from sqlalchemy.ext.asyncio import create_async_engine
 from asyncpg.exceptions import (  # type: ignore
     CannotConnectNowError,
     ConnectionDoesNotExistError,
 )
-from sqlalchemy.dialects.postgresql import UUID
-from shipment_monitoring.config import config
 from sqlalchemy import Enum
-from shipment_monitoring.core.domain.user import UserRole
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.exc import DatabaseError, OperationalError
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.sql import func
+
+from shipment_monitoring.config import config
 from shipment_monitoring.core.domain.shipment import ShipmentStatus
+from shipment_monitoring.core.domain.user import UserRole
 
 metadata = sqlalchemy.MetaData()
 
@@ -55,8 +57,8 @@ user_table = sqlalchemy.Table(
         primary_key=True,
         server_default=sqlalchemy.text("gen_random_uuid()"),
     ),
-    sqlalchemy.Column("username", sqlalchemy.String),
-    sqlalchemy.Column("password", sqlalchemy.String),
+    sqlalchemy.Column("email", sqlalchemy.String, unique=True, nullable=False),
+    sqlalchemy.Column("password", sqlalchemy.String, nullable=False),
     sqlalchemy.Column("role", Enum(UserRole, name="user_roles")),
 )
 
