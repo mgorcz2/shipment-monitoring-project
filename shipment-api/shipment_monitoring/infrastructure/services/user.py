@@ -37,7 +37,8 @@ class UserService(IUserService):
         if existing_user:
             raise ValueError("email already registered")
         user.password = password_hashing.hash_password(user.password)
-        return await self._repository.register_user(user)
+        user = await self._repository.register_user(user)
+        return UserDTO.from_record(user) if user else None
 
     async def get_user_by_id(self, user_id: UUID) -> UserDTO | None:
         """The method getting user by provided id from repository.

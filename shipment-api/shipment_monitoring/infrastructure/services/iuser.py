@@ -82,9 +82,21 @@ class IUserService(ABC):
             TokenDTO | None: A token DTO if login is successful, None otherwise.
         """
 
+    @abstractmethod
     async def get_all_users(self) -> Iterable[UserDTO] | None:
         """The abstract getting all users.
 
         Returns:
             Iterable[UserDTO] | None: The user objects DTO details.
+        """
+
+    @abstractmethod
+    async def get_users_by_role(self, role) -> Iterable[UserDTO]:
+        """The method getting user by provided role.
+
+        Args:
+            role (UserRole): Role of the users.
+
+        Returns:
+            Iterable[UserDTO]: The user objects DTO details.
         """
