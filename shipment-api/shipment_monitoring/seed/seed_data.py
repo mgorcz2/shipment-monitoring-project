@@ -14,9 +14,9 @@ Lodz = Location(street="", street_number="", city="Lodz", postcode="")
 
 
 USERS = [
-    UserIn(email="courier@example.com", password="courier", role=UserRole.COURIER),
-    UserIn(email="sender@example.com", password="sender", role=UserRole.SENDER),
-    UserIn(email="admin@example.com", password="admin", role=UserRole.ADMIN),
+    UserIn(email="courier@example.com", password="Courier123", role=UserRole.COURIER),
+    UserIn(email="sender@example.com", password="Sender123", role=UserRole.SENDER),
+    UserIn(email="admin@example.com", password="Admin123", role=UserRole.ADMIN),
 ]
 
 SHIPMENTS = [

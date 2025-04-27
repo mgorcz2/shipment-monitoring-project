@@ -3,11 +3,11 @@
 from typing import Any, Iterable
 from uuid import UUID
 
-from shipment_monitoring.core.domain.user import User, UserIn
+from sqlalchemy import delete, select, update
+
+from shipment_monitoring.core.domain.user import User, UserIn, UserRole
 from shipment_monitoring.core.repositories.iuser import IUserRepository
 from shipment_monitoring.db import database, user_table
-from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
-from sqlalchemy import delete, select, update
 
 
 class UserRepository(IUserRepository):
@@ -27,7 +27,7 @@ class UserRepository(IUserRepository):
         )
         new_user = await database.execute(query)
         new_user = await self.get_user_by_id(new_user)
-        return UserDTO.from_record(new_user) if new_user else None
+        return new_user if new_user else None
 
     async def get_user_by_id(self, user_id: UUID) -> Any | None:
         """The method getting user by provided id.
@@ -90,12 +90,25 @@ class UserRepository(IUserRepository):
         updated_user = await database.fetch_one(query)
         return updated_user if updated_user else None
 
-    async def get_all_users(self) -> Iterable[Any] | None:
+    async def get_all_users(self) -> Iterable[Any]:
         """The method getting all users from database.
 
         Returns:
-            Iterable[Any] | None: The user objects.
+            Iterable[Any]: The user objects.
         """
         query = select(user_table)
+        users = await database.fetch_all(query)
+        return users
+
+    async def get_users_by_role(self, role) -> Iterable[Any]:
+        """The method getting user by provided role.
+
+        Args:
+            role (UserRole): Role of the users.
+
+        Returns:
+            Iterable[Any]: The user objects.
+        """
+        query = select(user_table).where(user_table.c.role == role)
         users = await database.fetch_all(query)
         return users

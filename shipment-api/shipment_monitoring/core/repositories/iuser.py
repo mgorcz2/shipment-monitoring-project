@@ -73,3 +73,14 @@ class IUserRepository(ABC):
         Returns:
             Iterable[Any] | None: The user objects.
         """
+
+    @abstractmethod
+    async def get_users_by_role(self, role) -> Iterable[Any]:
+        """The method getting user by provided role.
+
+        Args:
+            role (UserRole): Role of the users.
+
+        Returns:
+            Iterable[Any]: The user objects.
+        """
