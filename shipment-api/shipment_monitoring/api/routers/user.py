@@ -3,8 +3,9 @@ from typing import Iterable
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+
 from shipment_monitoring.container import Container
-from shipment_monitoring.core.domain.user import User, UserIn, UserRole
+from shipment_monitoring.core.domain.user import User, UserIn, UserRole, UserUpdate
 from shipment_monitoring.core.security import auth
 from shipment_monitoring.infrastructure.dto.tokenDTO import TokenDTO
 from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
@@ -119,7 +120,7 @@ async def delete_user(
 @inject
 async def update_user(
     email: str,
-    data: User,
+    data: UserUpdate,
     current_user: User = Depends(auth.get_current_user),
     service: IUserService = Depends(Provide[Container.user_service]),
 ) -> dict:

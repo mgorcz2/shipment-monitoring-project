@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from typing import Iterable
 from uuid import UUID
 
-from shipment_monitoring.core.domain.user import User, UserIn
+from shipment_monitoring.core.domain.user import User, UserIn, UserUpdate
 from shipment_monitoring.core.repositories.iuser import IUserRepository
 from shipment_monitoring.core.security import consts, password_hashing
 from shipment_monitoring.core.security.token import create_access_token
@@ -35,7 +35,7 @@ class UserService(IUserService):
         """
         existing_user = await self._repository.get_user_by_email(user.email)
         if existing_user:
-            raise ValueError("email already registered")
+            raise ValueError("User with that email already registered.")
         user.password = password_hashing.hash_password(user.password)
         user = await self._repository.register_user(user)
         return UserDTO.from_record(user) if user else None
@@ -76,27 +76,34 @@ class UserService(IUserService):
         deleted_user = await self._repository.detele_user(email)
         return deleted_user if deleted_user else None
 
-    async def update_user(self, email: str, data: User) -> dict | None:
+    async def update_user(self, email: str, update_data: UserUpdate) -> dict | None:
         """The abstract updating user by provided email.
 
         Args:
             email (str): The email of the user.
-            data (User): The updated user details.
+            data (UserUpdate): The updated user details.
 
         Returns:
             dict | None: The user object if updated.
         """
-        existing_user = await self._repository.get_user_by_email(email)
-        if not existing_user:
+        original_user = await self._repository.get_user_by_email(email)
+        if not original_user:
             raise ValueError("No user found with the provided email. Try again.")
-        existing_user = await self._repository.get_user_by_email(data.email)
-        if existing_user:
-            raise ValueError("User with that email already registered.")
-        existing_user = await self._repository.get_user_by_id(data.id)
-        if existing_user:
-            raise ValueError("User with that id already registered.")
-        data.password = password_hashing.hash_password(data.password)
-        updated_user = await self._repository.update_user(email, data)
+        if update_data.email and update_data.email != email:
+            user_with_new_email = await self._repository.get_user_by_email(
+                update_data.email
+            )
+            if user_with_new_email:
+                raise ValueError("User with that email already registered.")
+        updated_user = UserIn(
+            email=update_data.email if update_data.email else original_user["email"],
+            password=update_data.password
+            if update_data.password
+            else original_user["password"],
+            role=update_data.role if update_data.role else original_user["role"],
+        )
+        updated_user.password = password_hashing.hash_password(update_data.password)
+        updated_user = await self._repository.update_user(email, updated_user)
         return updated_user if updated_user else None
 
     async def login_for_access_token(
@@ -131,4 +138,16 @@ class UserService(IUserService):
             Iterable[UserDTO] | None: The user objects DTO details.
         """
         users = await self._repository.get_all_users()
+        return [UserDTO.from_record(user) for user in users]
+
+    async def get_users_by_role(self, role) -> Iterable[UserDTO]:
+        """The method getting user by provided role.
+
+        Args:
+            role (UserRole): Role of the users.
+
+        Returns:
+            Iterable[UserDTO]: The user objects DTO details.
+        """
+        users = await self._repository.get_users_by_role(role)
         return [UserDTO.from_record(user) for user in users]
