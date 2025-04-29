@@ -2,6 +2,7 @@
 
 import enum
 import re
+from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
@@ -45,3 +46,9 @@ class User(UserIn):
 
     id: UUID
     model_config = ConfigDict(from_attributes=True, extra="ignore")
+
+
+class UserUpdate(BaseModel):
+    email: Optional[EmailStr] = None
+    password: Optional[str] = None
+    role: Optional[str] = None

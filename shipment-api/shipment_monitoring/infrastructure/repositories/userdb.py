@@ -5,7 +5,7 @@ from uuid import UUID
 
 from sqlalchemy import delete, select, update
 
-from shipment_monitoring.core.domain.user import User, UserIn, UserRole
+from shipment_monitoring.core.domain.user import User, UserIn, UserRole, UserUpdate
 from shipment_monitoring.core.repositories.iuser import IUserRepository
 from shipment_monitoring.db import database, user_table
 
@@ -71,7 +71,7 @@ class UserRepository(IUserRepository):
         deleted_user = await database.fetch_one(query)
         return deleted_user if deleted_user else None
 
-    async def update_user(self, email: str, data: User) -> Any | None:
+    async def update_user(self, email: str, data: UserIn) -> Any | None:
         """The abstract updating user by provided email.
 
         Args:

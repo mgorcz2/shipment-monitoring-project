@@ -19,9 +19,10 @@ def test_userin_valid_data(valid_password, valid_email):
 
 
 def test_userin_password_too_short(valid_email):  # left neighbor value
-    with pytest.raises(ValidationError) as exc_info:
+    with pytest.raises(
+        ValidationError, match="String should have at least 8 characters"
+    ):
         UserIn(email=valid_email, password="Abcdef7")
-    assert "String should have at least 8 characters" in str(exc_info.value)
 
 
 def test_userin_password_exact_minimum_lenght(valid_email):  # right neighbor value
@@ -40,23 +41,25 @@ def test_userin_password_maximum_lenght(valid_email):
 
 
 def test_userin_password_too_long(valid_email):  # right neighbor value
-    with pytest.raises(ValidationError) as exc_info:
+    with pytest.raises(
+        ValidationError, match="String should have at most 128 characters"
+    ):
         UserIn(email=valid_email, password="a" * 129)
-    assert "String should have at most 128 characters" in str(exc_info.value)
 
 
 def test_userin_password_missing_uppercase(valid_email):
-    with pytest.raises(ValidationError) as exc_info:
+    with pytest.raises(
+        ValidationError, match="Password must contain at least one uppercase letter"
+    ):
         UserIn(email=valid_email, password="abcd1234!")
-    assert "Password must contain at least one uppercase letter" in str(exc_info.value)
 
 
 def test_userin_password_missing_special_or_number(valid_email):
-    with pytest.raises(ValidationError) as exc_info:
+    with pytest.raises(
+        ValidationError,
+        match="Password must contain at least one number or special character",
+    ):
         UserIn(email=valid_email, password="Abcdefgh")
-    assert "Password must contain at least one number or special character" in str(
-        exc_info.value
-    )
 
 
 @pytest.mark.parametrize(
