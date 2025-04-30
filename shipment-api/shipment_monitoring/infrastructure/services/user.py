@@ -97,9 +97,11 @@ class UserService(IUserService):
                 raise ValueError("User with that email already registered.")
         updated_user = UserIn(
             email=update_data.email if update_data.email else original_user["email"],
-            password=update_data.password
-            if update_data.password
-            else original_user["password"],
+            password=(
+                update_data.password
+                if update_data.password
+                else original_user["password"]
+            ),
             role=update_data.role if update_data.role else original_user["role"],
         )
         updated_user.password = password_hashing.hash_password(update_data.password)
@@ -125,10 +127,7 @@ class UserService(IUserService):
         user = await self._repository.get_user_by_email(email=email)
         if not user or not password_hashing.verify_password(password, user.password):
             raise ValueError("Incorrect email or password")
-        access_token_expires = timedelta(minutes=consts.ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = create_access_token(
-            data={"sub": str(user.id)}, expires_delta=access_token_expires
-        )
+        access_token = create_access_token(data={"sub": str(user.id)})
         return {"access_token": access_token, "token_type": "bearer"}
 
     async def get_all_users(self) -> Iterable[UserDTO] | None:
