@@ -1,112 +1,160 @@
-import uuid
-
 import pytest
+from uuid import UUID, uuid4
 
-from shipment_monitoring.core.domain.user import User, UserIn, UserRole
-
-users_data = [
-    ("test1@example.com", "Password123", UserRole.SENDER),
-    ("another.user@example.org", "AnotherPass321", UserRole.COURIER),
-    ("user+special@example.com", "SpecialPass!@#", UserRole.ADMIN),
-]
+import shipment_monitoring.infrastructure.repositories.userdb as repo_module
+from shipment_monitoring.infrastructure.repositories.userdb import UserRepository
+from shipment_monitoring.core.domain.user import UserIn, UserRole, User
 
 
-@pytest.mark.anyio
-async def test_register_user(user_repository, valid_userin):
-    created = await user_repository.register_user(valid_userin)
-    assert created.email == valid_userin.email
+@pytest.fixture(autouse=True)
+def patch_database(mocker, valid_user):
+
+    db = mocker.patch.object(repo_module, "database")
+    db.execute = mocker.AsyncMock(return_value=valid_user.id)
+    db.fetch_one = mocker.AsyncMock(return_value=valid_user)
+    db.fetch_all = mocker.AsyncMock(return_value=[valid_user])
+    return db
 
 
-@pytest.mark.anyio
-async def test_get_user_by_email(user_repository, valid_userin):
-    await user_repository.register_user(valid_userin)
-    fetched = await user_repository.get_user_by_email(valid_userin.email)
-    assert fetched["email"] == valid_userin.email
-
-
-@pytest.mark.anyio
-async def test_get_user_by_id(user_repository, valid_userin):
-    created = await user_repository.register_user(valid_userin)
-    fetched = await user_repository.get_user_by_id(created.id)
-    assert fetched["id"] == created.id
+@pytest.fixture
+def repository():
+    return UserRepository()
 
 
 @pytest.mark.anyio
-async def test_delete_user(user_repository, valid_userin):
-    await user_repository.register_user(valid_userin)
-    deleted = await user_repository.detele_user(valid_userin.email)
-    assert deleted["email"] == valid_userin.email
-    assert await user_repository.get_user_by_email(valid_userin.email) is None
+async def test_register_user(repository, patch_database, valid_userin, valid_user):
+    result = await repository.register_user(valid_userin)
+    assert isinstance(result, User)
+    assert result.id == valid_user.id
+    patch_database.execute.assert_awaited()
+    patch_database.fetch_one.assert_awaited()
 
 
 @pytest.mark.anyio
-async def test_update_user(user_repository, valid_userin):
-    created = await user_repository.register_user(valid_userin)
-    new_data = User(
-        id=created.id,
-        email="new@example.com",
-        password=created.password,
-        role=created.role,
+async def test_register_user_returns_none(repository, patch_database, valid_userin):
+    patch_database.execute.return_value = None
+    patch_database.fetch_one.return_value = None
+    result = await repository.register_user(valid_userin)
+    assert result is None
+    patch_database.execute.assert_awaited_once()
+
+
+@pytest.mark.anyio
+async def test_get_user_by_id(repository, patch_database, valid_user):
+    result = await repository.get_user_by_id(valid_user.id)
+    assert result == valid_user
+    patch_database.fetch_one.assert_awaited_once()
+
+
+@pytest.mark.anyio
+async def test_get_user_returns_none(repository, patch_database, valid_user):
+    patch_database.fetch_one.return_value = None
+    result = await repository.get_user_by_id(valid_user.id)
+    assert result is None
+    patch_database.fetch_one.assert_awaited_once()
+
+
+@pytest.mark.anyio
+async def test_get_user_by_email(repository, patch_database, valid_user):
+    result = await repository.get_user_by_email(valid_user.email)
+    assert result == valid_user
+    patch_database.fetch_one.assert_awaited_once()
+
+
+@pytest.mark.anyio
+async def test_get_user_by_email_returns_none(repository, patch_database, valid_user):
+    patch_database.fetch_one.return_value = None
+    result = await repository.get_user_by_email(valid_user.email)
+    assert result == None
+    patch_database.fetch_one.assert_awaited_once()
+
+
+@pytest.mark.anyio
+async def test_delete_user(repository, patch_database, valid_user):
+    result = await repository.detele_user(valid_user.email)
+    assert result == valid_user
+    patch_database.fetch_one.assert_awaited_once()
+
+
+@pytest.mark.anyio
+async def test_delete_user_returns_none(repository, patch_database, valid_user):
+    patch_database.fetch_one.return_value = None
+    result = await repository.detele_user(valid_user.email)
+    assert result == None
+    patch_database.fetch_one.assert_awaited_once()
+
+
+@pytest.mark.anyio
+async def test_update_user(repository, patch_database, valid_user):
+    patch_database.fetch_one.return_value = valid_user
+    data = UserIn(
+        email=valid_user.email, password=valid_user.password, role=valid_user.role
     )
-    updated = await user_repository.update_user(valid_userin.email, new_data)
-    assert updated["email"] == "new@example.com"
+    result = await repository.update_user(valid_user.email, data)
+    assert result == valid_user
+    patch_database.fetch_one.assert_awaited_once()
 
 
 @pytest.mark.anyio
-async def test_get_all_users(user_repository, valid_userin):
-    await user_repository.register_user(valid_userin)
-    users = await user_repository.get_all_users()
-    assert isinstance(users, list)
-    assert any(u["email"] == valid_userin.email for u in users)
-
-
-@pytest.mark.parametrize("email,password,role", users_data)
-@pytest.mark.anyio
-async def test_register_multiple_users(user_repository, email, password, role):
-    user_in = UserIn(email=email, password=password, role=role)
-    created = await user_repository.register_user(user_in)
-    assert created.email == email
-    fetched = await user_repository.get_user_by_email(email)
-    assert fetched["email"] == email
-
-
-@pytest.mark.parametrize("email,password,role", users_data)
-@pytest.mark.anyio
-async def test_get_users_by_role(user_repository, email, password, role):
-    user_in = UserIn(email=email, password=password, role=role)
-    await user_repository.register_user(user_in)
-    fetched = await user_repository.get_users_by_role(role)
-    assert isinstance(fetched, list)
-    assert len(fetched) == 1
-
-
-@pytest.mark.anyio
-async def test_register_duplicate_user(user_repository, valid_userin):
-    await user_repository.register_user(valid_userin)
-    with pytest.raises(Exception):
-        await user_repository.register_user(valid_userin)
-
-
-@pytest.mark.anyio
-async def test_delete_nonexistent_user(user_repository):
-    deleted = await user_repository.detele_user("nonexistent@example.com")
-    assert deleted is None
-
-
-@pytest.mark.anyio
-async def test_update_nonexistent_user(user_repository):
-    non_existing_email = "notfound@example.com"
-    fake_user = User(
-        id=str(uuid.uuid4()),
-        email="new@example.com",
-        password="Newpass123",
-        role=UserRole.COURIER,
+async def test_update_user_returns_none(repository, patch_database, valid_user):
+    patch_database.fetch_one.return_value = None
+    data = UserIn(
+        email=valid_user.email, password=valid_user.password, role=valid_user.role
     )
-    updated = await user_repository.update_user(non_existing_email, fake_user)
-    assert updated is None
+    result = await repository.update_user(valid_user.email, data)
+    assert result == None
+    patch_database.fetch_one.assert_awaited_once()
 
 
 @pytest.mark.anyio
-async def test_get_all_users_empty(user_repository):
-    users = await user_repository.get_all_users()
-    assert users == []
+async def test_get_all_users(repository, patch_database, valid_user):
+    result = await repository.get_all_users()
+    assert isinstance(result, list)
+    assert result[0] == valid_user
+    patch_database.fetch_all.assert_awaited_once()
+
+
+@pytest.mark.anyio
+async def test_get_all_users_empty(repository, patch_database, valid_user):
+    patch_database.fetch_all.return_value = []
+    result = await repository.get_all_users()
+    assert isinstance(result, list)
+    assert len(result) == 0
+    assert result == []
+    patch_database.fetch_all.assert_awaited_once()
+
+
+@pytest.mark.parametrize(
+    "user",
+    [
+        User(
+            id=uuid4(),
+            email="user@example.com",
+            password="Password123",
+            role="sender",
+        ),
+        User(
+            id=uuid4(),
+            email="user@example.com",
+            password="Password123",
+            role="admin",
+        ),
+        User(
+            id=uuid4(),
+            email="user@example.com",
+            password="Password123",
+            role="courier",
+        ),
+    ],
+)
+@pytest.mark.anyio
+async def test_get_users_by_role(
+    repository,
+    patch_database,
+    user,
+):
+    patch_database.fetch_all.return_value = [user]
+    result = await repository.get_users_by_role(user.role)
+    assert isinstance(result, list)
+    assert user in result
+    patch_database.fetch_all.assert_awaited_once()

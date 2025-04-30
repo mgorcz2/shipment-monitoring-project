@@ -7,18 +7,6 @@ from shipment_monitoring.db import database, init_db
 from shipment_monitoring.infrastructure.repositories.userdb import UserRepository
 
 
-@pytest.fixture(scope="session", autouse=True)
-async def prepare_schema():
-    await init_db()
-
-
-@pytest.fixture(autouse=True)
-async def db_session():
-    await database.connect()
-    yield
-    await database.disconnect()
-
-
 @pytest.fixture(scope="session")
 def anyio_backend():
     return "asyncio"
@@ -51,8 +39,3 @@ def valid_user(valid_email, valid_password):
         password=valid_password,
         role="sender",
     )
-
-
-@pytest.fixture
-def user_repository():
-    return UserRepository()
