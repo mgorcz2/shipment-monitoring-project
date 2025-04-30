@@ -227,6 +227,7 @@ async def test_login_for_access_token_invalid_password(
             sample_record["email"], "wrongpassword"
         )
 
+
 # Token Tests
 class MockDateTime:
     @classmethod
