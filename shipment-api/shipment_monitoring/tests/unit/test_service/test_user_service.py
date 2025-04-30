@@ -13,10 +13,8 @@ from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
 from shipment_monitoring.infrastructure.services.user import UserService
 
 
-# Fixtures
 @pytest.fixture
 def repo_mock(mocker):
-    # Create an AsyncMock for each repository method used
     repo = mocker.Mock()
     repo.get_user_by_email = mocker.AsyncMock()
     repo.register_user = mocker.AsyncMock()
@@ -43,7 +41,7 @@ def patch_hash_and_token(mocker):
     mocker.patch.object(
         user_service_module,
         "create_access_token",
-        lambda data, expires_delta: "service-token",
+        lambda data: "service-token",
     )
 
 
@@ -187,7 +185,7 @@ async def test_get_users_by_role(user_service, repo_mock, sample_record):
     repo_mock.get_users_by_role.return_value = [sample_record]
     result = await user_service.get_users_by_role(UserRole.SENDER)
     assert isinstance(result, list)
-    assert result[0].email == sample_record["email"]
+    assert sample_record["email"] in [user.email for user in result]
 
 
 @pytest.mark.anyio
@@ -202,8 +200,6 @@ async def test_login_for_access_token_success(
         sample_record["email"], "Password123"
     )
     repo_mock.get_user_by_email.assert_awaited_once_with(email=sample_record["email"])
-
-    # Assercje dla zwróconego tokenu
     assert isinstance(token, dict)
     assert token["access_token"] == "service-token"
     assert token["token_type"] == "bearer"
@@ -231,34 +227,68 @@ async def test_login_for_access_token_invalid_password(
             sample_record["email"], "wrongpassword"
         )
 
-
-class FixedDateTime:
+# Token Tests
+class MockDateTime:
     @classmethod
     def now(cls, tz=None):
         return datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
 
 
-"""@classmethod
 @pytest.fixture(autouse=True)
 def patch_datetime(monkeypatch):
-    # Patch datetime in the token module and SECRET_KEY
     import shipment_monitoring.core.security.token as token_module
 
-    monkeypatch.setattr(token_module, "datetime", FixedDateTime)
-    monkeypatch.setenv("SECRET_KEY", "test-secret")
+    monkeypatch.setattr(token_module, "datetime", MockDateTime)
     monkeypatch.setattr(config, "SECRET_KEY", "test-secret")
-    return True
 
 
 def test_create_access_token_default_expiry():
-    consts.ACCESS_TOKEN_EXPIRE_MINUTES = 15
     payload = {"sub": "abc123"}
     token = create_access_token(payload)
-    decoded = jwt.decode(token, config.SECRET_KEY, algorithms=[consts.ALGORITHM])
-
-    # Payload fields
+    decoded = jwt.decode(
+        token,
+        config.SECRET_KEY,
+        algorithms=[consts.ALGORITHM],
+        options={"verify_exp": False},
+    )
     assert decoded["sub"] == "abc123"
-    # exp should be exactly FixedDateTime.now() + 15 minutes
-    expected_exp = int((FixedDateTime.now() + timedelta(minutes=15)).timestamp())
+    expected_exp = int(
+        (
+            MockDateTime.now() + timedelta(minutes=consts.ACCESS_TOKEN_EXPIRE_MINUTES)
+        ).timestamp()
+    )
     assert decoded["exp"] == expected_exp
-"""
+
+
+def test_create_access_token_without_sub():
+    payload = {"sub": ""}
+    with pytest.raises(
+        ValueError, match="Token payload must contain a non-empty 'sub'"
+    ):
+        token = create_access_token(payload)
+
+
+def test_create_access_token_contains_sub():
+    payload = {"sub": "abc123"}
+    token = create_access_token(payload)
+    decoded = jwt.decode(
+        token,
+        config.SECRET_KEY,
+        algorithms=[consts.ALGORITHM],
+        options={"verify_exp": False},
+    )
+    assert decoded["sub"] == "abc123"
+
+
+def test_access_token_incorrect_secret():
+    payload = {"sub": "abc123"}
+    token = create_access_token(payload)
+    with pytest.raises(jwt.JWTError):
+        jwt.decode(token, "wrong-secret", algorithms=[consts.ALGORITHM])
+
+
+def test_create_access_token_expired_error():
+    payload = {"sub": "abc123"}
+    token = create_access_token(payload)
+    with pytest.raises(jwt.ExpiredSignatureError):
+        jwt.decode(token, config.SECRET_KEY, algorithms=[consts.ALGORITHM])

@@ -7,7 +7,7 @@ from shipment_monitoring.core.security import consts
 from shipment_monitoring.config import config
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+def create_access_token(data: dict):
     """Generate a JSON Web Token(JWT).
 
     Args:
@@ -17,6 +17,9 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     Returns:
         _type_: A JWT-encoded access token as a string.
     """
+    if not data.get("sub"):
+        raise ValueError("Token payload must contain a non-empty 'sub'")
+
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(
         minutes=consts.ACCESS_TOKEN_EXPIRE_MINUTES
