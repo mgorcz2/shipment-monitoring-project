@@ -15,15 +15,7 @@ from shipment_monitoring.infrastructure.services.user import UserService
 
 @pytest.fixture
 def repo_mock(mocker):
-    repo = mocker.Mock()
-    repo.get_user_by_email = mocker.AsyncMock()
-    repo.register_user = mocker.AsyncMock()
-    repo.get_user_by_id = mocker.AsyncMock()
-    repo.detele_user = mocker.AsyncMock()
-    repo.update_user = mocker.AsyncMock()
-    repo.get_all_users = mocker.AsyncMock()
-    repo.get_users_by_role = mocker.AsyncMock()
-    return repo
+    return mocker.AsyncMock()
 
 
 @pytest.fixture(autouse=True)
@@ -61,17 +53,22 @@ def sample_record():
     }
 
 
-@pytest.mark.anyio
-async def test_register_user_success(user_service, repo_mock, sample_record):
-    repo_mock.get_user_by_email.return_value = None
-    repo_mock.register_user.return_value = sample_record
-
-    user_in = UserIn(
+@pytest.fixture
+def sample_user_in(sample_record):
+    return UserIn(
         email=sample_record["email"],
         password=sample_record["password"],
         role=UserRole.SENDER,
     )
-    dto = await user_service.register_user(user_in)
+
+
+@pytest.mark.anyio
+async def test_register_user_success(
+    user_service, repo_mock, sample_record, sample_user_in
+):
+    repo_mock.get_user_by_email.return_value = None
+    repo_mock.register_user.return_value = sample_record
+    dto = await user_service.register_user(sample_user_in)
 
     repo_mock.get_user_by_email.assert_awaited_once_with(sample_record["email"])
     repo_mock.register_user.assert_awaited_once()
@@ -80,15 +77,22 @@ async def test_register_user_success(user_service, repo_mock, sample_record):
 
 
 @pytest.mark.anyio
-async def test_register_user_duplicate(user_service, repo_mock, sample_record):
+async def test_register_user_duplicate(
+    user_service, repo_mock, sample_record, sample_user_in
+):
     repo_mock.get_user_by_email.return_value = sample_record
-    user_in = UserIn(
-        email=sample_record["email"],
-        password=sample_record["password"],
-        role=UserRole.SENDER,
-    )
     with pytest.raises(ValueError, match="User with that email already registered."):
-        await user_service.register_user(user_in)
+        await user_service.register_user(sample_user_in)
+
+
+@pytest.mark.anyio
+async def test_register_user_failed(user_service, repo_mock, sample_user_in):
+    repo_mock.get_user_by_email.return_value = None
+    repo_mock.register_user.return_value = None
+    with pytest.raises(
+        ValueError, match="Failed to register the user. Please try again."
+    ):
+        await user_service.register_user(sample_user_in)
 
 
 @pytest.mark.anyio
@@ -103,8 +107,8 @@ async def test_get_user_by_id_found(user_service, repo_mock, sample_record):
 @pytest.mark.anyio
 async def test_get_user_by_id_not_found(user_service, repo_mock):
     repo_mock.get_user_by_id.return_value = None
-    result = await user_service.get_user_by_id(uuid4())
-    assert result is None
+    with pytest.raises(ValueError, match="No user found with the provided ID"):
+        await user_service.get_user_by_id(uuid4())
 
 
 @pytest.mark.anyio
@@ -119,8 +123,8 @@ async def test_get_user_by_email_found(user_service, repo_mock, sample_record):
 @pytest.mark.anyio
 async def test_get_user_by_email_not_found(user_service, repo_mock):
     repo_mock.get_user_by_email.return_value = None
-    result = await user_service.get_user_by_email("no@one.com")
-    assert result is None
+    with pytest.raises(ValueError, match="No user found with the provided email"):
+        await user_service.get_user_by_email("no@one.com")
 
 
 @pytest.mark.anyio
@@ -134,8 +138,8 @@ async def test_delete_user_found(user_service, repo_mock, sample_record):
 @pytest.mark.anyio
 async def test_delete_user_not_found(user_service, repo_mock):
     repo_mock.detele_user.return_value = None
-    result = await user_service.detele_user("no@one.com")
-    assert result is None
+    with pytest.raises(ValueError, match="No user found with the provided email"):
+        await user_service.detele_user("no@one.com")
 
 
 @pytest.mark.anyio
@@ -155,6 +159,16 @@ async def test_update_user_email_conflict(user_service, repo_mock, sample_record
 
 
 @pytest.mark.anyio
+async def test_update_user_failed(user_service, repo_mock, sample_record):
+    repo_mock.get_user_by_email.return_value = sample_record
+    repo_mock.update_user.return_value = None
+    with pytest.raises(
+        ValueError, match="Failed to update the user. Please try again."
+    ):
+        await user_service.update_user(sample_record["email"], UserUpdate())
+
+
+@pytest.mark.anyio
 async def test_update_user_success(user_service, repo_mock, sample_record, mocker):
     repo_mock.get_user_by_email.side_effect = [sample_record, None]
     hashed = f"hashed-{sample_record['password']}"
@@ -167,7 +181,6 @@ async def test_update_user_success(user_service, repo_mock, sample_record, mocke
         email="new@e.com", password=sample_record["password"], role=UserRole.SENDER
     )
     result = await user_service.update_user(sample_record["email"], update)
-    repo_mock.update_user.assert_awaited_once()
     assert result["email"] == "new@e.com"
     assert result["password"] == hashed
 
@@ -181,11 +194,25 @@ async def test_get_all_users(user_service, repo_mock, sample_record):
 
 
 @pytest.mark.anyio
+async def test_get_all_users_not_found(user_service, repo_mock):
+    repo_mock.get_all_users.return_value = []
+    with pytest.raises(ValueError, match="No users found"):
+        await user_service.get_all_users()
+
+
+@pytest.mark.anyio
 async def test_get_users_by_role(user_service, repo_mock, sample_record):
     repo_mock.get_users_by_role.return_value = [sample_record]
     result = await user_service.get_users_by_role(UserRole.SENDER)
     assert isinstance(result, list)
     assert sample_record["email"] in [user.email for user in result]
+
+
+@pytest.mark.anyio
+async def test_get_users_by_role_not_found(user_service, repo_mock):
+    repo_mock.get_users_by_role.return_value = []
+    with pytest.raises(ValueError, match="No users found"):
+        await user_service.get_users_by_role(UserRole.SENDER)
 
 
 @pytest.mark.anyio

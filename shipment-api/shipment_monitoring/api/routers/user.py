@@ -81,12 +81,14 @@ async def get_user_by_email(
     Returns:
         UserDTO: The user DTO details if exists.
     """
-    if user := await service.get_user_by_email(email):
+    try:
+        user = await service.get_user_by_email(email)
         return user
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail="No user found with the provided email.",
-    )
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(error),
+        )
 
 
 @router.delete("/delete/{email}", status_code=status.HTTP_200_OK)
@@ -96,7 +98,7 @@ async def delete_user(
     email: str,
     current_user: User = Depends(auth.get_current_user),
     service: IUserService = Depends(Provide[Container.user_service]),
-) -> dict:
+) -> User:
     """The endpoint deleting user by provided email.
 
     Args:
@@ -107,12 +109,14 @@ async def delete_user(
     Returns:
         dict: The deleted user object.
     """
-    if user := await service.detele_user(email):
-        return dict(user)
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail="No user found with the provided email. Try again.",
-    )
+    try:
+        user = await service.detele_user(email)
+        return user
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(error),
+        )
 
 
 @router.put("/update/{email}", status_code=status.HTTP_200_OK)
@@ -123,7 +127,7 @@ async def update_user(
     data: UserUpdate,
     current_user: User = Depends(auth.get_current_user),
     service: IUserService = Depends(Provide[Container.user_service]),
-) -> dict:
+) -> User:
     """The endpoint updating user by provided email.
 
     Args:
@@ -136,8 +140,8 @@ async def update_user(
         dict: The updated user object if updated.
     """
     try:
-        if user := await service.update_user(email, data):
-            return dict(user)
+        user = await service.update_user(email, data)
+        return user
     except ValueError as error:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
 
@@ -158,6 +162,33 @@ async def get_all_users(
     Returns:
          Iterable[UserDTO]: The user objects DTO details.
     """
-    if users := await service.get_all_users():
+    try:
+        users = await service.get_all_users()
         return users
-    raise HTTPException(status_code=404, detail="Users not found")
+    except ValueError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
+
+
+@router.get("/role/{role}", status_code=status.HTTP_200_OK)
+@auth.role_required(UserRole.ADMIN)
+@inject
+async def get_users_by_role(
+    role: UserRole,
+    current_user: User = Depends(auth.get_current_user),
+    service: IUserService = Depends(Provide[Container.user_service]),
+) -> Iterable[UserDTO]:
+    """The endpoint getting users by role.
+
+    Args:
+        role (UserRole): The role of the users.
+        current_user (User): The currently injected authenticated user.
+        service (IUserService): The injected user service.
+
+    Returns:
+        Iterable[UserDTO]: The user objects DTO details.
+    """
+    try:
+        users = await service.get_users_by_role(role)
+        return users
+    except ValueError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))

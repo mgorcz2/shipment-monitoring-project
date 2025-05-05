@@ -5,7 +5,7 @@ import re
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, constr, field_validator
 
 
 class UserRole(str, enum.Enum):
@@ -50,5 +50,11 @@ class User(UserIn):
 
 class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
-    password: Optional[str] = None
-    role: Optional[str] = None
+    password: Optional[constr(min_length=8, max_length=128)] = None
+    role: Optional[UserRole] = None
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, value) -> Optional[str]:
+        """Validates the password complexity."""
+        return UserIn.validate_password(value)

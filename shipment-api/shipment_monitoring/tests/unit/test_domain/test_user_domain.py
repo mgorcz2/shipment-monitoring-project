@@ -3,7 +3,7 @@ from uuid import uuid4
 import pytest
 from pydantic import ValidationError
 
-from shipment_monitoring.core.domain.user import User, UserIn, UserRole
+from shipment_monitoring.core.domain.user import User, UserIn, UserRole, UserUpdate
 
 
 def test_userin_valid_data(valid_password, valid_email):
@@ -135,3 +135,40 @@ def test_user_model(valid_email, valid_password):
     assert user.email == valid_email
     assert user.password == valid_password
     assert user.role == UserRole.SENDER
+
+
+def test_user_update_empty():
+    update = UserUpdate()
+    assert update.email is None
+    assert update.password is None
+    assert update.role is None
+
+
+def test_user_update_partial_email(valid_email):
+    update = UserUpdate(email=valid_email)
+    assert update.email == valid_email
+    assert update.password is None
+    assert update.role is None
+
+
+def test_user_update_partial_password(valid_password):
+    update = UserUpdate(password=valid_password)
+    assert update.email is None
+    assert update.password == valid_password
+    assert update.role is None
+
+
+def test_user_update_partial_role():
+    update = UserUpdate(role=UserRole.ADMIN)
+    assert update.email is None
+    assert update.password is None
+    assert update.role == UserRole.ADMIN
+
+
+def test_user_update_all_fields(valid_email, valid_password):
+    update = UserUpdate(
+        email=valid_email, password=valid_password, role=UserRole.COURIER.value
+    )
+    assert update.email == valid_email
+    assert update.password == valid_password
+    assert update.role == UserRole.COURIER
