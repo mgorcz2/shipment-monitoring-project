@@ -1,14 +1,14 @@
-import pytest
 from uuid import UUID, uuid4
 
+import pytest
+
 import shipment_monitoring.infrastructure.repositories.userdb as repo_module
+from shipment_monitoring.core.domain.user import User, UserIn, UserRole
 from shipment_monitoring.infrastructure.repositories.userdb import UserRepository
-from shipment_monitoring.core.domain.user import UserIn, UserRole, User
 
 
 @pytest.fixture(autouse=True)
 def patch_database(mocker, valid_user):
-
     db = mocker.patch.object(repo_module, "database")
     db.execute = mocker.AsyncMock(return_value=valid_user.id)
     db.fetch_one = mocker.AsyncMock(return_value=valid_user)
@@ -65,7 +65,7 @@ async def test_get_user_by_email(repository, patch_database, valid_user):
 async def test_get_user_by_email_returns_none(repository, patch_database, valid_user):
     patch_database.fetch_one.return_value = None
     result = await repository.get_user_by_email(valid_user.email)
-    assert result == None
+    assert result is None
     patch_database.fetch_one.assert_awaited_once()
 
 
@@ -80,7 +80,7 @@ async def test_delete_user(repository, patch_database, valid_user):
 async def test_delete_user_returns_none(repository, patch_database, valid_user):
     patch_database.fetch_one.return_value = None
     result = await repository.detele_user(valid_user.email)
-    assert result == None
+    assert result is None
     patch_database.fetch_one.assert_awaited_once()
 
 
@@ -102,7 +102,7 @@ async def test_update_user_returns_none(repository, patch_database, valid_user):
         email=valid_user.email, password=valid_user.password, role=valid_user.role
     )
     result = await repository.update_user(valid_user.email, data)
-    assert result == None
+    assert result is None
     patch_database.fetch_one.assert_awaited_once()
 
 

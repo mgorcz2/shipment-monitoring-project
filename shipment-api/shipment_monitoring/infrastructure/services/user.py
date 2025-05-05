@@ -50,7 +50,9 @@ class UserService(IUserService):
             User | None: The user DTO details if exists.
         """
         user = await self._repository.get_user_by_id(user_id)
-        return UserDTO.from_record(user) if user else None
+        if not user:
+            raise ValueError(f"No user found with the provided ID: {user_id}")
+        return UserDTO.from_record(user)
 
     async def get_user_by_email(self, email) -> UserDTO | None:
         """The method getting user by provided email from repository.
@@ -62,7 +64,9 @@ class UserService(IUserService):
             User | None: The user object if exists.
         """
         user = await self._repository.get_user_by_email(email)
-        return UserDTO.from_record(user) if user else None
+        if not user:
+            raise ValueError(f"No user found with the provided email: {email}")
+        return UserDTO.from_record(user)
 
     async def detele_user(self, email: str) -> dict | None:
         """The method deleting user by provided email.
@@ -74,7 +78,9 @@ class UserService(IUserService):
             User | None: The deleted user object from repository.
         """
         deleted_user = await self._repository.detele_user(email)
-        return deleted_user if deleted_user else None
+        if not deleted_user:
+            raise ValueError(f"No user found with the provided email: {email}")
+        return deleted_user
 
     async def update_user(self, email: str, update_data: UserUpdate) -> dict | None:
         """The abstract updating user by provided email.
@@ -106,7 +112,10 @@ class UserService(IUserService):
         )
         updated_user.password = password_hashing.hash_password(update_data.password)
         updated_user = await self._repository.update_user(email, updated_user)
-        return updated_user if updated_user else None
+        updated_user = await self._repository.update_user(email, updated_user)
+        if not updated_user:
+            raise ValueError("Failed to update the user. Please try again.")
+        return updated_user
 
     async def login_for_access_token(
         self, email: str, password: str
@@ -137,6 +146,8 @@ class UserService(IUserService):
             Iterable[UserDTO] | None: The user objects DTO details.
         """
         users = await self._repository.get_all_users()
+        if not users:
+            raise ValueError("No users found in the repository.")
         return [UserDTO.from_record(user) for user in users]
 
     async def get_users_by_role(self, role) -> Iterable[UserDTO]:
@@ -149,4 +160,6 @@ class UserService(IUserService):
             Iterable[UserDTO]: The user objects DTO details.
         """
         users = await self._repository.get_users_by_role(role)
+        if not users:
+            raise ValueError(f"No users found with the role: {role}")
         return [UserDTO.from_record(user) for user in users]
