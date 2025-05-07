@@ -293,7 +293,7 @@ def test_create_access_token_without_sub():
     with pytest.raises(
         ValueError, match="Token payload must contain a non-empty 'sub'"
     ):
-        token = create_access_token(payload)
+        create_access_token(payload)
 
 
 def test_create_access_token_contains_sub():
