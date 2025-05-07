@@ -31,7 +31,6 @@ class UserIn(BaseModel):
     @field_validator("password")
     @classmethod
     def validate_password(cls, value: str) -> str:
-        """Validates the password complexity."""
         if not re.search(r"[A-Z]", value):
             raise ValueError("Password must contain at least one uppercase letter")
         if not re.search(r"[0-9\W]", value):
@@ -56,5 +55,4 @@ class UserUpdate(BaseModel):
     @field_validator("password")
     @classmethod
     def validate_password(cls, value) -> Optional[str]:
-        """Validates the password complexity."""
         return UserIn.validate_password(value)

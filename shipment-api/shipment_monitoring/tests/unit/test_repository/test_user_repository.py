@@ -115,7 +115,7 @@ async def test_get_all_users(repository, patch_database, valid_user):
 
 
 @pytest.mark.anyio
-async def test_get_all_users_empty(repository, patch_database, valid_user):
+async def test_get_all_users_empty(repository, patch_database):
     patch_database.fetch_all.return_value = []
     result = await repository.get_all_users()
     assert isinstance(result, list)
