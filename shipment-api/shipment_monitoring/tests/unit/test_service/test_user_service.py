@@ -262,7 +262,7 @@ class MockDateTime:
         return datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture()
 def patch_datetime(monkeypatch):
     import shipment_monitoring.core.security.token as token_module
 
@@ -270,6 +270,7 @@ def patch_datetime(monkeypatch):
     monkeypatch.setattr(config, "SECRET_KEY", "test-secret")
 
 
+@pytest.mark.usefixtures("patch_datetime")
 def test_create_access_token_default_expiry():
     payload = {"sub": "abc123"}
     token = create_access_token(payload)
@@ -286,6 +287,14 @@ def test_create_access_token_default_expiry():
         ).timestamp()
     )
     assert decoded["exp"] == expected_exp
+
+
+@pytest.mark.usefixtures("patch_datetime")
+def test_create_access_token_expired_error():
+    payload = {"sub": "abc123"}
+    token = create_access_token(payload)
+    with pytest.raises(jwt.ExpiredSignatureError):
+        jwt.decode(token, config.SECRET_KEY, algorithms=[consts.ALGORITHM])
 
 
 def test_create_access_token_without_sub():
@@ -313,10 +322,3 @@ def test_access_token_incorrect_secret():
     token = create_access_token(payload)
     with pytest.raises(jwt.JWTError):
         jwt.decode(token, "wrong-secret", algorithms=[consts.ALGORITHM])
-
-
-def test_create_access_token_expired_error():
-    payload = {"sub": "abc123"}
-    token = create_access_token(payload)
-    with pytest.raises(jwt.ExpiredSignatureError):
-        jwt.decode(token, config.SECRET_KEY, algorithms=[consts.ALGORITHM])

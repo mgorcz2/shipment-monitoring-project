@@ -145,6 +145,12 @@ async def test_get_all_users_empty(repository, patch_database):
             password="Password123",
             role="courier",
         ),
+        User(
+            id=uuid4(),
+            email="user@example.com",
+            password="Password123",
+            role="manager",
+        ),
     ],
 )
 @pytest.mark.anyio
