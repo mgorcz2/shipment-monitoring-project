@@ -3,6 +3,7 @@ from typing import Iterable
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+
 from shipment_monitoring.container import Container
 from shipment_monitoring.core.domain.user import User, UserIn, UserRole, UserUpdate
 from shipment_monitoring.core.security import auth
@@ -38,7 +39,7 @@ async def register_user(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
 
 
-@router.post("/login", response_model=TokenDTO)
+@router.post("/token", response_model=TokenDTO)
 @inject
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
@@ -62,8 +63,8 @@ async def login_for_access_token(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(error))
 
 
-@router.get("/get/{email}", response_model=UserDTO, status_code=status.HTTP_200_OK)
-@auth.role_required(UserRole.ADMIN)
+@router.get("/email/{email}", response_model=UserDTO, status_code=status.HTTP_200_OK)
+@auth.role_required([UserRole.ADMIN, UserRole.MANAGER])
 @inject
 async def get_user_by_email(
     email: str,
@@ -169,7 +170,7 @@ async def get_all_users(
 
 
 @router.get("/role/{role}", status_code=status.HTTP_200_OK)
-@auth.role_required(UserRole.ADMIN)
+@auth.role_required([UserRole.ADMIN, UserRole.MANAGER])
 @inject
 async def get_users_by_role(
     role: UserRole,

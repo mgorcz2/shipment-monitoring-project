@@ -6,24 +6,9 @@ from shipment_monitoring.db import database
 from shipment_monitoring.main import app
 
 
-@pytest.fixture(autouse=True)
-def s_email():
-    return "sender@example.com"
-
-
-@pytest.fixture(autouse=True)
-def a_email():
+@pytest.fixture()
+def admin_email():
     return "admin@example.com"
-
-
-@pytest.fixture(autouse=True)
-def s_pwd():
-    return "SendPass1!"
-
-
-@pytest.fixture(autouse=True)
-def a_pwd():
-    return "AdminPass1!"
 
 
 @pytest.fixture(autouse=True)
@@ -35,6 +20,10 @@ async def setup_database():
     await database.disconnect()
 
 
+def auth_headers(token):
+    return {"Authorization": f"Bearer {token}"}
+
+
 @pytest.fixture
 async def client():
     async with AsyncClient(
@@ -43,41 +32,43 @@ async def client():
         yield c
 
 
-async def register_user(client, s_email, s_pwd, role):
+@pytest.mark.anyio
+async def register_user(client, valid_email, valid_password, role):
     r = await client.post(
         "/users/register",
-        json={"email": s_email, "password": s_pwd, "role": role},
+        json={"email": valid_email, "password": valid_password, "role": role},
     )
     assert r.status_code == 201, r.text
     return r.json()
 
 
-async def login_user(client, s_email, s_password):
+@pytest.mark.anyio
+async def login_user(client, valid_email, s_password):
     r = await client.post(
-        "/users/login", data={"username": s_email, "password": s_password}
+        "/users/token", data={"username": valid_email, "password": s_password}
     )
     assert r.status_code == 200, r.text
     return r.json()["access_token"]
 
 
-def auth_headers(token):
-    return {"Authorization": f"Bearer {token}"}
-
-
 @pytest.mark.anyio
-async def test_register_user_success(client, s_email, s_pwd):
-    data = await register_user(client, s_email, s_pwd, "sender")
-    assert data["email"] == s_email
+async def test_register_user_success(client, valid_email, valid_password):
+    data = await register_user(client, valid_email, valid_password, "sender")
+    assert data["email"] == valid_email
     assert data["role"] == "sender"
     assert "id" in data
 
 
 @pytest.mark.anyio
-async def test_register_user_duplicate(client, s_email, s_pwd):
-    await register_user(client, s_email, s_pwd, UserRole.SENDER)
+async def test_register_user_duplicate(client, valid_email, valid_password):
+    await register_user(client, valid_email, valid_password, UserRole.SENDER)
     r = await client.post(
         "/users/register",
-        json={"email": s_email, "password": s_pwd, "role": UserRole.SENDER},
+        json={
+            "email": valid_email,
+            "password": valid_password,
+            "role": UserRole.SENDER,
+        },
     )
     assert r.status_code == 400
     assert "already registered" in r.json()["detail"]
@@ -94,59 +85,61 @@ async def test_register_user_invalid_payload(client):
 
 
 @pytest.mark.anyio
-async def test_login_success(client, s_email, s_pwd):
-    await register_user(client, s_email, s_pwd, UserRole.SENDER)
-    token = await login_user(client, s_email, s_pwd)
+async def test_login_success(client, valid_email, valid_password):
+    await register_user(client, valid_email, valid_password, UserRole.SENDER)
+    token = await login_user(client, valid_email, valid_password)
     assert isinstance(token, str)
 
 
 @pytest.mark.anyio
-async def test_login_failure(client, s_email, s_pwd):
-    await register_user(client, s_email, s_pwd, UserRole.SENDER)
+async def test_login_failure(client, valid_email, valid_password):
+    await register_user(client, valid_email, valid_password, UserRole.SENDER)
     r = await client.post(
-        "/users/login", data={"username": s_email, "password": "wrong"}
+        "/users/token", data={"username": valid_email, "password": "wrong"}
     )
     assert r.status_code == 401
     assert "Incorrect" in r.json()["detail"]
 
 
 @pytest.mark.anyio
-async def test_protected_endpoint_forbidden_to_non_admin(client, s_email, s_pwd):
-    await register_user(client, s_email, s_pwd, UserRole.SENDER)
-    token = await login_user(client, s_email, s_pwd)
-    r = await client.get(f"/users/get/{s_email}", headers=auth_headers(token))
-    assert r.status_code == 403
+async def test_get_user_by_email(client, admin_email, valid_password):
+    await register_user(client, admin_email, valid_password, UserRole.ADMIN)
+    token = await login_user(client, admin_email, valid_password)
+    r = await client.get(f"/users/email/{admin_email}", headers=auth_headers(token))
+    assert r.status_code == 200
+    assert r.json()["email"] == admin_email
 
 
 @pytest.mark.anyio
-async def test_admin_can_get_all_users(client, s_email, s_pwd, a_email, a_pwd):
-    await register_user(client, s_email, s_pwd, UserRole.SENDER.value)
-    await register_user(client, a_email, a_pwd, UserRole.ADMIN.value)
-    tok_a = await login_user(client, a_email, a_pwd)
+async def test_get_user_by_email_not_found(
+    client, admin_email, valid_email, valid_password
+):
+    await register_user(client, admin_email, valid_password, UserRole.ADMIN)
+    token = await login_user(client, admin_email, valid_password)
+    r = await client.get(f"/users/email/{valid_email}", headers=auth_headers(token))
+    r = await client.get(f"/users/email/{valid_email}", headers=auth_headers(token))
+    assert r.status_code == 404
+
+
+@pytest.mark.anyio
+async def test_get_all_users(client, valid_email, valid_password, admin_email):
+    await register_user(client, valid_email, valid_password, UserRole.SENDER)
+    await register_user(client, admin_email, valid_password, UserRole.ADMIN)
+    tok_a = await login_user(client, admin_email, valid_password)
     r = await client.get("/users/all", headers=auth_headers(tok_a))
     assert r.status_code == 200
-    assert any(u["email"] == s_email for u in r.json())
+    assert any(u["email"] == valid_email for u in r.json())
 
 
 @pytest.mark.anyio
-async def test_sender_cannot_get_users(client, s_email, s_pwd, a_email, a_pwd):
-    await register_user(client, s_email, s_pwd, UserRole.SENDER.value)
-    await register_user(client, a_email, a_pwd, UserRole.ADMIN.value)
+async def test_update_user_email(client, valid_email, valid_password, admin_email):
+    await register_user(client, valid_email, valid_password, UserRole.SENDER)
+    await register_user(client, admin_email, valid_password, UserRole.ADMIN)
 
-    tok_s = await login_user(client, s_email, s_pwd)
-    r = await client.get("/users/all", headers=auth_headers(tok_s))
-    assert r.status_code == 403
-
-
-@pytest.mark.anyio
-async def test_admin_can_update_user_email(client, s_email, s_pwd, a_email, a_pwd):
-    await register_user(client, s_email, s_pwd, UserRole.SENDER.value)
-    await register_user(client, a_email, a_pwd, UserRole.ADMIN.value)
-
-    tok_a = await login_user(client, a_email, a_pwd)
+    tok_a = await login_user(client, admin_email, valid_password)
     new_email = "new@ex.com"
     r = await client.put(
-        f"/users/update/{s_email}",
+        f"/users/update/{valid_email}",
         json={"email": new_email},
         headers=auth_headers(tok_a),
     )
@@ -155,39 +148,72 @@ async def test_admin_can_update_user_email(client, s_email, s_pwd, a_email, a_pw
 
 
 @pytest.mark.anyio
-async def test_admin_can_delete_user(client, s_email, s_pwd, a_email, a_pwd):
-    await register_user(client, s_email, s_pwd, UserRole.SENDER.value)
-    await register_user(client, a_email, a_pwd, UserRole.ADMIN.value)
+@pytest.mark.parametrize(
+    "role",
+    list(UserRole),
+)
+async def test_update_user_role(client, valid_email, valid_password, admin_email, role):
+    await register_user(client, valid_email, valid_password, UserRole.SENDER)
+    await register_user(client, admin_email, valid_password, UserRole.ADMIN)
 
-    tok_a = await login_user(client, a_email, a_pwd)
-    r = await client.delete(f"/users/delete/{s_email}", headers=auth_headers(tok_a))
+    tok_a = await login_user(client, admin_email, valid_password)
+    new_role = role
+    r = await client.put(
+        f"/users/update/{valid_email}",
+        json={"role": new_role},
+        headers=auth_headers(tok_a),
+    )
+    assert r.status_code == 200
+    assert r.json()["role"] == new_role
+
+
+@pytest.mark.anyio
+async def test_delete_user(client, valid_email, valid_password, admin_email):
+    await register_user(client, valid_email, valid_password, UserRole.SENDER)
+    await register_user(client, admin_email, valid_password, UserRole.ADMIN)
+
+    tok_a = await login_user(client, admin_email, valid_password)
+    r = await client.delete(f"/users/delete/{valid_email}", headers=auth_headers(tok_a))
     assert r.status_code == 200
 
 
 @pytest.mark.anyio
 async def test_get_deleted_user_returns_not_found(
-    client, s_email, s_pwd, a_email, a_pwd
+    client, valid_email, valid_password, admin_email
 ):
-    await register_user(client, s_email, s_pwd, UserRole.SENDER.value)
-    await register_user(client, a_email, a_pwd, UserRole.ADMIN.value)
+    await register_user(client, valid_email, valid_password, UserRole.SENDER)
+    await register_user(client, admin_email, valid_password, UserRole.ADMIN)
 
-    tok_a = await login_user(client, a_email, a_pwd)
-    await client.delete(f"/users/delete/{s_email}", headers=auth_headers(tok_a))
-    r = await client.get(f"/users/get/{s_email}", headers=auth_headers(tok_a))
+    tok_a = await login_user(client, admin_email, valid_password)
+    r = await client.delete(f"/users/delete/{valid_email}", headers=auth_headers(tok_a))
+    assert r.status_code == 200
+    r = await client.get(f"/users/email/{valid_email}", headers=auth_headers(tok_a))
     assert r.status_code == 404
 
 
 @pytest.mark.anyio
-@pytest.mark.parametrize("role", [UserRole.SENDER, UserRole.COURIER])
-async def test_admin_can_get_users_by_role(
-    client, role, a_email, a_pwd, s_email, s_pwd
-):
-    await register_user(client, a_email, a_pwd, UserRole.ADMIN.value)
-    await register_user(client, f"{role.value}@example.com", a_pwd, role.value)
-    tok_a = await login_user(client, a_email, a_pwd)
+@pytest.mark.parametrize(
+    "role", [UserRole.SENDER.value, UserRole.COURIER.value, UserRole.MANAGER.value]
+)
+async def test_get_users_by_role(client, role, admin_email, valid_password):
+    await register_user(client, admin_email, valid_password, UserRole.ADMIN)
+    await register_user(client, f"{role}@example.com", valid_password, role)
+    tok_a = await login_user(client, admin_email, valid_password)
 
-    r = await client.get(f"/users/role/{role.value}", headers=auth_headers(tok_a))
+    r = await client.get(f"/users/role/{role}", headers=auth_headers(tok_a))
     assert r.status_code == 200
     arr = r.json()
     assert len(arr) == 1
-    assert arr[0]["role"] == role.value
+    assert arr[0]["role"] == role
+
+
+@pytest.mark.anyio
+async def test_get_users_by_role_not_found(client, admin_email, valid_password):
+    await register_user(client, admin_email, valid_password, UserRole.ADMIN)
+    tok_a = await login_user(client, admin_email, valid_password)
+
+    r = await client.get(
+        f"/users/role/{UserRole.SENDER.value}", headers=auth_headers(tok_a)
+    )
+    assert r.status_code == 404
+    assert "No users found" in r.json()["detail"]

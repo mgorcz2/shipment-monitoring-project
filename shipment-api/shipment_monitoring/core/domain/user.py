@@ -11,6 +11,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field, constr, field_valid
 class UserRole(str, enum.Enum):
     """The user role enum class."""
 
+    MANAGER = "manager"
     COURIER = "courier"
     SENDER = "sender"
     ADMIN = "admin"
