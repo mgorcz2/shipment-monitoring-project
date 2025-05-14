@@ -10,6 +10,10 @@ from shipment_monitoring.infrastructure.repositories.userdb import UserRepositor
 
 @pytest.fixture(scope="session")
 def anyio_backend():
+    """
+    Specify the backend to use for anyio tests.
+    This is necessary for compatibility with pytest-asyncio.
+    """
     return "asyncio"
 
 

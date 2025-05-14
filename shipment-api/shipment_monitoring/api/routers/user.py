@@ -143,6 +143,10 @@ async def update_user(
         user = await service.update_user(email, data)
         return user
     except ValueError as error:
+        if "No user found" in str(error):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=str(error)
+            )
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
 
 

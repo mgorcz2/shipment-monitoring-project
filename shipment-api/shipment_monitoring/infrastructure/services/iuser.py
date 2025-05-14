@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Iterable
 from uuid import UUID
 
-from shipment_monitoring.core.domain.user import User, UserIn
+from shipment_monitoring.core.domain.user import User, UserIn, UserUpdate
 from shipment_monitoring.infrastructure.dto.tokenDTO import TokenDTO
 from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
 
@@ -57,12 +57,12 @@ class IUserService(ABC):
         """
 
     @abstractmethod
-    async def update_user(self, email: str, data: User) -> User:
+    async def update_user(self, email: str, data: UserUpdate) -> User:
         """The abstract updating user by provided email.
 
         Args:
             email (str): The email of the user.
-            data (User): The updated user details.
+            data (UserUpdate): The updated user details.
 
         Returns:
             User: The user object if updated.

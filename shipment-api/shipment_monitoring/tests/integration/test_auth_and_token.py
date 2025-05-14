@@ -1,4 +1,9 @@
+"""Integration tests for user authentication and authorization in the shipment monitoring system."""
+
+from datetime import datetime, timedelta, timezone
+
 import pytest
+from freezegun import freeze_time
 from httpx import ASGITransport, AsyncClient
 
 from shipment_monitoring.core.domain.user import UserRole
@@ -8,6 +13,11 @@ from shipment_monitoring.main import app
 
 @pytest.fixture(autouse=True)
 async def setup_database():
+    """
+    Fixture to set up the database connection for testing.
+    This fixture connects to the database before each test and rolls back any transactions
+    after each test to ensure a clean state.
+    """
     await database.connect()
     tx = await database.transaction()
     yield
@@ -17,6 +27,9 @@ async def setup_database():
 
 @pytest.fixture
 async def client():
+    """
+    Fixture to provide an HTTP client for testing.
+    """
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://testserver"
     ) as c:
@@ -25,6 +38,10 @@ async def client():
 
 @pytest.mark.anyio
 async def register_user(client, valid_email, valid_password, role):
+    """
+    Helper function to register a user for testing.
+    Also checks if the status code is correct and returns the user data.
+    """
     r = await client.post(
         "/users/register",
         json={"email": valid_email, "password": valid_password, "role": role},
@@ -34,11 +51,18 @@ async def register_user(client, valid_email, valid_password, role):
 
 
 def auth_headers(token):
+    """
+    Helper function to create authorization headers for API requests.
+    """
     return {"Authorization": f"Bearer {token}"}
 
 
 @pytest.mark.anyio
 async def login_user(client, valid_email, s_password):
+    """
+    Helper function to login a user for testing.
+    Also checks if the status code is correct and returns the access token.
+    """
     r = await client.post(
         "/users/token", data={"username": valid_email, "password": s_password}
     )
@@ -48,6 +72,11 @@ async def login_user(client, valid_email, s_password):
 
 @pytest.fixture
 async def check_role_access(client, valid_password):
+    """
+    Fixture to check role access for different endpoints.
+    This fixture takes a role and checks if the role has access to the specified endpoint.
+    """
+
     async def _check_role_access(
         role: UserRole,
         allowed_roles: list[UserRole],
@@ -80,6 +109,10 @@ async def check_role_access(client, valid_password):
 @pytest.mark.anyio
 @pytest.mark.parametrize("role", list(UserRole))
 async def test_access_to_get_user_by_email(check_role_access, role):
+    """
+    Test access to get user by email.
+    This test checks if the role has access to the endpoint /users/email/{email}.
+    """
     await check_role_access(
         role=role,
         allowed_roles=[UserRole.ADMIN, UserRole.MANAGER],
@@ -91,6 +124,10 @@ async def test_access_to_get_user_by_email(check_role_access, role):
 @pytest.mark.anyio
 @pytest.mark.parametrize("role", list(UserRole))
 async def test_access_to_delete_user(check_role_access, role):
+    """
+    Test access to delete user.
+    This test checks if the role has access to the endpoint /users/delete/{email}.
+    """
     await check_role_access(
         role=role,
         allowed_roles=[UserRole.ADMIN],
@@ -102,6 +139,10 @@ async def test_access_to_delete_user(check_role_access, role):
 @pytest.mark.anyio
 @pytest.mark.parametrize("role", list(UserRole))
 async def test_access_to_update_user(check_role_access, role):
+    """
+    Test access to update user.
+    This test checks if the role has access to the endpoint /users/update/{email}.
+    """
     await check_role_access(
         role=role,
         allowed_roles=[UserRole.ADMIN],
@@ -118,6 +159,10 @@ async def test_access_to_update_user(check_role_access, role):
 @pytest.mark.anyio
 @pytest.mark.parametrize("role", list(UserRole))
 async def test_access_to_get_all_users(check_role_access, role):
+    """
+    Test access to get all users.
+    This test checks if the role has access to the endpoint /users/all.
+    """
     await check_role_access(
         role=role,
         allowed_roles=[UserRole.ADMIN],
@@ -129,9 +174,31 @@ async def test_access_to_get_all_users(check_role_access, role):
 @pytest.mark.parametrize("role", list(UserRole))
 @pytest.mark.anyio
 async def test_access_to_get_users_by_role(check_role_access, role):
+    """
+    Test access to get users by role.
+    This test checks if the role has access to the endpoint /users/role/{role}.
+    """
     await check_role_access(
         role=role,
         allowed_roles=[UserRole.ADMIN, UserRole.MANAGER],
         endpoint="/users/role/sender",
         method="GET",
     )
+
+
+@pytest.mark.anyio
+async def test_token_expiry(client, valid_email, valid_password):
+    """
+    Test token expiration by simulating time passage.
+    This test checks if the token expires after a certain period.
+    Also check if the response status code is correct.
+    """
+    await register_user(client, valid_email, valid_password, UserRole.ADMIN)
+    token = await login_user(client, valid_email, valid_password)
+    auth_header = auth_headers(token)
+    response = await client.get("/users/all", headers=auth_header)
+    assert response.status_code == 200
+    with freeze_time(datetime.now(timezone.utc) + timedelta(minutes=15)):
+        response = await client.get("/users/all", headers=auth_header)
+        assert response.status_code == 401, "Token should be expired"
+        assert "Could not validate credentials" in response.json()["detail"]

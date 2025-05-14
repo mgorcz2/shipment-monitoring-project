@@ -1,4 +1,5 @@
-# tests/unit/test_routers/test_user_router.py
+"""Unit tests for User router."""
+
 from types import SimpleNamespace
 from uuid import uuid4
 
@@ -13,6 +14,9 @@ from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
 
 @pytest.fixture
 def mock_user_service(mocker):
+    """
+    Mock the user service for testing.
+    """
     return mocker.AsyncMock()
 
 
@@ -28,6 +32,10 @@ def user(request):
 
 @pytest.mark.anyio
 async def test_register_user_success(mock_user_service, valid_userin, valid_userDTO):
+    """
+    Test the register_user function
+    with a valid user input and check if the returned DTO matches the expected one.
+    """
     in_user = valid_userin
     expected = valid_userDTO
     mock_user_service.register_user.return_value = expected
@@ -39,6 +47,10 @@ async def test_register_user_success(mock_user_service, valid_userin, valid_user
 
 @pytest.mark.anyio
 async def test_register_user_failure(mock_user_service):
+    """
+    Test the register_user function with an invalid user input
+    and check if it raises an HTTPException with the correct status code and detail.
+    """
     in_data = UserIn(email="x@y.z", password="Password1", role=UserRole.COURIER)
     mock_user_service.register_user.side_effect = ValueError("error")
     with pytest.raises(HTTPException) as exc:
@@ -49,6 +61,10 @@ async def test_register_user_failure(mock_user_service):
 
 @pytest.mark.anyio
 async def test_token_success(mock_user_service):
+    """
+    Test the login_for_access_token function with valid credentials
+    and check if the returned DTO matches the expected one.
+    """
     form = SimpleNamespace(username="u@e", password="pw")
     expected = TokenDTO(access_token="tok", token_type="bearer")
     mock_user_service.login_for_access_token.return_value = expected
@@ -65,6 +81,10 @@ async def test_token_success(mock_user_service):
 
 @pytest.mark.anyio
 async def test_token_failure(mock_user_service):
+    """
+    Test the login_for_access_token function with invalid credentials
+    and check if it raises an HTTPException with the correct status code and detail.
+    """
     form = SimpleNamespace(username="u@e", password="pw")
     mock_user_service.login_for_access_token.side_effect = ValueError("nope")
 
@@ -81,6 +101,11 @@ async def test_token_failure(mock_user_service):
 
 @pytest.mark.anyio
 async def test_get_user_by_email_success(mock_user_service, user, valid_userDTO):
+    """
+    Test the get_user_by_email function with a valid email
+    and check if the returned DTO matches the expected one.
+    Also check if the function raises an HTTPException with the correct status code and detail
+    """
     dto = valid_userDTO
     mock_user_service.get_user_by_email.return_value = dto
     if user.role == UserRole.ADMIN:
@@ -100,6 +125,12 @@ async def test_get_user_by_email_success(mock_user_service, user, valid_userDTO)
 
 @pytest.mark.anyio
 async def test_get_user_by_email_not_found(mock_user_service, user):
+    """
+    Test the get_user_by_email function with an invalid email
+    and check if it raises an HTTPException with the correct status code and detail.
+    Also check if the function raises an HTTPException with the correct status code and detail
+    when the user is not an admin.
+    """
     mock_user_service.get_user_by_email.side_effect = ValueError("Error")
     if user.role == UserRole.ADMIN:
         with pytest.raises(HTTPException) as exc:
@@ -119,6 +150,12 @@ async def test_get_user_by_email_not_found(mock_user_service, user):
 
 @pytest.mark.anyio
 async def test_delete_user_success(mock_user_service, user, valid_user):
+    """
+    Test the delete_user function with a valid email
+    and check if the returned DTO matches the expected one.
+    Also check if the function raises an HTTPException with the correct status code and detail
+    when the user is not an admin.
+    """
     mock_user_service.detele_user.return_value = valid_user
     if user.role == UserRole.ADMIN:
         deleted = await user_router.delete_user(
@@ -137,6 +174,12 @@ async def test_delete_user_success(mock_user_service, user, valid_user):
 
 @pytest.mark.anyio
 async def test_delete_user_not_found(mock_user_service, user):
+    """
+    Test the delete_user function with an invalid email
+    and check if it raises an HTTPException with the correct status code and detail.
+    Also check if the function raises an HTTPException with the correct status code and detail
+    when the user is not an admin.
+    """
     mock_user_service.detele_user.side_effect = ValueError("not found")
 
     if user.role == UserRole.ADMIN:
@@ -159,6 +202,12 @@ async def test_delete_user_not_found(mock_user_service, user):
 async def test_update_user_success(
     mock_user_service, user, valid_user_update, valid_user
 ):
+    """
+    Test the update_user function with a valid email
+    and check if the returned DTO matches the expected one.
+    Also check if the function raises an HTTPException with the correct status code and detail
+    when the user is not an admin.
+    """
     mock_user_service.update_user.return_value = valid_user
 
     if user.role == UserRole.ADMIN:
@@ -186,6 +235,12 @@ async def test_update_user_success(
 
 @pytest.mark.anyio
 async def test_update_user_bad_request(mock_user_service, user, valid_user_update):
+    """
+    Test the update_user function with an invalid email
+    and check if it raises an HTTPException with the correct status code and detail.
+    Also check if the function raises an HTTPException with the correct status code and detail
+    when the user is not an admin.
+    """
     mock_user_service.update_user.side_effect = ValueError("Error")
     if user.role == UserRole.ADMIN:
         with pytest.raises(HTTPException) as exc:
@@ -211,6 +266,12 @@ async def test_update_user_bad_request(mock_user_service, user, valid_user_updat
 
 @pytest.mark.anyio
 async def test_get_all_users_success(mock_user_service, user):
+    """
+    Test the get_all_users function with a valid email
+    and check if the returned DTO matches the expected one.
+    Also check if the function raises an HTTPException with the correct status code and detail
+    when the user is not an admin.
+    """
     if user.role == UserRole.ADMIN:
         arr = [
             UserDTO(id=uuid4(), email="a@b.c", role=UserRole.ADMIN),
@@ -236,6 +297,12 @@ async def test_get_all_users_success(mock_user_service, user):
 
 @pytest.mark.anyio
 async def test_get_all_users_not_found(mock_user_service, user):
+    """
+    Test the get_all_users function with an invalid email
+    and check if it raises an HTTPException with the correct status code and detail.
+    Also check if the function raises an HTTPException with the correct status code and detail
+    when the user is not an admin.
+    """
     mock_user_service.get_all_users.side_effect = ValueError("none")
     if user.role == UserRole.ADMIN:
         with pytest.raises(HTTPException) as exc:
@@ -255,6 +322,12 @@ async def test_get_all_users_not_found(mock_user_service, user):
 
 @pytest.mark.anyio
 async def test_get_users_by_role_success(mock_user_service, user):
+    """
+    Test the get_users_by_role function with a valid email
+    and check if the returned DTO matches the expected one.
+    Also check if the function raises an HTTPException with the correct status code and detail
+    when the user is not an admin.
+    """
     if user.role == UserRole.ADMIN:
         arr = [
             UserDTO(id=uuid4(), email="x@y.z", role=UserRole.SENDER),
@@ -277,6 +350,12 @@ async def test_get_users_by_role_success(mock_user_service, user):
 
 @pytest.mark.anyio
 async def test_get_users_by_role_not_found(mock_user_service, user):
+    """
+    Test the get_users_by_role function with an invalid email
+    and check if it raises an HTTPException with the correct status code and detail.
+    Also check if the function raises an HTTPException with the correct status code and detail
+    when the user is not an admin.
+    """
     mock_user_service.get_users_by_role.side_effect = ValueError("none")
     if user.role == UserRole.ADMIN:
         with pytest.raises(HTTPException) as exc:
