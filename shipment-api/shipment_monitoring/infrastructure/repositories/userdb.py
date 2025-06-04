@@ -1,14 +1,13 @@
 """Module containing user repository implementation."""
 
 from typing import Any, Iterable
-
-from sqlalchemy import select, delete, update
-
-from shipment_monitoring.core.domain.user import UserIn, User
-from shipment_monitoring.core.repositories.iuser import IUserRepository
-from shipment_monitoring.db import user_table, database
-from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
 from uuid import UUID
+
+from sqlalchemy import delete, select, update
+
+from shipment_monitoring.core.domain.user import User, UserIn, UserRole, UserUpdate
+from shipment_monitoring.core.repositories.iuser import IUserRepository
+from shipment_monitoring.db import database, user_table
 
 
 class UserRepository(IUserRepository):
@@ -24,11 +23,11 @@ class UserRepository(IUserRepository):
             UserDTO | None: The user DTO details if exists.
         """
         query = user_table.insert().values(
-            username=data.username, password=data.password, role=data.role
+            email=data.email, password=data.password, role=data.role
         )
         new_user = await database.execute(query)
         new_user = await self.get_user_by_id(new_user)
-        return UserDTO.from_record(new_user) if new_user else None
+        return new_user if new_user else None
 
     async def get_user_by_id(self, user_id: UUID) -> Any | None:
         """The method getting user by provided id.
@@ -43,42 +42,40 @@ class UserRepository(IUserRepository):
         user = await database.fetch_one(query)
         return user if user else None
 
-    async def get_user_by_username(self, username) -> Any | None:
-        """The method getting user by provided username.
+    async def get_user_by_email(self, email) -> Any | None:
+        """The method getting user by provided email.
 
         Args:
-            username (str): The username of the user.
+            email (str): The email of the user.
 
         Returns:
             User | None: The user object if exists.
         """
 
-        query = select(user_table).where(user_table.c.username == username)
+        query = select(user_table).where(user_table.c.email == email)
         user = await database.fetch_one(query)
         return user if user else None
 
-    async def detele_user(self, username: str) -> Any | None:
-        """The abstract deleting user by provided username.
+    async def detele_user(self, email: str) -> Any | None:
+        """The abstract deleting user by provided email.
 
         Args:
-            username (str): The username of the user.
+            email (str): The email of the user.
 
         Returns:
             Any | None: The user object if deleted.
         """
         query = (
-            delete(user_table)
-            .where(user_table.c.username == username)
-            .returning(user_table)
+            delete(user_table).where(user_table.c.email == email).returning(user_table)
         )
         deleted_user = await database.fetch_one(query)
         return deleted_user if deleted_user else None
 
-    async def update_user(self, username: str, data: User) -> Any | None:
-        """The abstract updating user by provided username.
+    async def update_user(self, email: str, data: UserIn) -> Any | None:
+        """The abstract updating user by provided email.
 
         Args:
-            username (str): The username of the user.
+            email (str): The email of the user.
             data (User): The updated user details.
 
         Returns:
@@ -86,19 +83,32 @@ class UserRepository(IUserRepository):
         """
         query = (
             update(user_table)
-            .where(user_table.c.username == username)
+            .where(user_table.c.email == email)
             .values(data.model_dump())
             .returning(user_table)
         )
         updated_user = await database.fetch_one(query)
         return updated_user if updated_user else None
 
-    async def get_all_users(self) -> Iterable[Any] | None:
+    async def get_all_users(self) -> Iterable[Any]:
         """The method getting all users from database.
 
         Returns:
-            Iterable[Any] | None: The user objects.
+            Iterable[Any]: The user objects.
         """
         query = select(user_table)
+        users = await database.fetch_all(query)
+        return users
+
+    async def get_users_by_role(self, role) -> Iterable[Any]:
+        """The method getting user by provided role.
+
+        Args:
+            role (UserRole): Role of the users.
+
+        Returns:
+            Iterable[Any]: The user objects.
+        """
+        query = select(user_table).where(user_table.c.role == role)
         users = await database.fetch_all(query)
         return users

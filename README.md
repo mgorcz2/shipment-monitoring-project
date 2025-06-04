@@ -1,13 +1,10 @@
 # Shipment monitoring
-
-A project developed as part of the "Internet Service Programming" course.
-
 A web-based application for tracking and managing courier shipments. This service allows users to monitor real-time status, track deliveries, and get detailed information about their shipments.
 ## Features
 - Shipment list management
 - Shipment status updates
 - Nearest pickup location search
-- Courier, sender and recipient management
+- Courier, sender, manager and recipient management
 ## Technology stack
 - Python 3.12.7
 - PostgreSQL 17.0
@@ -22,6 +19,10 @@ A web-based application for tracking and managing courier shipments. This servic
 - API documentation (Swagger): http://localhost:8000/docs
 - Building the project using Docker: docker compose build (to refresh the cache: docker compose build --no-cache)
 - Running the project using Docker: docker compose up (to avoid cache issues: docker compose up --force-recreate)
+- Running tests: pytest
+- Running tests with coverage: coverage run -m pytest
+- Generating a coverage report in the terminal: coverage report
+- Generating an HTML coverage report: coverage html
  
 ## Setup
 To ensure email sending works correctly, set the following variables in the Docker container configuration("docker-compose.yml")
