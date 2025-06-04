@@ -1,17 +1,16 @@
 """Module containing user service implementation."""
 
+from datetime import datetime, timedelta
 from typing import Iterable
-from shipment_monitoring.core.domain.user import User, UserIn
+from uuid import UUID
+
+from shipment_monitoring.core.domain.user import User, UserIn, UserUpdate
+from shipment_monitoring.core.repositories.iuser import IUserRepository
+from shipment_monitoring.core.security import consts, password_hashing
+from shipment_monitoring.core.security.token import create_access_token
+from shipment_monitoring.infrastructure.dto.tokenDTO import TokenDTO
 from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
 from shipment_monitoring.infrastructure.services.iuser import IUserService
-from shipment_monitoring.core.repositories.iuser import IUserRepository
-from shipment_monitoring.core.security import consts
-from shipment_monitoring.infrastructure.dto.tokenDTO import TokenDTO
-from shipment_monitoring.core.security.token import create_access_token
-from datetime import datetime, timedelta
-from shipment_monitoring.core.security import password_hashing
-
-from uuid import UUID
 
 
 class UserService(IUserService):
@@ -22,113 +21,143 @@ class UserService(IUserService):
     def __init__(self, repository: IUserRepository):
         self._repository = repository
 
-    async def register_user(self, user: UserIn) -> UserDTO | None:
+    async def register_user(self, user: UserIn) -> UserDTO:
         """The method for registering a new user in repository.
 
         Args:
             user (UserIn): The user input data.
 
         Returns:
-            UserDTO | None: The user DTO details if exists.
+            UserDTO: The user DTO details if exists.
 
         Raises:
-            ValueError: If the username is already registered.
+            ValueError: If the email is already registered.
         """
-        existing_user = await self._repository.get_user_by_username(user.username)
+        existing_user = await self._repository.get_user_by_email(user.email)
         if existing_user:
-            raise ValueError("Username already registered")
+            raise ValueError("User with that email already registered.")
         user.password = password_hashing.hash_password(user.password)
-        return await self._repository.register_user(user)
+        user = await self._repository.register_user(user)
+        if not user:
+            raise ValueError("Failed to register the user. Please try again.")
+        return UserDTO.from_record(user) if user else None
 
-    async def get_user_by_id(self, user_id: UUID) -> UserDTO | None:
+    async def get_user_by_id(self, user_id: UUID) -> UserDTO:
         """The method getting user by provided id from repository.
 
         Args:
             user_id (UUID): UUID of the user.
 
         Returns:
-            User | None: The user DTO details if exists.
+            User: The user DTO details if exists.
         """
         user = await self._repository.get_user_by_id(user_id)
-        return UserDTO.from_record(user) if user else None
+        if not user:
+            raise ValueError(f"No user found with the provided ID: {user_id}")
+        return UserDTO.from_record(user)
 
-    async def get_user_by_username(self, username) -> UserDTO | None:
-        """The method getting user by provided username from repository.
-
-        Args:
-            username (str): The username of the user.
-
-        Returns:
-            User | None: The user object if exists.
-        """
-        user = await self._repository.get_user_by_username(username)
-        return UserDTO.from_record(user) if user else None
-
-    async def detele_user(self, username: str) -> dict | None:
-        """The method deleting user by provided username.
+    async def get_user_by_email(self, email) -> UserDTO:
+        """The method getting user by provided email from repository.
 
         Args:
-            username (str): The username of the user.
+            email (str): The email of the user.
 
         Returns:
-            User | None: The deleted user object from repository.
+            User: The user object if exists.
         """
-        deleted_user = await self._repository.detele_user(username)
-        return deleted_user if deleted_user else None
+        user = await self._repository.get_user_by_email(email)
+        if not user:
+            raise ValueError(f"No user found with the provided email: {email}")
+        return UserDTO.from_record(user)
 
-    async def update_user(self, username: str, data: User) -> dict | None:
-        """The abstract updating user by provided username.
+    async def detele_user(self, email: str) -> User:
+        """The method deleting user by provided email.
 
         Args:
-            username (str): The username of the user.
-            data (User): The updated user details.
+            email (str): The email of the user.
 
         Returns:
-            dict | None: The user object if updated.
+            User: The deleted user object from repository.
         """
-        existing_user = await self._repository.get_user_by_username(username)
-        if not existing_user:
-            raise ValueError("No user found with the provided username. Try again.")
-        existing_user = await self._repository.get_user_by_username(data.username)
-        if existing_user:
-            raise ValueError("User with that username already registered.")
-        existing_user = await self._repository.get_user_by_id(data.id)
-        if existing_user:
-            raise ValueError("User with that id already registered.")
-        data.password = password_hashing.hash_password(data.password)
-        updated_user = await self._repository.update_user(username, data)
-        return updated_user if updated_user else None
+        deleted_user = await self._repository.detele_user(email)
+        if not deleted_user:
+            raise ValueError(f"No user found with the provided email: {email}")
+        return deleted_user
 
-    async def login_for_access_token(
-        self, username: str, password: str
-    ) -> TokenDTO | None:
+    async def update_user(self, email: str, update_data: UserUpdate) -> User:
+        """The abstract updating user by provided email.
+
+        Args:
+            email (str): The email of the user.
+            data (UserUpdate): The updated user details.
+
+        Returns:
+            User: The user object if updated.
+        """
+        original_user = await self._repository.get_user_by_email(email)
+        if not original_user:
+            raise ValueError("No user found with the provided email. Try again.")
+        if update_data.email and update_data.email != email:
+            user_with_new_email = await self._repository.get_user_by_email(
+                update_data.email
+            )
+            if user_with_new_email:
+                raise ValueError("User with that email already registered.")
+        updated_user = UserIn(
+            email=update_data.email if update_data.email else original_user["email"],
+            password=(
+                password_hashing.hash_password(update_data.password)
+                if update_data.password
+                else original_user["password"]
+            ),
+            role=update_data.role if update_data.role else original_user["role"],
+        )
+        updated_user = await self._repository.update_user(email, updated_user)
+        if not updated_user:
+            raise ValueError("Failed to update the user. Please try again.")
+        return updated_user
+
+    async def login_for_access_token(self, email: str, password: str) -> TokenDTO:
         """The method for user authentication to get an access token.
 
         Args:
-            username (str): The login identifier for the user
+            email (str): The login identifier for the user
             password (str): The user's password for authentication.
 
         Returns:
-            TokenDTO | None: A token DTO if login is successful, None otherwise.
+            TokenDTO: A token DTO if login is successful, None otherwise.
 
         Raises:
             ValueError: If the users data is invalid.
         """
 
-        user = await self._repository.get_user_by_username(username=username)
+        user = await self._repository.get_user_by_email(email=email)
         if not user or not password_hashing.verify_password(password, user.password):
-            raise ValueError("Incorrect username or password")
-        access_token_expires = timedelta(minutes=consts.ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = create_access_token(
-            data={"sub": str(user.id)}, expires_delta=access_token_expires
-        )
+            raise ValueError("Incorrect email or password")
+        access_token = create_access_token(data={"sub": str(user.id)})
         return {"access_token": access_token, "token_type": "bearer"}
 
-    async def get_all_users(self) -> Iterable[UserDTO] | None:
+    async def get_all_users(self) -> Iterable[UserDTO]:
         """The method getting all users from repository.
 
         Returns:
-            Iterable[UserDTO] | None: The user objects DTO details.
+            Iterable[UserDTO]: The user objects DTO details.
         """
         users = await self._repository.get_all_users()
+        if not users:
+            raise ValueError("No users found in the repository.")
+        return [UserDTO.from_record(user) for user in users]
+
+    async def get_users_by_role(self, role) -> Iterable[UserDTO]:
+        """The method getting user by provided role.
+
+        Args:
+            role (UserRole): Role of the users.
+
+        Returns:
+            Iterable[UserDTO]: The user objects DTO details.
+        """
+        users = await self._repository.get_users_by_role(role)
+        if not users:
+            raise ValueError(f"No users found with the role: {role}")
         return [UserDTO.from_record(user) for user in users]

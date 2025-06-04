@@ -1,15 +1,17 @@
 """Module containing authentication and authorization methods."""
 
-from shipment_monitoring.container import Container
-from jose import jwt, JWTError
-from fastapi.security import OAuth2PasswordBearer
-from fastapi import Depends, HTTPException, status
-from shipment_monitoring.infrastructure.services.iuser import IUserService
-from dependency_injector.wiring import Provide, inject
-from shipment_monitoring.core.security import consts
-from shipment_monitoring.core.domain.user import User, UserRole
 from functools import wraps
+
+from dependency_injector.wiring import Provide, inject
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+
 from shipment_monitoring.config import config
+from shipment_monitoring.container import Container
+from shipment_monitoring.core.domain.user import User, UserRole
+from shipment_monitoring.core.security import consts
+from shipment_monitoring.infrastructure.services.iuser import IUserService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")
 
@@ -50,11 +52,11 @@ async def get_current_user(
     return user
 
 
-def role_required(required_role: str):
+def role_required(required_role: list[UserRole]):
     """A decorator that enforces role-based access control for endpoint methods.
 
     Args:
-        required_role (str): The role required to access the decorated endpoint.
+        required_role (list): The roles required to access the decorated endpoint.
     """
 
     def decorator(func):
@@ -63,7 +65,7 @@ def role_required(required_role: str):
             *args, current_user: User = Depends(get_current_user), **kwargs
         ):
             if (
-                current_user.role != required_role
+                current_user.role not in required_role
                 and current_user.role != UserRole.ADMIN
             ):
                 raise HTTPException(
