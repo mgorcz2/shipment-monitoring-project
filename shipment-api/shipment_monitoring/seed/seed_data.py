@@ -1,8 +1,8 @@
 """Data for testing"""
 
-from shipment_monitoring.core.domain.user import UserRole, UserIn
-from shipment_monitoring.core.domain.shipment import ShipmentStatus, ShipmentIn
 from shipment_monitoring.core.domain.location import Location
+from shipment_monitoring.core.domain.shipment import ShipmentIn, ShipmentStatus
+from shipment_monitoring.core.domain.user import UserIn, UserRole
 
 Warszawa = Location(street="", street_number="", city="Warszawa", postcode="")
 Olsztyn = Location(street="", street_number="", city="Olsztyn", postcode="")
@@ -14,8 +14,9 @@ Lodz = Location(street="", street_number="", city="Lodz", postcode="")
 
 
 USERS = [
-    UserIn(username="courier", password="courier", role=UserRole.COURIER),
-    UserIn(username="sender", password="sender", role=UserRole.SENDER),
+    UserIn(email="courier@example.com", password="Courier123", role=UserRole.COURIER),
+    UserIn(email="sender@example.com", password="Sender123", role=UserRole.SENDER),
+    UserIn(email="admin@example.com", password="Admin123", role=UserRole.ADMIN),
 ]
 
 SHIPMENTS = [
@@ -23,24 +24,30 @@ SHIPMENTS = [
         origin=Warszawa,
         destination=Olsztyn,
         weight=100,
-        recipient_email="example@gmail.com",
+        recipient_email="example@example.com",
     ),
     ShipmentIn(
-        origin=Olsztyn, destination=Lodz, weight=50, recipient_email="example@gmail.com"
+        origin=Olsztyn,
+        destination=Lodz,
+        weight=50,
+        recipient_email="example@example.com",
     ),
     ShipmentIn(
         origin=Poznan,
         destination=Warszawa,
         weight=100,
-        recipient_email="example@gmail.com",
+        recipient_email="example@example.com",
     ),
     ShipmentIn(
         origin=Krakow,
         destination=Bialystok,
         weight=50,
-        recipient_email="example@gmail.com",
+        recipient_email="example@example.com",
     ),
     ShipmentIn(
-        origin=Lodz, destination=Poznan, weight=56, recipient_email="example@gmail.com"
+        origin=Lodz,
+        destination=Poznan,
+        weight=56,
+        recipient_email="example@example.com",
     ),
 ]

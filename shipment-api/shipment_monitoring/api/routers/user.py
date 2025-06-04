@@ -1,14 +1,15 @@
 from typing import Iterable
-from dependency_injector.wiring import inject, Provide
+
+from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+
 from shipment_monitoring.container import Container
+from shipment_monitoring.core.domain.user import User, UserIn, UserRole, UserUpdate
+from shipment_monitoring.core.security import auth
 from shipment_monitoring.infrastructure.dto.tokenDTO import TokenDTO
-from shipment_monitoring.core.domain.user import UserIn, UserRole, User
 from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
 from shipment_monitoring.infrastructure.services.iuser import IUserService
-from shipment_monitoring.core.security import auth
-
 
 router = APIRouter(
     prefix="/users",
@@ -62,71 +63,75 @@ async def login_for_access_token(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(error))
 
 
-@router.get("/get/{username}", response_model=UserDTO, status_code=status.HTTP_200_OK)
-@auth.role_required(UserRole.ADMIN)
+@router.get("/email/{email}", response_model=UserDTO, status_code=status.HTTP_200_OK)
+@auth.role_required([UserRole.ADMIN, UserRole.MANAGER])
 @inject
-async def get_user_by_username(
-    username: str,
+async def get_user_by_email(
+    email: str,
     current_user: User = Depends(auth.get_current_user),
     service: IUserService = Depends(Provide[Container.user_service]),
 ) -> UserDTO:
-    """The endpoint getting user by provided username.
+    """The endpoint getting user by provided email.
 
     Args:
-        username (str): The username of the user.
+        email (str): The email of the user.
         current_user (User): The currently injected authenticated user.
         service (IUserService): The injected user service.
 
     Returns:
         UserDTO: The user DTO details if exists.
     """
-    if user := await service.get_user_by_username(username):
+    try:
+        user = await service.get_user_by_email(email)
         return user
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail="No user found with the provided username.",
-    )
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(error),
+        )
 
 
-@router.delete("/delete/{username}", status_code=status.HTTP_200_OK)
+@router.delete("/delete/{email}", status_code=status.HTTP_200_OK)
 @auth.role_required(UserRole.ADMIN)
 @inject
 async def delete_user(
-    username: str,
+    email: str,
     current_user: User = Depends(auth.get_current_user),
     service: IUserService = Depends(Provide[Container.user_service]),
-) -> dict:
-    """The endpoint deleting user by provided username.
+) -> User:
+    """The endpoint deleting user by provided email.
 
     Args:
-        username (str): The username of the user.
+        email (str): The email of the user.
         current_user (User): The currently injected authenticated user.
         service (IUserService): The injected user service.
 
     Returns:
         dict: The deleted user object.
     """
-    if user := await service.detele_user(username):
-        return dict(user)
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail="No user found with the provided username. Try again.",
-    )
+    try:
+        user = await service.detele_user(email)
+        return user
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(error),
+        )
 
 
-@router.put("/update/{username}", status_code=status.HTTP_200_OK)
+@router.put("/update/{email}", status_code=status.HTTP_200_OK)
 @auth.role_required(UserRole.ADMIN)
 @inject
 async def update_user(
-    username: str,
-    data: User,
+    email: str,
+    data: UserUpdate,
     current_user: User = Depends(auth.get_current_user),
     service: IUserService = Depends(Provide[Container.user_service]),
-) -> dict:
-    """The endpoint updating user by provided username.
+) -> User:
+    """The endpoint updating user by provided email.
 
     Args:
-        username (str): The username of the user.
+        email (str): The email of the user.
         data (User): The updated user details.
         current_user (User): The currently injected authenticated user.
         service (IUserService): The injected user service.
@@ -135,9 +140,13 @@ async def update_user(
         dict: The updated user object if updated.
     """
     try:
-        if user := await service.update_user(username, data):
-            return dict(user)
+        user = await service.update_user(email, data)
+        return user
     except ValueError as error:
+        if "No user found" in str(error):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=str(error)
+            )
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
 
 
@@ -157,6 +166,33 @@ async def get_all_users(
     Returns:
          Iterable[UserDTO]: The user objects DTO details.
     """
-    if users := await service.get_all_users():
+    try:
+        users = await service.get_all_users()
         return users
-    raise HTTPException(status_code=404, detail="Users not found")
+    except ValueError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
+
+
+@router.get("/role/{role}", status_code=status.HTTP_200_OK)
+@auth.role_required([UserRole.ADMIN, UserRole.MANAGER])
+@inject
+async def get_users_by_role(
+    role: UserRole,
+    current_user: User = Depends(auth.get_current_user),
+    service: IUserService = Depends(Provide[Container.user_service]),
+) -> Iterable[UserDTO]:
+    """The endpoint getting users by role.
+
+    Args:
+        role (UserRole): The role of the users.
+        current_user (User): The currently injected authenticated user.
+        service (IUserService): The injected user service.
+
+    Returns:
+        Iterable[UserDTO]: The user objects DTO details.
+    """
+    try:
+        users = await service.get_users_by_role(role)
+        return users
+    except ValueError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
