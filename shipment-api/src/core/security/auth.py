@@ -6,11 +6,11 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-
 from shipment_monitoring.config import config
 from shipment_monitoring.container import Container
 from shipment_monitoring.core.domain.user import User, UserRole
 from shipment_monitoring.core.security import consts
+from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
 from shipment_monitoring.infrastructure.services.iuser import IUserService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")
@@ -20,7 +20,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
     service: IUserService = Depends(Provide[Container.user_service]),
-) -> User:
+) -> UserDTO:
     """The method authenticating the user based on a JWT token.
 
     Args:

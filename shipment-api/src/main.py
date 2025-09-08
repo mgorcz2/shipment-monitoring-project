@@ -1,3 +1,5 @@
+"""Main module for the FastAPI application."""
+
 from contextlib import asynccontextmanager
 from sys import modules
 from typing import AsyncGenerator
@@ -5,12 +7,11 @@ from typing import AsyncGenerator
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.exception_handlers import http_exception_handler
 
+from shipment_monitoring.api.routers.seed import router as seed_router
 from shipment_monitoring.api.routers.shipment import router as shipment_router
 from shipment_monitoring.api.routers.user import router as user_router
-from shipment_monitoring.api.routers.seed import router as seed_router
 from shipment_monitoring.container import Container
-from shipment_monitoring.db import init_db, database
-
+from shipment_monitoring.db import database, init_db
 
 container = Container()
 container.wire(

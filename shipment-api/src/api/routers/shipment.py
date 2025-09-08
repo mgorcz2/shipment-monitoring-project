@@ -1,24 +1,24 @@
 from typing import Iterable
-from dependency_injector.wiring import inject, Provide
-from fastapi import APIRouter, Depends, HTTPException, status
+from uuid import UUID
 
+from dependency_injector.wiring import Provide, inject
+from fastapi import APIRouter, Depends, HTTPException, status
+from shipment_monitoring.container import Container
+from shipment_monitoring.core.domain.location import Location
 from shipment_monitoring.core.domain.shipment import (
     Shipment,
     ShipmentIn,
     ShipmentStatus,
 )
-from shipment_monitoring.core.domain.location import Location
+from shipment_monitoring.core.domain.user import User, UserRole
+from shipment_monitoring.core.security import auth
 from shipment_monitoring.infrastructure.dto.shipmentDTO import (
     ShipmentDTO,
     ShipmentWithDistanceDTO,
 )
+from shipment_monitoring.infrastructure.external.email import email_service
 from shipment_monitoring.infrastructure.services.ishipment import IShipmentService
 from shipment_monitoring.infrastructure.services.iuser import IUserService
-from shipment_monitoring.container import Container
-from shipment_monitoring.core.domain.user import User, UserRole
-from shipment_monitoring.core.security import auth
-from shipment_monitoring.infrastructure.external.email import email_service
-from uuid import UUID
 
 router = APIRouter(
     prefix="/shipments",

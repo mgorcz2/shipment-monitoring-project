@@ -1,11 +1,10 @@
 from uuid import uuid4
 
+# pylint: disable=redefined-outer-name
 import pytest
 
 from shipment_monitoring.core.domain.user import User, UserIn, UserUpdate
-from shipment_monitoring.db import database, init_db
 from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
-from shipment_monitoring.infrastructure.repositories.userdb import UserRepository
 
 
 @pytest.fixture(scope="session")
@@ -47,7 +46,7 @@ def valid_user(valid_email, valid_password):
 
 
 @pytest.fixture
-def valid_userDTO(valid_email, valid_password):
+def valid_userDTO(valid_email):
     return UserDTO(
         id=uuid4(),
         email=valid_email,

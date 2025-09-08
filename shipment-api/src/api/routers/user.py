@@ -3,7 +3,6 @@ from typing import Iterable
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-
 from shipment_monitoring.container import Container
 from shipment_monitoring.core.domain.user import User, UserIn, UserRole, UserUpdate
 from shipment_monitoring.core.security import auth
@@ -36,7 +35,9 @@ async def register_user(
         user = await service.register_user(new_user)
         return user
     except ValueError as error:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(error)
+        ) from error
 
 
 @router.post("/token", response_model=TokenDTO)
@@ -60,7 +61,9 @@ async def login_for_access_token(
         )
         return token
     except ValueError as error:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(error))
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail=str(error)
+        ) from error
 
 
 @router.get("/email/{email}", response_model=UserDTO, status_code=status.HTTP_200_OK)
@@ -88,11 +91,11 @@ async def get_user_by_email(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(error),
-        )
+        ) from error
 
 
 @router.delete("/delete/{email}", status_code=status.HTTP_200_OK)
-@auth.role_required(UserRole.ADMIN)
+@auth.role_required([UserRole.ADMIN])
 @inject
 async def delete_user(
     email: str,
@@ -116,11 +119,11 @@ async def delete_user(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(error),
-        )
+        ) from error
 
 
 @router.put("/update/{email}", status_code=status.HTTP_200_OK)
-@auth.role_required(UserRole.ADMIN)
+@auth.role_required([UserRole.ADMIN])
 @inject
 async def update_user(
     email: str,
@@ -146,12 +149,14 @@ async def update_user(
         if "No user found" in str(error):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail=str(error)
-            )
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
+            ) from error
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(error)
+        ) from error
 
 
 @router.get("/all", status_code=status.HTTP_200_OK)
-@auth.role_required(UserRole.ADMIN)
+@auth.role_required([UserRole.ADMIN])
 @inject
 async def get_all_users(
     current_user: User = Depends(auth.get_current_user),
@@ -170,7 +175,9 @@ async def get_all_users(
         users = await service.get_all_users()
         return users
     except ValueError as error:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(error)
+        ) from error
 
 
 @router.get("/role/{role}", status_code=status.HTTP_200_OK)
@@ -195,4 +202,6 @@ async def get_users_by_role(
         users = await service.get_users_by_role(role)
         return users
     except ValueError as error:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(error)
+        ) from error

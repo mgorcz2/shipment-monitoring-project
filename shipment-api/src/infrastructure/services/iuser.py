@@ -1,5 +1,6 @@
 """Module containing user service abstractions."""
 
+# pylint: disable=redefined-outer-name
 from abc import ABC, abstractmethod
 from typing import Iterable
 from uuid import UUID
@@ -13,7 +14,7 @@ class IUserService(ABC):
     """An abstract class representing the protocol of user service."""
 
     @abstractmethod
-    async def register_user(self, User: UserIn) -> UserDTO:
+    async def register_user(self, user: UserIn) -> UserDTO:
         """The abstract method for registering a new user in repository.
 
         Args:
