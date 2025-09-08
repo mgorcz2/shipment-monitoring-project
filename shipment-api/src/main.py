@@ -16,10 +16,10 @@ from shipment_monitoring.db import database, init_db
 container = Container()
 container.wire(
     modules=[
-        "shipment_monitoring.api.routers.shipment",
-        "shipment_monitoring.api.routers.user",
-        "shipment_monitoring.core.security.auth",
-        "shipment_monitoring.api.routers.seed",
+        "src.api.routers.shipment",
+        "src.api.routers.user",
+        "src.core.security.auth",
+        "src.api.routers.seed",
     ]
 )
 

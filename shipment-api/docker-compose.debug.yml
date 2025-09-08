@@ -3,7 +3,7 @@ services:
     build:
       context: .
     volumes:
-      - ./shipment_monitoring:/shipment_monitoring
+      - ./src:/src
     command:
       - "sh"
       - "-c"
