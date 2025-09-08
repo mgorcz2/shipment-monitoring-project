@@ -5,7 +5,7 @@ from dotenv import dotenv_values
 from shipment_monitoring.config import config
 
 
-# config = dotenv_values("shipment_monitoring/.env")
+# config = dotenv_values("src/.env")
 conf = ConnectionConfig(
     MAIL_USERNAME=config.MAIL_USERNAME,
     MAIL_PASSWORD=config.MAIL_PASSWORD,
