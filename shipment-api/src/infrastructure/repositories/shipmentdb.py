@@ -3,15 +3,15 @@
 from typing import Any, Iterable, Tuple
 from uuid import UUID
 
-from sqlalchemy import select, join, update, delete
+from sqlalchemy import delete, join, select, update
 
-from shipment_monitoring.core.repositories.ishipment import IShipmentRepository
-from shipment_monitoring.core.domain.shipment import (
+from src.core.domain.shipment import (
     Shipment,
     ShipmentIn,
     ShipmentStatus,
 )
-from shipment_monitoring.db import shipment_table, database
+from src.core.repositories.ishipment import IShipmentRepository
+from src.db import database, shipment_table
 
 
 class ShipmentRepository(IShipmentRepository):

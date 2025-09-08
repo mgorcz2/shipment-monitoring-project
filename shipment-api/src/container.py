@@ -1,12 +1,12 @@
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Factory, Singleton
 
-from shipment_monitoring.infrastructure.repositories.shipmentdb import (
+from src.infrastructure.repositories.shipmentdb import (
     ShipmentRepository,
 )
-from shipment_monitoring.infrastructure.repositories.userdb import UserRepository
-from shipment_monitoring.infrastructure.services.shipment import ShipmentService
-from shipment_monitoring.infrastructure.services.user import UserService
+from src.infrastructure.repositories.userdb import UserRepository
+from src.infrastructure.services.shipment import ShipmentService
+from src.infrastructure.services.user import UserService
 
 
 class Container(DeclarativeContainer):

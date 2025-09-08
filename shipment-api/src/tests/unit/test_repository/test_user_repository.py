@@ -5,9 +5,9 @@ from uuid import uuid4
 
 import pytest
 
-import shipment_monitoring.infrastructure.repositories.userdb as repo_module
-from shipment_monitoring.core.domain.user import User, UserIn
-from shipment_monitoring.infrastructure.repositories.userdb import UserRepository
+import src.infrastructure.repositories.userdb as repo_module
+from src.core.domain.user import User, UserIn
+from src.infrastructure.repositories.userdb import UserRepository
 
 
 @pytest.fixture(autouse=True)

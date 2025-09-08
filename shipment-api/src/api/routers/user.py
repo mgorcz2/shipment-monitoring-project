@@ -3,12 +3,12 @@ from typing import Iterable
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from shipment_monitoring.container import Container
-from shipment_monitoring.core.domain.user import User, UserIn, UserRole, UserUpdate
-from shipment_monitoring.core.security import auth
-from shipment_monitoring.infrastructure.dto.tokenDTO import TokenDTO
-from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
-from shipment_monitoring.infrastructure.services.iuser import IUserService
+from src.container import Container
+from src.core.domain.user import User, UserIn, UserRole, UserUpdate
+from src.core.security import auth
+from src.infrastructure.dto.tokenDTO import TokenDTO
+from src.infrastructure.dto.userDTO import UserDTO
+from src.infrastructure.services.iuser import IUserService
 
 router = APIRouter(
     prefix="/users",

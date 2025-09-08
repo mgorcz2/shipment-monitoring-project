@@ -3,8 +3,8 @@ from uuid import uuid4
 # pylint: disable=redefined-outer-name
 import pytest
 
-from shipment_monitoring.core.domain.user import User, UserIn, UserUpdate
-from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
+from src.core.domain.user import User, UserIn, UserUpdate
+from src.infrastructure.dto.userDTO import UserDTO
 
 
 @pytest.fixture(scope="session")

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Iterable
 from uuid import UUID
 
-from shipment_monitoring.core.domain.user import User, UserIn
+from src.core.domain.user import User, UserIn
 
 
 class IUserRepository(ABC):

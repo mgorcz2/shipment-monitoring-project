@@ -1,7 +1,8 @@
 """Module containing email service implementation."""
 
 from fastapi_mail import FastMail, MessageSchema
-from shipment_monitoring.infrastructure.external.email.email_conf import conf
+
+from src.infrastructure.external.email.email_conf import conf
 
 mail = FastMail(conf)
 

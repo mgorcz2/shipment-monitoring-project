@@ -5,15 +5,15 @@ from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 import pytest
-import shipment_monitoring.core.security.token as token_module
-import shipment_monitoring.infrastructure.services.user as user_service_module
+import src.core.security.token as token_module
+import src.infrastructure.services.user as user_service_module
 from jose import jwt
-from shipment_monitoring.config import config
-from shipment_monitoring.core.domain.user import UserIn, UserRole, UserUpdate
-from shipment_monitoring.core.security import consts
-from shipment_monitoring.core.security.token import create_access_token
-from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
-from shipment_monitoring.infrastructure.services.user import UserService
+from src.config import config
+from src.core.domain.user import UserIn, UserRole, UserUpdate
+from src.core.security import consts
+from src.core.security.token import create_access_token
+from src.infrastructure.dto.userDTO import UserDTO
+from src.infrastructure.services.user import UserService
 
 
 @pytest.fixture

@@ -3,22 +3,22 @@ from uuid import UUID
 
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, status
-from shipment_monitoring.container import Container
-from shipment_monitoring.core.domain.location import Location
-from shipment_monitoring.core.domain.shipment import (
+from src.container import Container
+from src.core.domain.location import Location
+from src.core.domain.shipment import (
     Shipment,
     ShipmentIn,
     ShipmentStatus,
 )
-from shipment_monitoring.core.domain.user import User, UserRole
-from shipment_monitoring.core.security import auth
-from shipment_monitoring.infrastructure.dto.shipmentDTO import (
+from src.core.domain.user import User, UserRole
+from src.core.security import auth
+from src.infrastructure.dto.shipmentDTO import (
     ShipmentDTO,
     ShipmentWithDistanceDTO,
 )
-from shipment_monitoring.infrastructure.external.email import email_service
-from shipment_monitoring.infrastructure.services.ishipment import IShipmentService
-from shipment_monitoring.infrastructure.services.iuser import IUserService
+from src.infrastructure.external.email import email_service
+from src.infrastructure.services.ishipment import IShipmentService
+from src.infrastructure.services.iuser import IUserService
 
 router = APIRouter(
     prefix="/shipments",

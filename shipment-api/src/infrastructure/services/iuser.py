@@ -5,9 +5,9 @@ from abc import ABC, abstractmethod
 from typing import Iterable
 from uuid import UUID
 
-from shipment_monitoring.core.domain.user import User, UserIn, UserUpdate
-from shipment_monitoring.infrastructure.dto.tokenDTO import TokenDTO
-from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
+from src.core.domain.user import User, UserIn, UserUpdate
+from src.infrastructure.dto.tokenDTO import TokenDTO
+from src.infrastructure.dto.userDTO import UserDTO
 
 
 class IUserService(ABC):

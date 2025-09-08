@@ -14,9 +14,9 @@ from sqlalchemy.exc import DatabaseError, OperationalError
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.sql import func
 
-from shipment_monitoring.config import config
-from shipment_monitoring.core.domain.shipment import ShipmentStatus
-from shipment_monitoring.core.domain.user import UserRole
+from src.config import config
+from src.core.domain.shipment import ShipmentStatus
+from src.core.domain.user import UserRole
 
 metadata = sqlalchemy.MetaData()
 

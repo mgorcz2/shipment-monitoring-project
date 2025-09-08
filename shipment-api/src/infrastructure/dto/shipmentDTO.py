@@ -1,11 +1,13 @@
 """A module containing DTO models for output shipments."""
 
+from datetime import datetime
+from typing import Optional
+from uuid import UUID
+
 from asyncpg import Record  # type: ignore
 from pydantic import BaseModel, ConfigDict
-from shipment_monitoring.core.domain.shipment import ShipmentStatus
-from uuid import UUID
-from typing import Optional
-from datetime import datetime
+
+from src.core.domain.shipment import ShipmentStatus
 
 
 class ShipmentDTO(BaseModel):

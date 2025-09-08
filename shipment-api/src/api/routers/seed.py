@@ -1,11 +1,11 @@
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, status
-from shipment_monitoring.container import Container
-from shipment_monitoring.core.domain.user import User, UserRole
-from shipment_monitoring.core.security import auth
-from shipment_monitoring.infrastructure.services.ishipment import IShipmentService
-from shipment_monitoring.infrastructure.services.iuser import IUserService
-from shipment_monitoring.seed.seed_data import SHIPMENTS, USERS
+from src.container import Container
+from src.core.domain.user import User, UserRole
+from src.core.security import auth
+from src.infrastructure.services.ishipment import IShipmentService
+from src.infrastructure.services.iuser import IUserService
+from src.seed.seed_data import SHIPMENTS, USERS
 
 router = APIRouter(tags=["seed"])
 

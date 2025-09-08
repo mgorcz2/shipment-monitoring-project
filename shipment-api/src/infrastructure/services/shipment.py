@@ -1,20 +1,21 @@
 """Module containing shipment service implementation."""
 
-from typing import Iterable, Any
-from shipment_monitoring.core.domain.shipment import (
-    ShipmentStatus,
-    ShipmentIn,
+from typing import Any, Iterable
+from uuid import UUID
+
+from src.core.domain.location import Location
+from src.core.domain.shipment import (
     Shipment,
+    ShipmentIn,
+    ShipmentStatus,
 )
-from shipment_monitoring.core.repositories.ishipment import IShipmentRepository
-from shipment_monitoring.infrastructure.dto.shipmentDTO import (
+from src.core.repositories.ishipment import IShipmentRepository
+from src.infrastructure.dto.shipmentDTO import (
     ShipmentDTO,
     ShipmentWithDistanceDTO,
 )
-from shipment_monitoring.infrastructure.services.ishipment import IShipmentService
-from shipment_monitoring.infrastructure.external.geolocation import geopy
-from shipment_monitoring.core.domain.location import Location
-from uuid import UUID
+from src.infrastructure.external.geolocation import geopy
+from src.infrastructure.services.ishipment import IShipmentService
 
 
 class ShipmentService(IShipmentService):
