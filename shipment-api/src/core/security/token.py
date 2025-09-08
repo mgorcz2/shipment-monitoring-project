@@ -3,8 +3,8 @@
 from datetime import datetime, timedelta, timezone
 
 from jose import jwt
-from shipment_monitoring.config import config
-from shipment_monitoring.core.security import consts
+from src.config import config
+from src.core.security import consts
 
 
 def create_access_token(data: dict):

@@ -1,9 +1,9 @@
 """E-mail config file"""
 
-from fastapi_mail import ConnectionConfig
 from dotenv import dotenv_values
-from shipment_monitoring.config import config
+from fastapi_mail import ConnectionConfig
 
+from src.config import config
 
 # config = dotenv_values("src/.env")
 conf = ConnectionConfig(

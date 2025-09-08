@@ -2,18 +2,18 @@
 
 from abc import ABC, abstractmethod
 from typing import Iterable
+from uuid import UUID
 
-from shipment_monitoring.core.domain.shipment import (
+from src.core.domain.location import Location
+from src.core.domain.shipment import (
+    Shipment,
     ShipmentIn,
     ShipmentStatus,
-    Shipment,
 )
-from shipment_monitoring.core.domain.location import Location
-from shipment_monitoring.infrastructure.dto.shipmentDTO import (
+from src.infrastructure.dto.shipmentDTO import (
     ShipmentDTO,
     ShipmentWithDistanceDTO,
 )
-from uuid import UUID
 
 
 class IShipmentService(ABC):

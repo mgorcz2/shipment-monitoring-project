@@ -1,8 +1,8 @@
 """Data for testing"""
 
-from shipment_monitoring.core.domain.location import Location
-from shipment_monitoring.core.domain.shipment import ShipmentIn, ShipmentStatus
-from shipment_monitoring.core.domain.user import UserIn, UserRole
+from src.core.domain.location import Location
+from src.core.domain.shipment import ShipmentIn, ShipmentStatus
+from src.core.domain.user import UserIn, UserRole
 
 Warszawa = Location(street="", street_number="", city="Warszawa", postcode="")
 Olsztyn = Location(street="", street_number="", city="Olsztyn", postcode="")

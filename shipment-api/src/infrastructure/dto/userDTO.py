@@ -5,7 +5,7 @@ from uuid import UUID
 from asyncpg import Record
 from pydantic import BaseModel, ConfigDict
 
-from shipment_monitoring.core.domain.user import UserRole
+from src.core.domain.user import UserRole
 
 
 class UserDTO(BaseModel):

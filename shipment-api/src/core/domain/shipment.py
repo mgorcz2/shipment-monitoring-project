@@ -1,11 +1,12 @@
 """A model containing shipment-related models."""
 
-from typing import Optional
-from datetime import datetime
 import enum
+from datetime import datetime
+from typing import Optional
 from uuid import UUID
+
 from pydantic import BaseModel, ConfigDict
-from shipment_monitoring.core.domain.location import Location
+from src.core.domain.location import Location
 
 
 class ShipmentStatus(str, enum.Enum):

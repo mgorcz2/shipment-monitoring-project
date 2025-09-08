@@ -6,12 +6,12 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from shipment_monitoring.config import config
-from shipment_monitoring.container import Container
-from shipment_monitoring.core.domain.user import User, UserRole
-from shipment_monitoring.core.security import consts
-from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
-from shipment_monitoring.infrastructure.services.iuser import IUserService
+from src.config import config
+from src.container import Container
+from src.core.domain.user import User, UserRole
+from src.core.security import consts
+from src.infrastructure.dto.userDTO import UserDTO
+from src.infrastructure.services.iuser import IUserService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")
 

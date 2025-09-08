@@ -4,8 +4,8 @@ from abc import ABC, abstractmethod
 from typing import Any, Iterable, Tuple
 from uuid import UUID
 
-from shipment_monitoring.core.domain.location import Location
-from shipment_monitoring.core.domain.shipment import (
+from src.core.domain.location import Location
+from src.core.domain.shipment import (
     Shipment,
     ShipmentIn,
     ShipmentStatus,

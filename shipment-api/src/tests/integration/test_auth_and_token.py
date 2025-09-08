@@ -7,9 +7,9 @@ import pytest
 from freezegun import freeze_time
 from httpx import ASGITransport, AsyncClient
 
-from shipment_monitoring.core.domain.user import UserRole
-from shipment_monitoring.db import database
-from shipment_monitoring.main import app
+from src.core.domain.user import UserRole
+from src.db import database
+from src.main import app
 
 
 @pytest.fixture(autouse=True)

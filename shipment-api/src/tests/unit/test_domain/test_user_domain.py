@@ -5,7 +5,7 @@ from uuid import uuid4
 import pytest
 from pydantic import ValidationError
 
-from shipment_monitoring.core.domain.user import User, UserIn, UserRole, UserUpdate
+from src.core.domain.user import User, UserIn, UserRole, UserUpdate
 
 
 def test_userin_valid_data(valid_password, valid_email):

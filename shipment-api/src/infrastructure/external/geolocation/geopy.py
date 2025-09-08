@@ -4,9 +4,9 @@ Enought for testing purposes.
 """
 
 from geopy.geocoders import Nominatim
-from shipment_monitoring.core.domain.location import Location
 from haversine import haversine
 
+from src.core.domain.location import Location
 
 geolocator = Nominatim(user_agent="shipment_app", timeout=1000)
 

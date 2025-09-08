@@ -7,10 +7,10 @@ from uuid import uuid4
 import pytest
 from fastapi import HTTPException, status
 
-import shipment_monitoring.api.routers.user as user_router
-from shipment_monitoring.core.domain.user import User, UserIn, UserRole
-from shipment_monitoring.infrastructure.dto.tokenDTO import TokenDTO
-from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
+import src.api.routers.user as user_router
+from src.core.domain.user import User, UserIn, UserRole
+from src.infrastructure.dto.tokenDTO import TokenDTO
+from src.infrastructure.dto.userDTO import UserDTO
 
 
 @pytest.fixture
