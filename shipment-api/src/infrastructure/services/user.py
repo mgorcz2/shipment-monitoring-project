@@ -1,12 +1,11 @@
 """Module containing user service implementation."""
 
-from datetime import datetime, timedelta
 from typing import Iterable
 from uuid import UUID
 
 from shipment_monitoring.core.domain.user import User, UserIn, UserUpdate
 from shipment_monitoring.core.repositories.iuser import IUserRepository
-from shipment_monitoring.core.security import consts, password_hashing
+from shipment_monitoring.core.security import password_hashing
 from shipment_monitoring.core.security.token import create_access_token
 from shipment_monitoring.infrastructure.dto.tokenDTO import TokenDTO
 from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
@@ -37,10 +36,10 @@ class UserService(IUserService):
         if existing_user:
             raise ValueError("User with that email already registered.")
         user.password = password_hashing.hash_password(user.password)
-        user = await self._repository.register_user(user)
-        if not user:
+        new_user = await self._repository.register_user(user)
+        if not new_user:
             raise ValueError("Failed to register the user. Please try again.")
-        return UserDTO.from_record(user) if user else None
+        return UserDTO.from_record(new_user)
 
     async def get_user_by_id(self, user_id: UUID) -> UserDTO:
         """The method getting user by provided id from repository.
@@ -112,10 +111,10 @@ class UserService(IUserService):
             ),
             role=update_data.role if update_data.role else original_user["role"],
         )
-        updated_user = await self._repository.update_user(email, updated_user)
-        if not updated_user:
+        user = await self._repository.update_user(email, updated_user)
+        if not user:
             raise ValueError("Failed to update the user. Please try again.")
-        return updated_user
+        return user
 
     async def login_for_access_token(self, email: str, password: str) -> TokenDTO:
         """The method for user authentication to get an access token.

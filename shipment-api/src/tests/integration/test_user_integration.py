@@ -1,5 +1,6 @@
 """End to end integration tests for user in the shipment monitoring system."""
 
+# pylint: disable=redefined-outer-name
 import pytest
 from httpx import ASGITransport, AsyncClient
 
@@ -10,6 +11,9 @@ from shipment_monitoring.main import app
 
 @pytest.fixture()
 def admin_email():
+    """
+    Fixture to provide an admin email for testing.
+    """
     return "admin@example.com"
 
 

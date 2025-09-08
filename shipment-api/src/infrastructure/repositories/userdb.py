@@ -5,7 +5,7 @@ from uuid import UUID
 
 from sqlalchemy import delete, select, update
 
-from shipment_monitoring.core.domain.user import User, UserIn, UserRole, UserUpdate
+from shipment_monitoring.core.domain.user import UserIn
 from shipment_monitoring.core.repositories.iuser import IUserRepository
 from shipment_monitoring.db import database, user_table
 

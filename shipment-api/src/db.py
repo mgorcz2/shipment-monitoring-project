@@ -1,8 +1,10 @@
+"""Database module."""
+
 import asyncio
 
 import databases
 import sqlalchemy
-from asyncpg.exceptions import (  # type: ignore
+from asyncpg.exceptions import (
     CannotConnectNowError,
     ConnectionDoesNotExistError,
 )

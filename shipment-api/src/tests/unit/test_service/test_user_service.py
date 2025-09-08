@@ -1,9 +1,11 @@
 """Unit tests for User service."""
 
+# pylint: disable=redefined-outer-name
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 import pytest
+import shipment_monitoring.core.security.token as token_module
 import shipment_monitoring.infrastructure.services.user as user_service_module
 from jose import jwt
 from shipment_monitoring.config import config
@@ -54,6 +56,9 @@ def user_service(repo_mock):
 
 @pytest.fixture
 def sample_record():
+    """
+    Fixture to create a sample user record.
+    """
     raw = "Password123"
     return {
         "id": uuid4(),
@@ -65,6 +70,9 @@ def sample_record():
 
 @pytest.fixture
 def sample_user_in(sample_record):
+    """
+    Fixture to create a sample UserIn object.
+    """
     return UserIn(
         email=sample_record["email"],
         password=sample_record["password"],
@@ -341,8 +349,6 @@ def patch_datetime(monkeypatch):
     """
     Fixture to patch the datetime module for testing.
     """
-    import shipment_monitoring.core.security.token as token_module
-
     monkeypatch.setattr(token_module, "datetime", MockDateTime)
     monkeypatch.setattr(config, "SECRET_KEY", "test-secret")
 

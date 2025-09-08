@@ -1,5 +1,6 @@
 """Unit tests for User router."""
 
+# pylint: disable=redefined-outer-name
 from types import SimpleNamespace
 from uuid import uuid4
 
@@ -7,7 +8,7 @@ import pytest
 from fastapi import HTTPException, status
 
 import shipment_monitoring.api.routers.user as user_router
-from shipment_monitoring.core.domain.user import User, UserIn, UserRole, UserUpdate
+from shipment_monitoring.core.domain.user import User, UserIn, UserRole
 from shipment_monitoring.infrastructure.dto.tokenDTO import TokenDTO
 from shipment_monitoring.infrastructure.dto.userDTO import UserDTO
 
@@ -112,8 +113,8 @@ async def test_get_user_by_email_success(mock_user_service, user, valid_userDTO)
         result = await user_router.get_user_by_email(
             email=valid_userDTO.email, current_user=user, service=mock_user_service
         )
-        result.email == valid_userDTO.email
-        result.id == valid_userDTO.id
+        assert result.email == valid_userDTO.email
+        assert result.id == valid_userDTO.id
     else:
         with pytest.raises(
             HTTPException, match="No permission to access this resource."

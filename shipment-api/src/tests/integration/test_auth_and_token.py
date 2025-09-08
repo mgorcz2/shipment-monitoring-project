@@ -1,5 +1,6 @@
 """Integration tests for user authentication and authorization in the shipment monitoring system."""
 
+# pylint: disable=redefined-outer-name
 from datetime import datetime, timedelta, timezone
 
 import pytest

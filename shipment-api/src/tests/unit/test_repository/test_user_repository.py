@@ -1,6 +1,7 @@
 """Unit tests for User repository."""
 
-from uuid import UUID, uuid4
+# pylint: disable=redefined-outer-name
+from uuid import uuid4
 
 import pytest
 
