@@ -25,7 +25,7 @@ packages_table = sqlalchemy.Table(
     "packages",
     metadata,
     sqlalchemy.Column(
-        "shipment_id",
+        "id",
         sqlalchemy.ForeignKey("shipments.id", ondelete="CASCADE"),
         primary_key=True,
         nullable=False,
@@ -50,7 +50,7 @@ staff_table = sqlalchemy.Table(
     "staff",
     metadata,
     sqlalchemy.Column(
-        "user_id",
+        "id",
         sqlalchemy.ForeignKey("users.id", ondelete="CASCADE"),
         primary_key=True,
         nullable=False,
@@ -73,7 +73,7 @@ client_table = sqlalchemy.Table(
     "clients",
     metadata,
     sqlalchemy.Column(
-        "client_id",
+        "id",
         sqlalchemy.ForeignKey("users.id", ondelete="CASCADE"),
         primary_key=True,
         nullable=False,

@@ -1,0 +1,30 @@
+.home-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f7f7f7;
+}
+
+.home-logo {
+  width: 160px;
+  margin-bottom: 32px;
+}
+
+.home-title {
+  margin-bottom: 32px;
+  font-size: 2rem;
+  color: #222;
+}
+
+.home-login-btn {
+  padding: 16px 32px;
+  font-size: 18px;
+  background: var(--primary-color, #01c363);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 24px;
+}
