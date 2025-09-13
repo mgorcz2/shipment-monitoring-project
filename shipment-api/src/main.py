@@ -6,6 +6,7 @@ from typing import AsyncGenerator
 
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.exception_handlers import http_exception_handler
+from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.routers.seed import router as seed_router
 from src.api.routers.shipment import router as shipment_router
@@ -34,6 +35,14 @@ async def lifespan(_: FastAPI) -> AsyncGenerator:
 
 
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.include_router(shipment_router)
 app.include_router(user_router)
 app.include_router(seed_router)
