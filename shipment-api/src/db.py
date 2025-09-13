@@ -20,15 +20,96 @@ from src.core.domain.user import UserRole
 
 metadata = sqlalchemy.MetaData()
 
+
+packages_table = sqlalchemy.Table(
+    "packages",
+    metadata,
+    sqlalchemy.Column(
+        "shipment_id",
+        sqlalchemy.ForeignKey("shipments.id", ondelete="CASCADE"),
+        primary_key=True,
+        nullable=False,
+    ),
+    sqlalchemy.Column("weight", sqlalchemy.Float),
+    sqlalchemy.Column("length", sqlalchemy.Float),
+    sqlalchemy.Column("width", sqlalchemy.Float),
+    sqlalchemy.Column("height", sqlalchemy.Float),
+    sqlalchemy.Column("fragile", sqlalchemy.Boolean),
+    sqlalchemy.Column(
+        "created_at", sqlalchemy.DateTime(timezone=True), server_default=func.now()
+    ),
+    sqlalchemy.Column(
+        "last_updated",
+        sqlalchemy.DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    ),
+)
+staff_table = sqlalchemy.Table(
+    "staff",
+    metadata,
+    sqlalchemy.Column(
+        "user_id",
+        sqlalchemy.ForeignKey("users.id", ondelete="CASCADE"),
+        primary_key=True,
+        nullable=False,
+    ),
+    sqlalchemy.Column("first_name", sqlalchemy.String, nullable=False),
+    sqlalchemy.Column("last_name", sqlalchemy.String, nullable=False),
+    sqlalchemy.Column("phone_number", sqlalchemy.String, nullable=True),
+    sqlalchemy.Column(
+        "created_at", sqlalchemy.DateTime(timezone=True), server_default=func.now()
+    ),
+    sqlalchemy.Column(
+        "last_updated",
+        sqlalchemy.DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    ),
+)
+client_table = sqlalchemy.Table(
+    "clients",
+    metadata,
+    sqlalchemy.Column(
+        "client_id",
+        sqlalchemy.ForeignKey("users.id", ondelete="CASCADE"),
+        primary_key=True,
+        nullable=False,
+    ),
+    sqlalchemy.Column("first_name", sqlalchemy.String, nullable=False),
+    sqlalchemy.Column("last_name", sqlalchemy.String, nullable=False),
+    sqlalchemy.Column("address", sqlalchemy.String, nullable=True),
+    sqlalchemy.Column("phone_number", sqlalchemy.String, nullable=True),
+    sqlalchemy.Column(
+        "created_at", sqlalchemy.DateTime(timezone=True), server_default=func.now()
+    ),
+    sqlalchemy.Column(
+        "last_updated",
+        sqlalchemy.DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    ),
+)
+
+
 shipment_table = sqlalchemy.Table(
     "shipments",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("sender_id", sqlalchemy.ForeignKey("users.id"), nullable=False),
+    sqlalchemy.Column("recipient_", sqlalchemy.ForeignKey("users.id"), nullable=False),
     sqlalchemy.Column("courier_id", sqlalchemy.ForeignKey("users.id"), nullable=True),
+    sqlalchemy.Column(
+        "package_id", sqlalchemy.ForeignKey("packages.id"), nullable=False
+    ),
     sqlalchemy.Column("status", Enum(ShipmentStatus, name="shipment_status")),
-    sqlalchemy.Column("weight", sqlalchemy.Float),
-    sqlalchemy.Column("recipient_email", sqlalchemy.String, nullable=True),
+    sqlalchemy.Column("weight", sqlalchemy.Float),  # to be removed
+    sqlalchemy.Column(
+        "recipient_email", sqlalchemy.String, nullable=False
+    ),  # to be removed
     sqlalchemy.Column(
         "created_at",
         sqlalchemy.DateTime(timezone=True),
