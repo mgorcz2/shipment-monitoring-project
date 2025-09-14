@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.routers.seed import router as seed_router
 from src.api.routers.shipment import router as shipment_router
+from src.api.routers.staff import router as staff_router
 from src.api.routers.user import router as user_router
 from src.container import Container
 from src.db import database, init_db
@@ -21,6 +22,7 @@ container.wire(
         "src.api.routers.user",
         "src.core.security.auth",
         "src.api.routers.seed",
+        "src.api.routers.staff",
     ]
 )
 
@@ -46,6 +48,7 @@ app.add_middleware(
 app.include_router(shipment_router)
 app.include_router(user_router)
 app.include_router(seed_router)
+app.include_router(staff_router)
 
 
 @app.exception_handler(HTTPException)

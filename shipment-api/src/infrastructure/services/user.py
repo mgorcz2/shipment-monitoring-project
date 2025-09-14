@@ -39,7 +39,7 @@ class UserService(IUserService):
         new_user = await self._repository.register_user(user)
         if not new_user:
             raise ValueError("Failed to register the user. Please try again.")
-        return UserDTO.from_record(new_user)
+        return UserDTO.model_validate(new_user)
 
     async def get_user_by_id(self, user_id: UUID) -> UserDTO:
         """The method getting user by provided id from repository.
@@ -53,7 +53,7 @@ class UserService(IUserService):
         user = await self._repository.get_user_by_id(user_id)
         if not user:
             raise ValueError(f"No user found with the provided ID: {user_id}")
-        return UserDTO.from_record(user)
+        return UserDTO.model_validate(user)
 
     async def get_user_by_email(self, email) -> UserDTO:
         """The method getting user by provided email from repository.
@@ -67,7 +67,7 @@ class UserService(IUserService):
         user = await self._repository.get_user_by_email(email)
         if not user:
             raise ValueError(f"No user found with the provided email: {email}")
-        return UserDTO.from_record(user)
+        return UserDTO.model_validate(user)
 
     async def detele_user(self, email: str) -> User:
         """The method deleting user by provided email.
@@ -145,7 +145,7 @@ class UserService(IUserService):
         users = await self._repository.get_all_users()
         if not users:
             raise ValueError("No users found in the repository.")
-        return [UserDTO.from_record(user) for user in users]
+        return [UserDTO.model_validate(user) for user in users]
 
     async def get_users_by_role(self, role) -> Iterable[UserDTO]:
         """The method getting user by provided role.
@@ -159,4 +159,4 @@ class UserService(IUserService):
         users = await self._repository.get_users_by_role(role)
         if not users:
             raise ValueError(f"No users found with the role: {role}")
-        return [UserDTO.from_record(user) for user in users]
+        return [UserDTO.model_validate(user) for user in users]

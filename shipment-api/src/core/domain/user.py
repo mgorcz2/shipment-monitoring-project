@@ -15,6 +15,7 @@ class UserRole(str, enum.Enum):
     COURIER = "courier"
     SENDER = "sender"
     ADMIN = "admin"
+    CLIENT = "client"
 
 
 class UserIn(BaseModel):
@@ -57,3 +58,25 @@ class UserUpdate(BaseModel):
     @classmethod
     def validate_password(cls, value) -> Optional[str]:
         return UserIn.validate_password(value)
+
+
+class StaffIn(BaseModel):
+    """An input staff model"""
+
+    first_name: str = Field(..., description="The first name of the staff")
+    last_name: str = Field(..., description="The last name of the staff")
+    phone_number: str = Field(..., description="The phone number of the staff")
+
+    @field_validator("phone_number")
+    @classmethod
+    def validate_phone_number(cls, value: str) -> str:
+        if not re.match(r"^\+?[1-9]\d{1,14}$", value):
+            raise ValueError("Invalid phone number format")
+        return value
+
+
+class Staff(StaffIn):
+    """The staff model class"""
+
+    id: UUID
+    model_config = ConfigDict(from_attributes=True, extra="ignore")
