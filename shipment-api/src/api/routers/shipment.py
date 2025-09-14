@@ -259,7 +259,8 @@ async def add_shipment(
         sender_id = current_user.id
         if new_shipment := await service.add_shipment(new_shipment, sender_id):
             recipient_email = new_shipment.recipient_email
-            if recipient_email is not None:
+
+            if recipient_email == "AB":
                 await email_service.send_email(
                     new_shipment.id,
                     subject="Powiadomienie: Nadano Twoją przesyłkę",

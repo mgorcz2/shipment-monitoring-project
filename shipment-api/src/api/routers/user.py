@@ -67,7 +67,6 @@ async def login_for_access_token(
 
 
 @router.get("/email/{email}", response_model=UserDTO, status_code=status.HTTP_200_OK)
-@auth.role_required([UserRole.ADMIN, UserRole.MANAGER])
 @inject
 async def get_user_by_email(
     email: str,

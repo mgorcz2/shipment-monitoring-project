@@ -1,0 +1,53 @@
+.shipment-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 20px;
+  margin: 8px;
+  min-width: 280px;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: box-shadow 0.2s;
+}
+.shipment-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+}
+.shipment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.shipment-id {
+  font-weight: bold;
+  color: #01c363;
+}
+.shipment-status {
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 0.9em;
+  color: #fff;
+}
+.status-delivered { background: #01c363; }
+.status-in_transit { background: #f0ad4e; }
+.status-pending { background: #6c757d; }
+.status-cancelled { background: #dc3545; }
+.shipment-info {
+  margin-bottom: 12px;
+  font-size: 0.95em;
+}
+.shipment-actions button {
+  margin-right: 8px;
+  background: #01c363;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.shipment-actions button:hover {
+  background: #018f4e;
+}

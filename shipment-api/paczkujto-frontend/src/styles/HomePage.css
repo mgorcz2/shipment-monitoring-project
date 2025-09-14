@@ -4,9 +4,17 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100%;
   background: #f7f7f7;
+    box-sizing: border-box;
 }
-
+@media (min-width: 600px) {
+  .home-container{
+    /* Wyśrodkuj w poziomie całą zawartość */
+    align-items: center;
+    justify-content: center;
+  }
+}
 .home-logo {
   width: 160px;
   margin-bottom: 32px;
