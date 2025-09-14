@@ -1,36 +1,47 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
 import "../styles/Sidebar.css";
 import { logout, isLoggedIn } from "../services/authService";
 import { FaSignOutAlt, FaPhone, FaThLarge, FaComments, FaTruck, FaCalendarAlt, FaUser, FaCog } from "react-icons/fa";
 
-
+const menuItems = [
+  { icon: <FaPhone />, path: "/contact" },
+  { icon: <FaThLarge />, path: "/shipments" },
+  { icon: <FaComments />, path: "/messages" },
+  { icon: <FaTruck />, path: "/courier" },
+  { icon: <FaCalendarAlt />, path: "/calendar" },
+  { icon: <FaUser />, path: "/profile" },
+  { icon: <FaCog />, path: "/settings" },
+];
 
 export default function Sidebar() {
-  const [active, setActive] = useState(1);
   const navigate = useNavigate();
+  const location = useLocation();
 
   return (
     <div className="sidebar">
       <div className="sidebar-logo" onClick={() => navigate("/")}>
         <img src={logo} alt="Logo" style={{ cursor: "pointer" }} />
       </div>
+      {isLoggedIn() && (
       <nav className="sidebar-nav">
-        <button className={`sidebar-btn${active === 0 ? " active" : ""}`} onClick={() => setActive(0)}><FaPhone /></button>
-        <button className={`sidebar-btn${active === 1 ? " active" : ""}`} onClick={() => setActive(1)}><FaThLarge /></button>
-        <button className={`sidebar-btn${active === 2 ? " active" : ""}`} onClick={() => setActive(2)}><FaComments /></button>
-        <button className={`sidebar-btn${active === 3 ? " active" : ""}`} onClick={() => setActive(3)}><FaTruck /></button>
-        <button className={`sidebar-btn${active === 4 ? " active" : ""}`} onClick={() => setActive(4)}><FaCalendarAlt /></button>
-        <button className={`sidebar-btn${active === 5 ? " active" : ""}`} onClick={() => setActive(5)}><FaUser /></button>
-        <button className={`sidebar-btn${active === 6 ? " active" : ""}`} onClick={() => setActive(6)}><FaCog /></button>
+        {menuItems.map((item, idx) => (
+          <button
+            key={idx}
+            className={`sidebar-btn${location.pathname.startsWith(item.path) ? " active" : ""}`}
+            onClick={() => navigate(item.path)}
+          >
+            {item.icon}
+          </button>
+        ))}
       </nav>
-
-{isLoggedIn() && (
-  <button className="sidebar-btn" onClick={logout} title="Wyloguj" style={{ marginBottom: 24 }}>
-    <FaSignOutAlt />
-  </button>
-)}
+      )}
+      {isLoggedIn() && (
+        <button className="sidebar-btn" onClick={logout} title="Wyloguj" style={{ marginBottom: 24 }}>
+          <FaSignOutAlt />
+        </button>
+      )}
     </div>
   );
 }
