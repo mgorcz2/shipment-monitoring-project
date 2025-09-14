@@ -80,3 +80,26 @@ class Staff(StaffIn):
 
     id: UUID
     model_config = ConfigDict(from_attributes=True, extra="ignore")
+
+
+class ClientIn(BaseModel):
+    """An input client model"""
+
+    first_name: str = Field(..., description="The first name of the client")
+    last_name: str = Field(..., description="The last name of the client")
+    phone_number: str = Field(..., description="The phone number of the client")
+    address: Optional[str] = Field(None, description="The address of the client")
+
+    @field_validator("phone_number")
+    @classmethod
+    def validate_phone_number(cls, value: str) -> str:
+        if not re.match(r"^\+?[1-9]\d{1,14}$", value):
+            raise ValueError("Invalid phone number format")
+        return value
+
+
+class Client(ClientIn):
+    """The client model class"""
+
+    id: UUID
+    model_config = ConfigDict(from_attributes=True, extra="ignore")
