@@ -5,7 +5,7 @@ from uuid import UUID
 
 from sqlalchemy import delete, select, update
 
-from src.core.domain.user import UserIn
+from src.core.domain.user import User, UserIn
 from src.core.repositories.iuser import IUserRepository
 from src.db import database, user_table
 
@@ -13,23 +13,25 @@ from src.db import database, user_table
 class UserRepository(IUserRepository):
     """A class representing user DB repository."""
 
-    async def register_user(self, data: UserIn) -> Any | None:
+    async def register_user(self, data: UserIn) -> User | None:
         """The method registering new user.
 
         Args:
             user (UserIn): The user input data.
 
         Returns:
-            UserDTO | None: The user DTO details if exists.
+            User | None: The user object if registered.
         """
-        query = user_table.insert().values(
-            email=data.email, password=data.password, role=data.role
+        query = (
+            user_table.insert()
+            .values(email=data.email, password=data.password, role=data.role)
+            .returning(user_table.c.id)
         )
-        new_user = await database.execute(query)
-        new_user = await self.get_user_by_id(new_user)
-        return new_user if new_user else None
+        new_user_id = await database.execute(query)
+        user_record = await self.get_user_by_id(new_user_id)
+        return user_record if user_record else None
 
-    async def get_user_by_id(self, user_id: UUID) -> Any | None:
+    async def get_user_by_id(self, user_id: UUID) -> User | None:
         """The method getting user by provided id.
 
         Args:
@@ -40,9 +42,9 @@ class UserRepository(IUserRepository):
         """
         query = select(user_table).where(user_table.c.id == user_id)
         user = await database.fetch_one(query)
-        return user if user else None
+        return User(**user) if user else None
 
-    async def get_user_by_email(self, email) -> Any | None:
+    async def get_user_by_email(self, email) -> User | None:
         """The method getting user by provided email.
 
         Args:
@@ -54,9 +56,9 @@ class UserRepository(IUserRepository):
 
         query = select(user_table).where(user_table.c.email == email)
         user = await database.fetch_one(query)
-        return user if user else None
+        return User(**user) if user else None
 
-    async def detele_user(self, email: str) -> Any | None:
+    async def detele_user(self, email: str) -> User | None:
         """The abstract deleting user by provided email.
 
         Args:
@@ -69,9 +71,9 @@ class UserRepository(IUserRepository):
             delete(user_table).where(user_table.c.email == email).returning(user_table)
         )
         deleted_user = await database.fetch_one(query)
-        return deleted_user if deleted_user else None
+        return User(**deleted_user) if deleted_user else None
 
-    async def update_user(self, email: str, data: UserIn) -> Any | None:
+    async def update_user(self, email: str, data: UserIn) -> User | None:
         """The abstract updating user by provided email.
 
         Args:
@@ -88,9 +90,9 @@ class UserRepository(IUserRepository):
             .returning(user_table)
         )
         updated_user = await database.fetch_one(query)
-        return updated_user if updated_user else None
+        return User(**updated_user) if updated_user else None
 
-    async def get_all_users(self) -> Iterable[Any]:
+    async def get_all_users(self) -> Iterable[User]:
         """The method getting all users from database.
 
         Returns:
@@ -98,9 +100,9 @@ class UserRepository(IUserRepository):
         """
         query = select(user_table)
         users = await database.fetch_all(query)
-        return users
+        return [User(**user) for user in users]
 
-    async def get_users_by_role(self, role) -> Iterable[Any]:
+    async def get_users_by_role(self, role) -> Iterable[User]:
         """The method getting user by provided role.
 
         Args:
@@ -111,4 +113,4 @@ class UserRepository(IUserRepository):
         """
         query = select(user_table).where(user_table.c.role == role)
         users = await database.fetch_all(query)
-        return users
+        return [User(**user) for user in users]
