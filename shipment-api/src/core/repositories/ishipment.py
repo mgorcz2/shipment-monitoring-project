@@ -18,7 +18,7 @@ class IShipmentRepository(ABC):
     @abstractmethod
     async def assign_shipment_to_courier(
         self, shipment_id: int, courier_id: UUID
-    ) -> Any | None:
+    ) -> Shipment | None:
         """The abstract assigning shipment to courier.
 
         Args:
@@ -32,7 +32,7 @@ class IShipmentRepository(ABC):
     @abstractmethod
     async def update_status(
         self, courier_id: UUID, shipment_id: int, new_status: ShipmentStatus
-    ) -> Any | None:
+    ) -> Shipment | None:
         """The abstract changing shipment status by provided id and courier id.
 
         Args:
@@ -45,7 +45,9 @@ class IShipmentRepository(ABC):
         """
 
     @abstractmethod
-    async def check_status(self, shipment_id: int, recipient_email: str) -> Any | None:
+    async def check_status(
+        self, shipment_id: int, recipient_email: str
+    ) -> Shipment | None:
         """The abstract getting shipment by provided id and Recipient email.
 
         Args:
@@ -57,7 +59,7 @@ class IShipmentRepository(ABC):
         """
 
     @abstractmethod
-    async def get_all_shipments(self) -> Iterable[Any]:
+    async def get_all_shipments(self) -> Iterable[Shipment]:
         """The abstract getting all shipments from data storage.
 
         Returns:
@@ -65,7 +67,7 @@ class IShipmentRepository(ABC):
         """
 
     @abstractmethod
-    async def get_shipment_by_id(self, shipment_id: int) -> Any | None:
+    async def get_shipment_by_id(self, shipment_id: int) -> Shipment | None:
         """The abstract getting shipment by provided id.
 
         Args:
@@ -76,7 +78,7 @@ class IShipmentRepository(ABC):
         """
 
     @abstractmethod
-    async def delete_shipment(self, shipment_id: int) -> Any | None:
+    async def delete_shipment(self, shipment_id: int) -> Shipment | None:
         """The abstract deleting shipment by provided id.
 
         Args:
@@ -92,10 +94,10 @@ class IShipmentRepository(ABC):
         data: ShipmentIn,
         origin: str,
         destination: str,
+        sender_id: UUID,
         origin_coords: Tuple,
         destination_coords: Tuple,
-        user_id: UUID,
-    ) -> Any | None:
+    ) -> Shipment | None:
         """The abstract adding new shipment to the data storage.
 
         Args:

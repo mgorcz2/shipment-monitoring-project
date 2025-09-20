@@ -1,60 +1,55 @@
-import React, { useState } from "react";
+import React from "react";
 import logo from "../assets/logo.png";
 import "../styles/HomePage.css";
 import { useNavigate } from "react-router-dom";
-import { isTokenValid, getToken } from "../services/authService";
-import axios from "axios";
+import { isTokenValid } from "../services/authService";
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const [users, setUsers] = useState([]);
-  const [error, setError] = useState("");
-
-  const handleGetUsers = async () => {
-    setError("");
-    setUsers([]);
-    try {
-      const res = await axios.get("http://localhost:8000/users/all", {
-        headers: {
-          Authorization: `Bearer ${getToken()}`
-        }
-      });
-      setUsers(res.data);
-    } catch (err) {
-      if (err.response && err.response.data && err.response.data.detail) {
-        setError(err.response.data.detail);
-      } else if (err.response) {
-        setError("Błąd: " + err.response.status);
-      } else {
-        setError("Brak połączenia z serwerem");
-      }
-    }
-  };
+  const user = isTokenValid() ? JSON.parse(localStorage.getItem("user")) : null;
+  const client_data = isTokenValid() ? JSON.parse(localStorage.getItem("client_data")) : null;
 
   return (
     <div className="home-container">
       <img src={logo} alt="Logo" className="home-logo" />
-      <h1 className="home-title">Witamy w paczkuj.to</h1>
-      {!isTokenValid() && (
-        <button className="home-login-btn" onClick={() => navigate("/login")}>
-          Zaloguj
-        </button>
-      )}
-      {isTokenValid() && (
-        <button className="home-login-btn" onClick={handleGetUsers}>
-          Pobierz wszystkich użytkowników
-        </button>
-      )}
-      {error && <div style={{ color: "red", marginTop: 16 }}>{error}</div>}
-      {users.length > 0 && (
-        <div style={{ marginTop: 16 }}>
-          <h3>Użytkownicy:</h3>
-          <ul>
-            {users.map((user) => (
-              <li key={user.id || user.email}>{user.email || JSON.stringify(user)}</li>
-            ))}
-          </ul>
+      <h1 className="home-title">
+        {user ? `Witaj, ${client_data.first_name}!` : "Witamy w paczkuj.to"}
+      </h1>
+      <p style={{ color: "#444", marginBottom: 32, fontSize: 18, textAlign: "center" }}>
+        Szybko i wygodnie nadaj przesyłkę lub sprawdź status swoich paczek.
+      </p>
+      {isTokenValid() ? (
+        <div style={{ display: "flex", gap: 24 }}>
+          <button
+            className="home-login-btn"
+            style={{ fontSize: 20, padding: "18px 40px" }}
+            onClick={() => navigate("/create-shipment")}
+          >
+            Nadaj paczkę
+          </button>
+          <button
+            className="home-login-btn"
+            style={{
+              background: "#fff",
+              color: "#01c363",
+              border: "2px solid #01c363",
+              fontWeight: "bold",
+              fontSize: 20,
+              padding: "18px 40px"
+            }}
+            onClick={() => navigate("/shipments")}
+          >
+            Moje paczki
+          </button>
         </div>
+      ) : (
+        <button
+          className="home-login-btn"
+          style={{ fontSize: 20, padding: "18px 40px" }}
+          onClick={() => navigate("/login")}
+        >
+          Zaloguj się
+        </button>
       )}
     </div>
   );

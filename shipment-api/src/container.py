@@ -2,10 +2,12 @@ from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Factory, Singleton
 
 from src.infrastructure.repositories.clientdb import ClientRepository
+from src.infrastructure.repositories.packagedb import PackageRepository
 from src.infrastructure.repositories.shipmentdb import ShipmentRepository
 from src.infrastructure.repositories.staffdb import StaffRepository
 from src.infrastructure.repositories.userdb import UserRepository
 from src.infrastructure.services.client import ClientService
+from src.infrastructure.services.package import PackageService
 from src.infrastructure.services.shipment import ShipmentService
 from src.infrastructure.services.staff import StaffService
 from src.infrastructure.services.user import UserService
@@ -35,4 +37,10 @@ class Container(DeclarativeContainer):
 
     client_repository = Singleton(ClientRepository)
 
-    client_service = Factory(ClientService, repository=client_repository)
+    client_service = Factory(
+        ClientService, repository=client_repository, user_repository=user_repository
+    )
+
+    package_repository = Singleton(PackageRepository)
+
+    package_service = Factory(PackageService, repository=package_repository)

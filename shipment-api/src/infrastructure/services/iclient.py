@@ -17,7 +17,6 @@ class IClientService(ABC):
 
         Args:
             client (ClientIn): The client input data to register.
-            user_id (UUID): The related user id.
 
         Returns:
             ClientDTO: The registered client object if successful.

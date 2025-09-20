@@ -5,7 +5,7 @@ from uuid import UUID
 
 from sqlalchemy import delete, insert, select, update
 
-from src.core.domain.user import ClientIn
+from src.core.domain.user import Client, ClientIn
 from src.core.repositories.iclient import IClientRepository
 from src.db import client_table, database, user_table
 

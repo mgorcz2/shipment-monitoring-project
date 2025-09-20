@@ -238,7 +238,7 @@ async def sort_by_distance(
 
 
 @router.post("/add", response_model=ShipmentDTO, status_code=status.HTTP_201_CREATED)
-@auth.role_required(UserRole.SENDER)
+@auth.role_required(UserRole.CLIENT)
 @inject
 async def add_shipment(
     new_shipment: ShipmentIn,

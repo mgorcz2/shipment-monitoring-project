@@ -27,7 +27,6 @@ export default function ShipmentsPage() {
 
   const handleDetails = (shipment) => {
     alert("Szczegóły przesyłki: " + JSON.stringify(shipment, null, 2));
-    // Możesz tu przekierować do strony szczegółów przesyłki
   };
 
   return (
