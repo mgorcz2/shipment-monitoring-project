@@ -35,16 +35,6 @@
   border: 1px solid #ddd;
 }
 
-.login-button {
-  padding: 12px;
-  font-size: 16px;
-background:#00b359;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
 .login-error {
   color: red;
   text-align: center;

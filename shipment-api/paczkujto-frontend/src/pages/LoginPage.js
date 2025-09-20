@@ -79,7 +79,7 @@ export default function LoginPage() {
           className="login-input"
           disabled={loading}
         />
-        <button type="submit" className="login-button" disabled={loading}>
+        <button type="submit" className="btn btn-primary" disabled={loading}>
           {loading ? "Logowanie..." : "Zaloguj"}
         </button>
         {error && <div className="login-error">{error}</div>}
@@ -88,7 +88,7 @@ export default function LoginPage() {
       <div style={{ marginTop: 24, textAlign: "center" }}>
         <button
           type="button"
-          className="login-button"
+          className="btn btn-outline"
           style={{
             background: "#fff",
             color: "#00b359",

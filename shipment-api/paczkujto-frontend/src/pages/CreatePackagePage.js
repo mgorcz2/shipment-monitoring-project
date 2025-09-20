@@ -1,9 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import logo from "../assets/logo.png";
 import "../styles/CreatePackagePage.css";
 import { createShipment } from "../services/shipmentService";
 import { createPackage } from "../services/packageService";
+import { geocodeAddress, formatAddress } from "../services/geocodingService";
 import { useNavigate } from "react-router-dom";
+import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
 
 export default function CreatePackagePage() {
   const [form, setForm] = useState({
@@ -25,6 +36,8 @@ export default function CreatePackagePage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [coords, setCoords] = useState(null);
+  const [destCoords, setDestCoords] = useState(null);
   const navigate = useNavigate();
 
   const handleChange = e => {
@@ -34,6 +47,38 @@ export default function CreatePackagePage() {
       [name]: type === "checkbox" ? checked : value
     }));
   };
+
+  useEffect(() => {
+    if (form.origin_street && form.origin_city && form.origin_postcode) {
+      const address = formatAddress(
+        form.origin_street, 
+        form.origin_street_number, 
+        form.origin_city, 
+        form.origin_postcode
+      );
+      geocodeAddress(address).then(coordinates => {
+        if (coordinates) setCoords(coordinates);
+      });
+    } else {
+      setCoords(null);
+    }
+  }, [form.origin_street, form.origin_street_number, form.origin_city, form.origin_postcode]);
+
+  useEffect(() => {
+    if (form.destination_street && form.destination_city && form.destination_postcode) {
+      const address = formatAddress(
+        form.destination_street, 
+        form.destination_street_number, 
+        form.destination_city, 
+        form.destination_postcode
+      );
+      geocodeAddress(address).then(coordinates => {
+        if (coordinates) setDestCoords(coordinates);
+      });
+    } else {
+      setDestCoords(null);
+    }
+  }, [form.destination_street, form.destination_street_number, form.destination_city, form.destination_postcode]);
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -57,6 +102,8 @@ export default function CreatePackagePage() {
             postcode: form.destination_postcode,
           },
           recipient_email: form.recipient_email,
+          origin_coords: coords,
+          destination_coords: destCoords
         },
         token
       );
@@ -104,7 +151,7 @@ export default function CreatePackagePage() {
       <img src={logo} alt="Logo" style={{ width: 80, marginBottom: 16 }} />
       <h2 className="create-package-title">Nadaj paczkę</h2>
       <form className="create-package-form" onSubmit={handleSubmit}>
-        <h3 style={{ marginBottom: 8 }}>Adres nadania</h3>
+        <h3 className="section-header">Adres nadania</h3>
         <input
           type="text"
           name="origin_street"
@@ -146,7 +193,23 @@ export default function CreatePackagePage() {
           disabled={loading}
         />
 
-        <h3 style={{ marginBottom: 8, marginTop: 16 }}>Adres odbioru</h3>
+        {coords && (
+          <div className="map-container">
+            <MapContainer 
+              center={coords} 
+              zoom={15} 
+              className="leaflet-container"
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="&copy; OpenStreetMap contributors"
+              />
+              <Marker position={coords} />
+            </MapContainer>
+          </div>
+        )}
+
+        <h3 className="section-header">Adres odbioru</h3>
         <input
           type="text"
           name="destination_street"
@@ -188,6 +251,22 @@ export default function CreatePackagePage() {
           disabled={loading}
         />
 
+        {destCoords && (
+          <div className="map-container">
+            <MapContainer 
+              center={destCoords} 
+              zoom={15} 
+              className="leaflet-container"
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="&copy; OpenStreetMap contributors"
+              />
+              <Marker position={destCoords} />
+            </MapContainer>
+          </div>
+        )}
+
         <input
           type="email"
           name="recipient_email"
@@ -199,7 +278,7 @@ export default function CreatePackagePage() {
           disabled={loading}
         />
 
-        <h3 style={{ marginBottom: 8, marginTop: 16 }}>Dane paczki</h3>
+        <h3 className="section-header">Dane paczki</h3>
         <input
           type="number"
           name="weight"

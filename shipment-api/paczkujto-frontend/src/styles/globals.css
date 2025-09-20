@@ -1,0 +1,74 @@
+:root {
+  /* Zmienne kolorów */
+  --primary-color: #01c363;
+  --primary-dark: #018f4e;
+  --primary-light: #b2dfdb;
+  --success: #388e3c;
+  --error: #d32f2f;
+  --text-primary: #222;
+  --text-secondary: #444;
+  --bg-light: #f7f7f7;
+  --bg-white: #fff;
+  --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.07);
+  --shadow-medium: 0 2px 12px rgba(0, 0, 0, 0.09);
+  --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.13);
+}
+
+.btn {
+  padding: 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: var(--bg-white);
+}
+
+.btn-outline {
+  background: var(--bg-white);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
+
+/* Efekty hover i active dla wszystkich przycisków */
+.btn:hover, button:hover {
+  filter: brightness(110%);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn:active, button:active {
+  transform: translateY(1px);
+  filter: brightness(95%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.form-input {
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--primary-light);
+  background: #f7fafc;
+  transition: border 0.2s;
+}
+
+.form-input:focus {
+  border: 1.5px solid var(--primary-color);
+  outline: none;
+}
+
+.card {
+  background: var(--bg-white);
+  border-radius: 12px;
+  box-shadow: var(--shadow-light);
+  padding: 20px;
+  transition: box-shadow 0.2s;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-hover);
+}

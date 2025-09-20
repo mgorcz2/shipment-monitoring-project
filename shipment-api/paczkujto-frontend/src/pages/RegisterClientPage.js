@@ -146,7 +146,7 @@ export default function RegisterClientPage() {
           className="register-input"
           disabled={loading}
         />
-        <button type="submit" className="register-button" disabled={loading}>
+        <button type="submit" className="btn btn-primary" disabled={loading}>
           {loading ? "Rejestracja..." : "Zarejestruj się"}
         </button>
         {error && <div className="register-error">{error}</div>}

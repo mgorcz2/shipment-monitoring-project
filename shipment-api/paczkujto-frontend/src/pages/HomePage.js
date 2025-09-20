@@ -21,14 +21,14 @@ export default function HomePage() {
       {isTokenValid() ? (
         <div style={{ display: "flex", gap: 24 }}>
           <button
-            className="home-login-btn"
+            className="btn btn-primary"
             style={{ fontSize: 20, padding: "18px 40px" }}
             onClick={() => navigate("/create-shipment")}
           >
             Nadaj paczkę
           </button>
           <button
-            className="home-login-btn"
+            className="btn btn-primary"
             style={{
               background: "#fff",
               color: "#01c363",
@@ -44,7 +44,7 @@ export default function HomePage() {
         </div>
       ) : (
         <button
-          className="home-login-btn"
+          className="btn btn-primary"
           style={{ fontSize: 20, padding: "18px 40px" }}
           onClick={() => navigate("/login")}
         >

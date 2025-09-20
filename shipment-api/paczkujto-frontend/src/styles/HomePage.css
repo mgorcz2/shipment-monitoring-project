@@ -10,7 +10,6 @@
 }
 @media (min-width: 600px) {
   .home-container{
-    /* Wyśrodkuj w poziomie całą zawartość */
     align-items: center;
     justify-content: center;
   }
@@ -24,15 +23,4 @@
   margin-bottom: 32px;
   font-size: 2rem;
   color: #222;
-}
-
-.home-login-btn {
-  padding: 16px 32px;
-  font-size: 18px;
-  background: var(--primary-color, #01c363);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-bottom: 24px;
 }
