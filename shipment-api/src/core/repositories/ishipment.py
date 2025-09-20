@@ -59,7 +59,7 @@ class IShipmentRepository(ABC):
         """
 
     @abstractmethod
-    async def get_all_shipments(self) -> Iterable[Shipment]:
+    async def get_all_shipments(self) -> Iterable[dict]:
         """The abstract getting all shipments from data storage.
 
         Returns:

@@ -141,11 +141,12 @@ async def get_all_shipments(
                 for shipment in shipments
                 if shipment.courier_id == current_user.id
             ]
-        if current_user.role == "sender":
+        if current_user.role == "client":
             return [
                 shipment
                 for shipment in shipments
                 if shipment.sender_id == current_user.id
+                or shipment.recipient_email == current_user.email
             ]
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail="No shipments found."

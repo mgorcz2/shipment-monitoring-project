@@ -43,16 +43,6 @@
   outline: none;
 }
 
-.register-button {
-  padding: 12px;
-  font-size: 16px;
-  background: #00b359;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
 
 .register-button:disabled {
   background: #b2dfdb;

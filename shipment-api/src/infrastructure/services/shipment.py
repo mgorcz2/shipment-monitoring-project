@@ -167,8 +167,14 @@ class ShipmentService(IShipmentService):
         """
         origin = await geopy.get_address_from_location(data.origin)
         destination = await geopy.get_address_from_location(data.destination)
-        origin_coords = await geopy.get_coords(origin)
-        destination_coords = await geopy.get_coords(destination)
+        origin_coords = (
+            data.origin_coords if data.origin_coords else await geopy.get_coords(origin)
+        )
+        destination_coords = (
+            data.destination_coords
+            if data.destination_coords
+            else await geopy.get_coords(destination)
+        )
         new_shipment = await self._repository.add_shipment(
             data, origin, destination, origin_coords, destination_coords, user_id
         )

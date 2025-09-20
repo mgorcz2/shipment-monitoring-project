@@ -51,3 +51,22 @@
   color: #01c363;
   margin-top: 8px;
 }
+.map-container {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.leaflet-container {
+  height: 300px;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.section-header {
+  margin-bottom: 8px;
+  margin-top: 16px;
+  color: #444;
+}

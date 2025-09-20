@@ -3,7 +3,8 @@
 from typing import Any, Iterable, Tuple
 from uuid import UUID
 
-from sqlalchemy import delete, join, select, update
+from sqlalchemy import delete, func, join, literal, select, update
+from sqlalchemy.sql import literal_column
 
 from src.core.domain.shipment import (
     Shipment,
@@ -11,7 +12,7 @@ from src.core.domain.shipment import (
     ShipmentStatus,
 )
 from src.core.repositories.ishipment import IShipmentRepository
-from src.db import database, shipment_table
+from src.db import client_table, database, shipment_table, user_table
 
 
 class ShipmentRepository(IShipmentRepository):
@@ -82,12 +83,37 @@ class ShipmentRepository(IShipmentRepository):
         return shipment
 
     async def get_all_shipments(self) -> Iterable[Any]:
-        """The method getting all shipments from the data storage.
+        """The method getting all shipments from the data storage."""
+        recipient_user = user_table.alias("recipient_user")
+        recipient_client = client_table.alias("recipient_client")
 
-        Returns:
-            Iterable[Any]: Shipments in the data storage.
-        """
-        query = select(shipment_table)
+        sender_fullname = func.concat_ws(
+            literal_column("' '"),
+            client_table.c.first_name,
+            client_table.c.last_name,
+        ).label("sender_fullname")
+
+        recipient_fullname = func.concat_ws(
+            literal_column("' '"),
+            recipient_client.c.first_name,
+            recipient_client.c.last_name,
+        ).label("recipient_fullname")
+
+        query = select(
+            shipment_table,
+            sender_fullname,
+            recipient_fullname,
+        ).select_from(
+            shipment_table.outerjoin(
+                user_table, shipment_table.c.sender_id == user_table.c.id
+            )
+            .outerjoin(client_table, user_table.c.id == client_table.c.id)
+            .outerjoin(
+                recipient_user, shipment_table.c.recipient_id == recipient_user.c.id
+            )
+            .outerjoin(recipient_client, recipient_user.c.id == recipient_client.c.id)
+        )
+
         shipments = await database.fetch_all(query)
         return shipments
 

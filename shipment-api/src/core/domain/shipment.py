@@ -28,6 +28,8 @@ class ShipmentIn(BaseModel):
     recipient_id: Optional[UUID] = None
     origin: Location
     destination: Location
+    origin_coords: tuple[float, float] | None = None
+    destination_coords: tuple[float, float] | None = None
 
 
 class Shipment(ShipmentIn):

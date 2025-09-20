@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import ShipmentsPage from "./pages/ShipmentsPage";
 import RegisterClientPage from "./pages/RegisterClientPage";
 import CreatePackagePage from "./pages/CreatePackagePage";
+import './styles/globals.css'; 
 
 
 function App() {
