@@ -4,6 +4,9 @@ import Layout from "./components/Layout";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import ShipmentsPage from "./pages/ShipmentsPage";
+import RegisterClientPage from "./pages/RegisterClientPage";
+import CreatePackagePage from "./pages/CreatePackagePage";
+
 
 function App() {
   return (
@@ -13,6 +16,8 @@ function App() {
           <Route path="shipments" element={<ShipmentsPage />} />
           <Route index element={<HomePage />} />
           <Route path="login" element={<LoginPage />} />
+          <Route path="register-client" element={<RegisterClientPage />} />
+          <Route path="create-shipment" element={<CreatePackagePage />} />
         </Route>
       </Routes>
     </BrowserRouter>

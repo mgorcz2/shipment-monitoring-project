@@ -8,3 +8,12 @@ export const getAllShipments = async () => {
     }
   });
 };
+
+
+export const createShipment = async (shipmentData, token) => {
+  return axios.post(
+    "http://localhost:8000/shipments/add",
+    shipmentData,
+    { headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } }
+  );
+};

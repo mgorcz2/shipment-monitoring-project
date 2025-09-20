@@ -33,7 +33,12 @@ services:
     networks:
       - backend
     container_name: db
+    volumes:
+      - pgdata:/var/lib/postgresql/data 
     
 
 networks:
   backend:
+
+volumes:
+  pgdata: 

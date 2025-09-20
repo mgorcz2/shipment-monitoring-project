@@ -9,6 +9,7 @@ from fastapi.exception_handlers import http_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.routers.client import router as client_router
+from src.api.routers.package import router as package_router
 from src.api.routers.seed import router as seed_router
 from src.api.routers.shipment import router as shipment_router
 from src.api.routers.staff import router as staff_router
@@ -25,6 +26,7 @@ container.wire(
         "src.api.routers.seed",
         "src.api.routers.staff",
         "src.api.routers.client",
+        "src.api.routers.package",
     ]
 )
 
@@ -52,6 +54,7 @@ app.include_router(user_router)
 app.include_router(seed_router)
 app.include_router(staff_router)
 app.include_router(client_router)
+app.include_router(package_router)
 
 
 @app.exception_handler(HTTPException)

@@ -147,7 +147,6 @@ class ShipmentRepository(IShipmentRepository):
         query = shipment_table.insert().values(
             sender_id=user_id,
             status="ready_for_pickup",
-            weight=data.weight,
             recipient_email=(
                 None if data.recipient_email == "" else data.recipient_email
             ),

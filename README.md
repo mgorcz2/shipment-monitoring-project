@@ -23,6 +23,10 @@ A web-based application for tracking and managing courier shipments. This servic
 - Running tests with coverage: coverage run -m pytest
 - Generating a coverage report in the terminal: coverage report
 - Generating an HTML coverage report: coverage html
+
+## Frontend (React)
+ - npm start
+
  
 ## Setup
 To ensure email sending works correctly, set the following variables in the Docker container configuration("docker-compose.yml")

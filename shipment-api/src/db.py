@@ -103,10 +103,7 @@ shipment_table = sqlalchemy.Table(
     sqlalchemy.Column("recipient_id", sqlalchemy.ForeignKey("users.id")),
     sqlalchemy.Column("courier_id", sqlalchemy.ForeignKey("users.id")),
     sqlalchemy.Column("status", Enum(ShipmentStatus, name="shipment_status")),
-    sqlalchemy.Column("weight", sqlalchemy.Float),  # to be removed
-    sqlalchemy.Column(
-        "recipient_email", sqlalchemy.String, nullable=False
-    ),  # to be removed
+    sqlalchemy.Column("recipient_email", sqlalchemy.String, nullable=True),
     sqlalchemy.Column(
         "created_at",
         sqlalchemy.DateTime(timezone=True),
@@ -153,10 +150,7 @@ engine = create_async_engine(
     future=True,
     pool_pre_ping=True,
 )
-database = databases.Database(
-    db_uri,
-    force_rollback=True,
-)
+database = databases.Database(db_uri)
 
 
 async def init_db(retries: int = 5, delay: int = 5) -> None:

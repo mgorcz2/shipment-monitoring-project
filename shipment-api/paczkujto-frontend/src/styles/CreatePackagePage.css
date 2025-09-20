@@ -1,0 +1,53 @@
+.create-package-container {
+  max-width: 420px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px #0002;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.create-package-title {
+  font-size: 2rem;
+  margin-bottom: 24px;
+  color: #01c363;
+  font-weight: bold;
+}
+.create-package-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.create-package-input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+.create-package-button {
+  background: #01c363;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s;
+}
+.create-package-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+.create-package-error {
+  color: #d00;
+  margin-top: 8px;
+}
+.create-package-success {
+  color: #01c363;
+  margin-top: 8px;
+}

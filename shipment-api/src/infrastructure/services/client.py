@@ -3,8 +3,9 @@
 from typing import Iterable
 from uuid import UUID
 
-from src.core.domain.user import ClientIn
+from src.core.domain.user import ClientIn, UserIn
 from src.core.repositories.iclient import IClientRepository
+from src.core.repositories.iuser import IUserRepository
 from src.infrastructure.dto.userDTO import ClientDTO
 from src.infrastructure.services.iclient import IClientService
 
@@ -12,11 +13,14 @@ from src.infrastructure.services.iclient import IClientService
 class ClientService(IClientService):
     """A class representing implementation of client-related services."""
 
-    def __init__(self, repository: IClientRepository):
+    def __init__(self, repository: IClientRepository, user_repository: IUserRepository):
         self._repository = repository
+        self._user_repository = user_repository
 
     async def register_client(self, client: ClientIn, user_id: UUID) -> ClientDTO:
-        """Register a new client in repository and return DTO."""
+        """
+        Register a new client in repository and return DTO.
+        """
         record = await self._repository.register_client(client, user_id)
         if not record:
             raise ValueError("Failed to register the client. Please try again.")
