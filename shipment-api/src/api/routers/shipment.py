@@ -6,7 +6,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from src.container import Container
 from src.core.domain.location import Location
 from src.core.domain.shipment import (
-    Shipment,
     ShipmentIn,
     ShipmentStatus,
 )

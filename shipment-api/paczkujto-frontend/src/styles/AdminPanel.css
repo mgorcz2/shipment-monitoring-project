@@ -1,0 +1,335 @@
+.admin-panel {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.admin-header {
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 16px;
+}
+
+.admin-header h1 {
+  font-size: 24px;
+  margin-bottom: 8px;
+  color: var(--primary-dark);
+}
+
+.admin-header p {
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+.loading-state, .error-state {
+  text-align: center;
+  padding: 40px;
+  background: var(--bg-light);
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.loading-state {
+  color: var(--text-secondary);
+}
+
+.error-state {
+  color: var(--error);
+}
+
+.user-details-modal {
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.user-basic-info, .user-extended-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-row {
+  display: flex;
+  align-items: flex-start;
+}
+
+.info-label {
+  width: 140px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.info-value {
+  flex-grow: 1;
+}
+
+.user-id {
+  font-family: monospace;
+  font-size: 14px;
+  color: #666;
+  word-break: break-all;
+}
+
+.divider {
+  margin: 20px 0;
+  border: none;
+  height: 1px;
+  background-color: #eee;
+}
+
+h3 {
+  color: var(--primary-dark);
+  margin-bottom: 16px;
+}
+
+.loading-state, .error-state, .no-details-state {
+  padding: 16px;
+  text-align: center;
+  margin: 20px 0;
+  border-radius: 8px;
+}
+
+.loading-state {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.error-state {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.no-details-state {
+  background-color: #f5f5f5;
+  color: #666;
+  font-style: italic;
+}
+/* Dodaj te style do istniejącego pliku AdminPanel.css */
+
+/* Styling dla kontenera tabeli */
+.user-list-container {
+  background: var(--bg-white);
+  border-radius: 12px;
+  box-shadow: var(--shadow-light);
+  padding: 16px;
+  margin-bottom: 30px;
+  overflow: hidden;
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-group label {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.filter-select {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background-color: white;
+  font-size: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(1, 195, 99, 0.2);
+}
+
+/* Styling dla tabeli */
+.table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #eaeaea;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background: white;
+}
+
+.user-table th {
+  background-color: #f8f9fa;
+  padding: 14px 20px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 2px solid #e0e0e0;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+.user-table th:hover {
+  background-color: #f0f2f5;
+}
+
+.user-table th svg {
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+.user-table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid #eaeaea;
+  color: var(--text-primary);
+}
+
+.user-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.user-table tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.user-table tbody tr:hover {
+  background-color: #f5f9ff;
+}
+
+.user-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Styling dla odznak ról */
+.role-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  display: inline-block;
+  letter-spacing: 0.3px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.role-admin {
+  background-color: #ffcdd2;
+  color: #c62828;
+}
+
+.role-client {
+  background-color: #bbdefb;
+  color: #1565c0;
+}
+
+.role-courier {
+  background-color: #c8e6c9;
+  color: #2e7d32;
+}
+
+.role-manager {
+  background-color: #fff9c4;
+  color: #f9a825;
+}
+
+.role-support {
+  background-color: #d1c4e9;
+  color: #4527a0;
+}
+
+/* Styling dla przycisków akcji */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-secondary);
+}
+
+.details-btn {
+  color: #0277bd;
+  background-color: rgba(2, 119, 189, 0.08);
+}
+
+.edit-btn {
+  color: #00796b;
+  background-color: rgba(0, 121, 107, 0.08);
+}
+
+.delete-btn {
+  color: #c62828;
+  background-color: rgba(198, 40, 40, 0.08);
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+}
+
+.details-btn:hover {
+  background-color: rgba(2, 119, 189, 0.15);
+  color: #0277bd;
+}
+
+.edit-btn:hover {
+  background-color: rgba(0, 121, 107, 0.15);
+  color: #00796b;
+}
+
+.delete-btn:hover {
+  background-color: rgba(198, 40, 40, 0.15);
+  color: #c62828;
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px 0;
+  color: #757575;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .user-table th,
+  .user-table td {
+    padding: 12px 10px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .action-btn {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .filter-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}

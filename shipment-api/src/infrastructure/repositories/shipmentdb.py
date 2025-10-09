@@ -3,7 +3,7 @@
 from typing import Any, Iterable, Tuple
 from uuid import UUID
 
-from sqlalchemy import delete, func, join, literal, select, update
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.sql import literal_column
 
 from src.core.domain.shipment import (
@@ -216,9 +216,9 @@ class ShipmentRepository(IShipmentRepository):
             .where(shipment_table.c.id == shipment_id)
             .values(
                 sender_id=old_shipment.sender_id,
+                recipient_id=data.recipient_id,
                 courier_id=old_shipment.courier_id,
                 status=old_shipment.status,
-                weight=data.weight,
                 recipient_email=(
                     None if data.recipient_email == "" else data.recipient_email
                 ),
