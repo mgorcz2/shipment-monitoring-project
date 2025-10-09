@@ -15,10 +15,16 @@ def patch_database(mocker, valid_user):
     """
     Patch the database connection and its methods to avoid actual database calls.
     """
+    user_dict = {
+        "id": valid_user.id,
+        "email": valid_user.email,
+        "password": valid_user.password,
+        "role": valid_user.role,
+    }
     db = mocker.patch.object(repo_module, "database")
     db.execute = mocker.AsyncMock(return_value=valid_user.id)
     db.fetch_one = mocker.AsyncMock(return_value=valid_user)
-    db.fetch_all = mocker.AsyncMock(return_value=[valid_user])
+    db.fetch_all = mocker.AsyncMock(return_value=[user_dict])
     return db
 
 

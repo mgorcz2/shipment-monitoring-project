@@ -31,7 +31,7 @@ def valid_userin(valid_email, valid_password):
     return UserIn(
         email=valid_email,
         password=valid_password,
-        role="sender",
+        role="client",
     )
 
 
@@ -41,7 +41,7 @@ def valid_user(valid_email, valid_password):
         id=uuid4(),
         email=valid_email,
         password=valid_password,
-        role="sender",
+        role="client",
     )
 
 
@@ -50,7 +50,7 @@ def valid_userDTO(valid_email):
     return UserDTO(
         id=uuid4(),
         email=valid_email,
-        role="sender",
+        role="client",
     )
 
 
@@ -59,5 +59,5 @@ def valid_user_update(valid_email, valid_password):
     return UserUpdate(
         email=valid_email,
         password=valid_password,
-        role="sender",
+        role="client",
     )
