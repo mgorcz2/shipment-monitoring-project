@@ -1,10 +1,13 @@
 import axios from "axios";
+import { getToken } from "./authService";
 
-export const getUserByEmail = async (email, token) => {
+
+export const getUserByEmail = async (email) => {
   return axios.get(
-    `http://localhost:8000/users/email/${email}`,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+    `http://localhost:8000/users/email/${email}`,{
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }});
 };
 
 export const registerUser = async (data) => {
@@ -14,3 +17,14 @@ export const registerUser = async (data) => {
     { headers: { "Content-Type": "application/json" } }
   );
 };
+
+
+export const getAllUsers = async (token) => {
+  return await axios.get("http://localhost:8000/users/all",{
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }});
+};
+
+
+

@@ -14,6 +14,7 @@ class UserDTO(BaseModel):
     id: UUID
     email: str
     role: UserRole
+    created_at: str | None = None
 
     model_config = ConfigDict(
         from_attributes=True,
@@ -30,6 +31,7 @@ class UserDTO(BaseModel):
             id=record_dict.pop("id"),
             email=record_dict.pop("email"),
             role=record_dict.pop("role"),
+            created_at=record_dict.pop("created_at", None),
         )
 
 

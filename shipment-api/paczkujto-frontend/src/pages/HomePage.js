@@ -2,45 +2,64 @@ import React from "react";
 import logo from "../assets/logo.png";
 import "../styles/HomePage.css";
 import { useNavigate } from "react-router-dom";
-import { isTokenValid } from "../services/authService";
+import { isTokenValid, getUserRole } from "../services/authService";
 
 export default function HomePage() {
   const navigate = useNavigate();
   const user = isTokenValid() ? JSON.parse(localStorage.getItem("user")) : null;
   const client_data = isTokenValid() ? JSON.parse(localStorage.getItem("client_data")) : null;
+  const userRole = getUserRole();
+
+  const getWelcomeMessage = () => {
+    if (!user) return "Witamy w paczkuj.to";
+    
+    if (client_data && client_data.first_name) {
+      return `Witaj, ${client_data.first_name}!`;
+    }
+    
+    if (userRole === "admin") {
+      return "Witaj, Administratorze!";
+    }
+
+    return `Witaj, ${user.email}!`;
+  };
 
   return (
     <div className="home-container">
       <img src={logo} alt="Logo" className="home-logo" />
-      <h1 className="home-title">
-        {user ? `Witaj, ${client_data.first_name}!` : "Witamy w paczkuj.to"}
-      </h1>
+      <h1 className="home-title">{getWelcomeMessage()}</h1>
       <p style={{ color: "#444", marginBottom: 32, fontSize: 18, textAlign: "center" }}>
         Szybko i wygodnie nadaj przesyłkę lub sprawdź status swoich paczek.
       </p>
       {isTokenValid() ? (
         <div style={{ display: "flex", gap: 24 }}>
-          <button
-            className="btn btn-primary"
-            style={{ fontSize: 20, padding: "18px 40px" }}
-            onClick={() => navigate("/create-shipment")}
-          >
-            Nadaj paczkę
-          </button>
-          <button
-            className="btn btn-primary"
-            style={{
-              background: "#fff",
-              color: "#01c363",
-              border: "2px solid #01c363",
-              fontWeight: "bold",
-              fontSize: 20,
-              padding: "18px 40px"
-            }}
-            onClick={() => navigate("/shipments")}
-          >
-            Moje paczki
-          </button>
+          {userRole === "client" && (
+            <>
+              <button
+                className="btn btn-primary"
+                style={{ fontSize: 20, padding: "18px 40px" }}
+                onClick={() => navigate("/create-shipment")}
+              >
+                Nadaj paczkę
+              </button>
+              <button
+                className="btn btn-primary"
+                style={{ fontSize: 20, padding: "18px 40px" }}
+                onClick={() => navigate("/shipments")}
+              >
+                Moje paczki
+              </button>
+            </>
+          )}
+          {userRole === "admin" && (
+            <button
+              className="btn btn-primary"
+              style={{ fontSize: 20, padding: "18px 40px" }}
+              onClick={() => navigate("/admin")}
+            >
+              Panel administracyjny
+            </button>
+          )}
         </div>
       ) : (
         <button

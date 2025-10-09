@@ -70,3 +70,95 @@
   margin-top: 16px;
   color: #444;
 }
+
+.geocoding-status {
+  margin: 8px 0;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.geocoding-status.loading {
+  background-color: #e3f2fd;
+  color: #0d47a1;
+}
+
+.geocoding-status.error {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.geocoding-status.success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.distance-info {
+  margin: 16px 0;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.distance-label {
+  font-weight: bold;
+}
+
+.shipping-cost-container {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.shipping-cost-container h3 {
+  margin-top: 0;
+  color: #01c363;
+  font-size: 1.2rem;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.shipping-cost-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cost-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  padding: 4px 0;
+  border-bottom: 1px dotted #ddd;
+  align-items: center;
+}
+
+.cost-item {
+  padding-right: 8px;
+  overflow-wrap: break-word; 
+}
+.cost-row.total {
+  margin-top: 8px;
+  border-bottom: none;
+  border-top: 2px solid #ddd;
+  padding-top: 8px;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.cost-value {
+  font-weight: 500;
+  white-space: nowrap;
+  text-align: right;
+  min-width: 70px;
+}
+.input-hint {
+  font-size: 0.8rem;
+  color: #666;
+  margin: -5px 0 10px 0;
+  font-style: italic;
+}

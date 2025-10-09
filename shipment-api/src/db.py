@@ -137,6 +137,12 @@ user_table = sqlalchemy.Table(
     sqlalchemy.Column("email", sqlalchemy.String, unique=True, nullable=False),
     sqlalchemy.Column("password", sqlalchemy.String, nullable=False),
     sqlalchemy.Column("role", Enum(UserRole, name="user_roles")),
+    sqlalchemy.Column(
+        "created_at",
+        sqlalchemy.DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    ),
 )
 
 
