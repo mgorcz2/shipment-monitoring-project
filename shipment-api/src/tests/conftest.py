@@ -44,6 +44,15 @@ def valid_user(valid_email, valid_password):
         role="client",
     )
 
+@pytest.fixture
+def valid_user_dict(valid_user):
+        return {
+        "id": valid_user.id,
+        "email": valid_user.email,
+        "password": valid_user.password,
+        "role": valid_user.role,
+    }
+
 
 @pytest.fixture
 def valid_userDTO(valid_email):
