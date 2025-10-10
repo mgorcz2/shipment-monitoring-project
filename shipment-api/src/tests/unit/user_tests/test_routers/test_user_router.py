@@ -21,7 +21,7 @@ def mock_user_service(mocker):
     return mocker.AsyncMock()
 
 
-@pytest.fixture(params=[UserRole.ADMIN, UserRole.SENDER, UserRole.COURIER])
+@pytest.fixture(params=[UserRole.ADMIN, UserRole.CLIENT, UserRole.COURIER, UserRole.MANAGER])
 def user(request):
     return User(
         id=uuid4(),
@@ -329,23 +329,23 @@ async def test_get_users_by_role_success(mock_user_service, user):
     Also check if the function raises an HTTPException with the correct status code and detail
     when the user is not an admin.
     """
-    if user.role == UserRole.ADMIN:
+    if user.role in [UserRole.ADMIN, UserRole.MANAGER]:
         arr = [
-            UserDTO(id=uuid4(), email="x@y.z", role=UserRole.SENDER),
+            UserDTO(id=uuid4(), email="x@y.z", role=UserRole.CLIENT),
         ]
         mock_user_service.get_users_by_role.return_value = arr
 
         dto = await user_router.get_users_by_role(
-            role=UserRole.SENDER, current_user=user, service=mock_user_service
+            role=UserRole.CLIENT, current_user=user, service=mock_user_service
         )
         assert len(dto) == 1
-        mock_user_service.get_users_by_role.assert_awaited_once_with(UserRole.SENDER)
+        mock_user_service.get_users_by_role.assert_awaited_once_with(UserRole.CLIENT)
     else:
         with pytest.raises(
             HTTPException, match="No permission to access this resource."
         ):
             await user_router.get_users_by_role(
-                role=UserRole.SENDER, current_user=user, service=mock_user_service
+                role=UserRole.CLIENT, current_user=user, service=mock_user_service
             )
 
 
@@ -358,10 +358,10 @@ async def test_get_users_by_role_not_found(mock_user_service, user):
     when the user is not an admin.
     """
     mock_user_service.get_users_by_role.side_effect = ValueError("none")
-    if user.role == UserRole.ADMIN:
+    if user.role in [UserRole.ADMIN, UserRole.MANAGER]:
         with pytest.raises(HTTPException) as exc:
             await user_router.get_users_by_role(
-                role=UserRole.SENDER, current_user=user, service=mock_user_service
+                role=UserRole.CLIENT, current_user=user, service=mock_user_service
             )
         assert exc.value.status_code == status.HTTP_404_NOT_FOUND
         assert exc.value.detail == "none"
@@ -370,5 +370,5 @@ async def test_get_users_by_role_not_found(mock_user_service, user):
             HTTPException, match="No permission to access this resource."
         ):
             await user_router.get_users_by_role(
-                role=UserRole.SENDER, current_user=user, service=mock_user_service
+                role=UserRole.CLIENT, current_user=user, service=mock_user_service
             )

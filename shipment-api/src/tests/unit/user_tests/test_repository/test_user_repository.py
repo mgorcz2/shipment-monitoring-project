@@ -11,20 +11,14 @@ from src.infrastructure.repositories.userdb import UserRepository
 
 
 @pytest.fixture(autouse=True)
-def patch_database(mocker, valid_user):
+def patch_database(mocker, valid_user, valid_user_dict):
     """
     Patch the database connection and its methods to avoid actual database calls.
     """
-    user_dict = {
-        "id": valid_user.id,
-        "email": valid_user.email,
-        "password": valid_user.password,
-        "role": valid_user.role,
-    }
     db = mocker.patch.object(repo_module, "database")
-    db.execute = mocker.AsyncMock(return_value=valid_user.id)
-    db.fetch_one = mocker.AsyncMock(return_value=valid_user)
-    db.fetch_all = mocker.AsyncMock(return_value=[user_dict])
+    db.execute = mocker.AsyncMock(return_value=valid_user_dict)
+    db.fetch_one = mocker.AsyncMock(return_value=valid_user_dict)
+    db.fetch_all = mocker.AsyncMock(return_value=[valid_user_dict])
     return db
 
 
@@ -124,16 +118,15 @@ async def test_delete_user_returns_none(repository, patch_database, valid_user):
 
 
 @pytest.mark.anyio
-async def test_update_user(repository, patch_database, valid_user):
+async def test_update_user(repository, patch_database, valid_user_dict, valid_userin):
     """
     Test the update_user method of the UserRepository.
     """
-    patch_database.fetch_one.return_value = valid_user
     data = UserIn(
-        email=valid_user.email, password=valid_user.password, role=valid_user.role
+        email=valid_userin.email, password=valid_userin.password, role=valid_userin.role
     )
-    result = await repository.update_user(valid_user.email, data)
-    assert result == valid_user
+    result = await repository.update_user(valid_userin.email, data)
+    assert result == User(**valid_user_dict)
     patch_database.fetch_one.assert_awaited_once()
 
 
@@ -182,7 +175,7 @@ async def test_get_all_users_empty(repository, patch_database):
             id=uuid4(),
             email="user@example.com",
             password="Password123",
-            role="sender",
+            role="client",
         ),
         User(
             id=uuid4(),
@@ -213,7 +206,7 @@ async def test_get_users_by_role(
     """
     Test the get_users_by_role method of the UserRepository.
     """
-    patch_database.fetch_all.return_value = [user]
+    patch_database.fetch_all.return_value = [user.dict()]
     result = await repository.get_users_by_role(user.role)
     assert isinstance(result, list)
     assert user in result

@@ -401,6 +401,7 @@ def test_create_access_token_contains_sub():
     """
     Test the creation of an access token with a valid payload.
     """
+    config.SECRET_KEY = "testsecret"
     payload = {"sub": "abc123"}
     token = create_access_token(payload)
     decoded = jwt.decode(
@@ -417,6 +418,7 @@ def test_access_token_incorrect_secret():
     Test the error raised when decoding a token with an incorrect secret.
     """
     payload = {"sub": "abc123"}
+    config.SECRET_KEY = "testsecret"
     token = create_access_token(payload)
     with pytest.raises(jwt.JWTError):
         jwt.decode(token, "wrong-secret", algorithms=[consts.ALGORITHM])
