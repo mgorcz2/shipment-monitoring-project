@@ -4,6 +4,7 @@ import "../styles/LoginPage.css";
 import { translate } from "../i18n/index.js";
 import { login, isTokenValid } from "../services/authService";
 import { getUserByEmail } from "../services/userService";
+import { getMyProfile } from "../services/userService"; 
 import { getClientById } from "../services/clientService.js";
 import { useNavigate } from "react-router-dom";
 
@@ -29,7 +30,7 @@ export default function LoginPage() {
       const res = await login(email, password);
       localStorage.setItem("token", res.data.access_token);
 
-      const userRes = await getUserByEmail(email, res.data.access_token);
+      const userRes = await getMyProfile(res.data.access_token);
       localStorage.setItem("user", JSON.stringify(userRes.data));
 
     if (userRes.data.role === "client") {
