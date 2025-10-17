@@ -10,6 +10,15 @@ export const getUserByEmail = async (email) => {
     }});
 };
 
+export const getMyProfile = async () => {
+  return axios.get(
+    `http://localhost:8000/users/me`,{
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    });
+};
+
 export const registerUser = async (data) => {
   return axios.post(
     "http://localhost:8000/users/register",

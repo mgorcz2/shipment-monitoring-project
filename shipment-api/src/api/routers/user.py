@@ -66,6 +66,17 @@ async def login_for_access_token(
         ) from error
 
 
+
+@router.get("/me", response_model=UserDTO)
+@inject
+async def get_my_profile(
+    current_user: User = Depends(auth.get_current_user),
+    service: IUserService = Depends(Provide[Container.user_service]),
+) -> UserDTO:
+    user = await service.get_user_by_id(current_user.id)  
+    return user
+
+
 @router.get("/email/{email}", response_model=UserDTO, status_code=status.HTTP_200_OK)
 @auth.role_required([UserRole.ADMIN])
 @inject
