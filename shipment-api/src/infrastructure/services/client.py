@@ -8,14 +8,16 @@ from src.core.repositories.iclient import IClientRepository
 from src.core.repositories.iuser import IUserRepository
 from src.infrastructure.dto.userDTO import ClientDTO
 from src.infrastructure.services.iclient import IClientService
+from src.infrastructure.email.email_service import EmailService
 
 
 class ClientService(IClientService):
     """A class representing implementation of client-related services."""
 
-    def __init__(self, repository: IClientRepository, user_repository: IUserRepository):
+    def __init__(self, repository: IClientRepository, user_repository: IUserRepository, email_service: EmailService ) -> None:
         self._repository = repository
         self._user_repository = user_repository
+        self._email_service = email_service
 
     async def register_client(self, client: ClientIn, user_id: UUID) -> ClientDTO:
         """
@@ -23,7 +25,12 @@ class ClientService(IClientService):
         """
         record = await self._repository.register_client(client, user_id)
         if not record:
-            raise ValueError("Failed to register the client. Please try again.")
+            raise ValueError("Failed to register the client. Please try again.")        
+        self._email_service.send_welcome_email(
+        user_email=record["email"],
+        first_name=record["first_name"],  
+        address=record["address"] 
+        )
         return ClientDTO.from_record(record)
 
     async def get_client(self, user_id: UUID) -> ClientDTO:

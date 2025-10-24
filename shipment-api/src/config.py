@@ -22,7 +22,7 @@ class AppConfig(BaseConfig):
     MAIL_USERNAME: Optional[str] = None
     MAIL_PASSWORD: Optional[str] = None
     MAIL_FROM: Optional[str] = None
-    MAIL_PORT: Optional[str] = None
+    MAIL_PORT: Optional[int] = None
     MAIL_SERVER: Optional[str] = None
 
     SECRET_KEY: Optional[str] = None
