@@ -11,6 +11,7 @@ from src.infrastructure.services.package import PackageService
 from src.infrastructure.services.shipment import ShipmentService
 from src.infrastructure.services.staff import StaffService
 from src.infrastructure.services.user import UserService
+from src.infrastructure.email.email_service import EmailService
 
 
 class Container(DeclarativeContainer):
@@ -34,11 +35,11 @@ class Container(DeclarativeContainer):
         StaffService,
         repository=staff_repository,
     )
-
+    email_service = Singleton(EmailService)
     client_repository = Singleton(ClientRepository)
 
     client_service = Factory(
-        ClientService, repository=client_repository, user_repository=user_repository
+        ClientService, repository=client_repository, user_repository=user_repository, email_service=email_service
     )
 
     package_repository = Singleton(PackageRepository)

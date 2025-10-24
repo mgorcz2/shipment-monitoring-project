@@ -14,12 +14,13 @@ services:
       - DB_PASSWORD=pass
       - MAIL_USERNAME=mail@example.com
       - MAIL_PASSWORD=password
-      - MAIL_PORT=587
-      - MAIL_SERVER=smtp.example.com
-      - MAIL_FROM=mail@example.com
+      - MAIL_PORT=1025
+      - MAIL_SERVER=mailhog
+      - MAIL_FROM=noreply@paczkujto.com
       - SECRET_KEY=SECRET_KEY
     depends_on:
       - db
+      - mailhog
     networks:
       - backend
     container_name: app
@@ -36,6 +37,14 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data 
     
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"   
+      - "8025:8025"
+    networks:
+      - backend
+    container_name: mailhog
 
 networks:
   backend:
