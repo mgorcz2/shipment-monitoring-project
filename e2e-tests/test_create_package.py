@@ -37,8 +37,6 @@ def test_create_package_full_flow(authenticated_driver):
     time.sleep(5)
     assert "/shipments" in authenticated_driver.current_url
 
-    print("Package created successfully!")
-
 
 def test_shipping_cost_calculation(authenticated_driver):
     package_page = CreatePackagePage(authenticated_driver)

@@ -16,7 +16,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-// Funkcja obliczająca odległość między punktami geograficznymi (w km)
 function calculateDistance(lat1, lon1, lat2, lon2) {
   if (!lat1 || !lon1 || !lat2 || !lon2) return null;
   
@@ -28,71 +27,50 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
     Math.sin(dLon/2) * Math.sin(dLon/2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c; // Odległość w km
+  return R * c; 
 }
-
-// Funkcja obliczająca koszt przesyłki - zmodyfikowany model degresywny
 function calculateShippingCost(weight, length, width, height, distance, isFragile) {
-  // Konwersja na liczby
   weight = parseFloat(weight) || 0;
   length = parseFloat(length) || 0;
   width = parseFloat(width) || 0;
   height = parseFloat(height) || 0;
   distance = parseFloat(distance) || 0;
   
-  // Podstawowy koszt przesyłki
   let cost = 15;
-  
-  // Dopłata za wagę - nowy model degresywny:
-  // - pierwsze 10kg powyżej 1kg: 2 zł/kg
-  // - kolejne 20kg: 1 zł/kg
-  // - powyżej 30kg: 0.5 zł/kg
   let weightCost = 0;
   if (weight > 1) {
     if (weight <= 11) {
-      // Do 11 kg (czyli do 10 kg nadwagi)
       weightCost = (weight - 1) * 2;
     } else if (weight <= 31) {
-      // Do 31 kg (10kg po 2zł i reszta po 1zł)
       weightCost = 10 * 2 + (weight - 11) * 1;
     } else {
-      // Powyżej 31 kg (10kg po 2zł, 20kg po 1zł i reszta po 0.5zł)
       weightCost = 10 * 2 + 20 * 1 + (weight - 31) * 0.5;
     }
     cost += weightCost;
   }
   
-  // Obliczenie objętości w cm³
   const volume = length * width * height;
   
-  // Dopłata za objętość (0.5 zł za każde 1000 cm³ powyżej 5000 cm³)
   let volumeCost = 0;
   if (volume > 5000) {
     volumeCost = ((volume - 5000) / 1000) * 0.5;
     cost += volumeCost;
   }
   
-  // Dopłata za odległość - nowy model degresywny:
-  // - pierwsze 50km powyżej 10km: 0.5 zł/km
-  // - kolejne kilometry: 0.3 zł/km
   let distanceCost = 0;
   if (distance > 10) {
     if (distance <= 60) {
-      // Do 60 km (czyli do 50 km nadwyżki)
       distanceCost = (distance - 10) * 0.5;
     } else {
-      // Powyżej 60 km
       distanceCost = 50 * 0.5 + (distance - 60) * 0.3;
     }
     cost += distanceCost;
   }
-  
-  // Opłata za przesyłkę delikatną (fragile): +20% do ceny końcowej
+
   if (isFragile) {
     cost *= 1.2;
   }
-  
-  // Zachowujemy również informacje o poszczególnych kosztach
+
   return {
     total: cost.toFixed(2),
     weightCost: weightCost.toFixed(2),
@@ -133,7 +111,6 @@ export default function CreatePackagePage() {
   const [shippingCost, setShippingCost] = useState(null);
   const navigate = useNavigate();
 
-  // Funkcja sprawdzająca czy wszystkie wymagane pola do obliczenia kosztu są wypełnione
   const canCalculateCost = () => {
     return (
       distance !== null &&
@@ -149,15 +126,12 @@ export default function CreatePackagePage() {
     
     let validatedValue = value;
     
-    // Walidacja dla pól numerycznych
     if (type === "number") {
-      // Jeśli pole jest puste, zachowaj pustą wartość
       if (value === "") {
         validatedValue = "";
       } else {
         const numValue = parseFloat(value);
         
-        // Określ limity dla różnych pól
         let min = 1;
         let max = Infinity;
         
@@ -176,14 +150,12 @@ export default function CreatePackagePage() {
             break;
         }
         
-        // Aplikuj limity tylko jeśli wartość nie jest pusta
         if (!isNaN(numValue)) {
           validatedValue = Math.min(Math.max(numValue, min), max).toString();
         }
       }
     }
     
-    // Aktualizuj formularz z nową wartością
     const updatedForm = {
       ...form,
       [name]: type === "checkbox" ? checked : validatedValue
@@ -191,31 +163,28 @@ export default function CreatePackagePage() {
     
     setForm(updatedForm);
 
-    // Resetuj koordynaty przy zmianie adresów
+
     if (name.startsWith("origin_")) {
       setCoords(null);
       setGeocodingOriginError("");
       setDistance(null);
       setShippingCost(null);
-      return; // Wyjdź wcześniej, bo nie ma sensu kontynuować
+      return; 
     } 
     else if (name.startsWith("destination_")) {
       setDestCoords(null);
       setGeocodingDestError("");
       setDistance(null);
       setShippingCost(null);
-      return; // Wyjdź wcześniej, bo nie ma sensu kontynuować
+      return; 
     }
     
-    // Resetuj cenę jeśli jakieś pole wymiarów lub wagi zostało opróżnione
     if (["weight", "length", "width", "height"].includes(name) && validatedValue === "") {
       setShippingCost(null);
       return;
     }
     
-    // Aktualizuj cenę po zmianie dowolnego pola - włączając w to checkbox fragile
     if (distance !== null) {
-      // Sprawdź czy istnieją wszystkie niezbędne dane do kalkulacji
       if (
         updatedForm.weight && parseFloat(updatedForm.weight) >= 1 &&
         updatedForm.length && parseFloat(updatedForm.length) >= 1 &&
@@ -240,17 +209,14 @@ export default function CreatePackagePage() {
           cost: costResult.total
         });
       } else {
-        // Jeśli brakuje danych do obliczenia ceny, resetuj
         setShippingCost(null);
       }
     }
   };
 
-  // Efekt dla geokodowania adresu nadania
   useEffect(() => {
     const timer = setTimeout(() => {
       if (form.origin_street && form.origin_city && form.origin_postcode) {
-        // Walidacja kodu pocztowego (dla Polski: xx-xxx)
         const postcodePattern = /^\d{2}-\d{3}$/;
         if (!postcodePattern.test(form.origin_postcode)) {
           setGeocodingOriginError("Niepoprawny format kodu pocztowego (xx-xxx)");
@@ -290,11 +256,9 @@ export default function CreatePackagePage() {
     return () => clearTimeout(timer);
   }, [form.origin_street, form.origin_street_number, form.origin_city, form.origin_postcode]);
 
-  // Efekt dla geokodowania adresu odbioru
   useEffect(() => {
     const timer = setTimeout(() => {
       if (form.destination_street && form.destination_city && form.destination_postcode) {
-        // Walidacja kodu pocztowego (dla Polski: xx-xxx)
         const postcodePattern = /^\d{2}-\d{3}$/;
         if (!postcodePattern.test(form.destination_postcode)) {
           setGeocodingDestError("Niepoprawny format kodu pocztowego (xx-xxx)");
@@ -334,7 +298,6 @@ export default function CreatePackagePage() {
     return () => clearTimeout(timer);
   }, [form.destination_street, form.destination_street_number, form.destination_city, form.destination_postcode]);
 
-  // Efekt dla obliczania odległości i aktualizacji ceny
   useEffect(() => {
     if (coords && destCoords) {
       const calculatedDistance = calculateDistance(
@@ -343,7 +306,6 @@ export default function CreatePackagePage() {
       );
       setDistance(calculatedDistance);
       
-      // Po zmianie odległości, aktualizuj cenę tylko jeśli wszystkie dane są dostępne
       if (calculatedDistance !== null && canCalculateCost()) {
         const costResult = calculateShippingCost(
           form.weight, 
@@ -363,9 +325,7 @@ export default function CreatePackagePage() {
     }
   }, [coords, destCoords]);
 
-  // Efekt do monitorowania zmian w formularzu które wpływają na cenę
   useEffect(() => {
-    // Sprawdź czy wszystkie potrzebne dane są dostępne
     if (canCalculateCost()) {
       const costResult = calculateShippingCost(
         form.weight,
@@ -384,13 +344,11 @@ export default function CreatePackagePage() {
     setError("");
     setSuccess("");
     
-    // Walidacja adresów
     if (!coords || !destCoords) {
       setError("Nie można nadać paczki bez poprawnych adresów. Sprawdź poprawność adresów nadania i odbioru.");
       return;
     }
     
-    // Walidacja wymiarów i wagi paczki
     const weight = parseFloat(form.weight);
     const length = parseFloat(form.length);
     const width = parseFloat(form.width);
@@ -470,20 +428,16 @@ export default function CreatePackagePage() {
     }
   };
 
-  // Pomocnicze funkcje do wyświetlania informacji o opłatach
   const getWeightCostDescription = () => {
     const weight = parseFloat(form.weight);
     
     if (weight <= 1) return "";
     
     if (weight <= 11) {
-      // Do 10 kg nadwagi po 2 zł/kg
       return `Dopłata za wagę (${(weight - 1).toFixed(2)} kg powyżej 1 kg @ 2 zł/kg):`;
     } else if (weight <= 31) {
-      // 10kg po 2zł + reszta po 1zł
       return `Dopłata za wagę (10 kg @ 2 zł/kg + ${(weight - 11).toFixed(2)} kg @ 1 zł/kg):`;
     } else {
-      // 10kg po 2zł + 20kg po 1zł + reszta po 0.5zł
       return `Dopłata za wagę (10 kg @ 2 zł/kg + 20 kg @ 1 zł/kg + ${(weight - 31).toFixed(2)} kg @ 0.5 zł/kg):`;
     }
   };
@@ -492,10 +446,8 @@ export default function CreatePackagePage() {
     if (!distance || distance <= 10) return "";
     
     if (distance <= 60) {
-      // Do 50 km nadwyżki po 0.5 zł/km
       return `Dopłata za odległość (${(distance - 10).toFixed(2)} km powyżej 10 km @ 0.5 zł/km):`;
     } else {
-      // 50km po 0.5 zł + reszta po 0.3 zł
       return `Dopłata za odległość (50 km @ 0.5 zł/km + ${(distance - 60).toFixed(2)} km @ 0.3 zł/km):`;
     }
   };
@@ -731,7 +683,6 @@ export default function CreatePackagePage() {
           Czy paczka jest krucha?
         </label>
         
-        {/* Informacja o szacowanym koszcie przesyłki */}
         {shippingCost !== null && (
           <div className="shipping-cost-container">
             <h3>Szacowany koszt przesyłki</h3>

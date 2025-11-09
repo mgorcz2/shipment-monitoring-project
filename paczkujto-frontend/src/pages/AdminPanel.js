@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from "react";
-import { getAllUsers } from "../services/userService";
+import { getAllUsers, deleteUser } from "../services/userService";  
 import UserList from "../components/UsersTable";
 import UserDetailsModal from "../components/UserDetailsModal";
+import DeleteConfirmModal from "../components/DeleteConfirmModal"; 
 import "../styles/AdminPanel.css";
 
 const AdminPanel = () => {
@@ -9,7 +11,8 @@ const AdminPanel = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);  
+  const [isDeleting, setIsDeleting] = useState(false);      
 
   useEffect(() => {
     fetchUsers();
@@ -38,9 +41,31 @@ const AdminPanel = () => {
   };
 
   const handleDeleteUser = (user) => {
-    if (window.confirm(`Czy na pewno chcesz usunąć użytkownika ${user.email}?`)) {
-      alert(`Funkcja usuwania użytkownika zostanie zaimplementowana później`);
+    setUserToDelete(user);  
+  };
+
+  const confirmDelete = async () => {
+    if (!userToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteUser(userToDelete.email);
+      
+      setUsers(users.filter(u => u.id !== userToDelete.id));
+      
+      alert(`✓ Użytkownik ${userToDelete.email} został usunięty`);
+      
+      setUserToDelete(null);
+    } catch (err) {
+      console.error("Błąd podczas usuwania:", err);
+      alert(`✗ Błąd: ${err.response?.data?.detail || "Nie udało się usunąć użytkownika"}`);
+    } finally {
+      setIsDeleting(false);
     }
+  };
+
+  const cancelDelete = () => {
+    setUserToDelete(null);
   };
 
   const closeDetailsModal = () => {
@@ -69,6 +94,15 @@ const AdminPanel = () => {
 
       {selectedUser && (
         <UserDetailsModal user={selectedUser} onClose={closeDetailsModal} />
+      )}
+
+      {userToDelete && (
+        <DeleteConfirmModal
+          user={userToDelete}
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+          isDeleting={isDeleting}
+        />
       )}
     </div>
   );
