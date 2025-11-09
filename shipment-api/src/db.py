@@ -99,9 +99,15 @@ shipment_table = sqlalchemy.Table(
     "shipments",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("sender_id", sqlalchemy.ForeignKey("users.id")),
-    sqlalchemy.Column("recipient_id", sqlalchemy.ForeignKey("users.id")),
-    sqlalchemy.Column("courier_id", sqlalchemy.ForeignKey("users.id")),
+    sqlalchemy.Column(
+        "sender_id", sqlalchemy.ForeignKey("users.id", ondelete="SET NULL")
+    ),
+    sqlalchemy.Column(
+        "recipient_id", sqlalchemy.ForeignKey("users.id", ondelete="SET NULL")
+    ),
+    sqlalchemy.Column(
+        "courier_id", sqlalchemy.ForeignKey("users.id", ondelete="SET NULL")
+    ),
     sqlalchemy.Column("status", Enum(ShipmentStatus, name="shipment_status")),
     sqlalchemy.Column("recipient_email", sqlalchemy.String, nullable=True),
     sqlalchemy.Column(

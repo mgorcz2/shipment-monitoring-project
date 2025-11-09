@@ -36,4 +36,11 @@ export const getAllUsers = async (token) => {
 };
 
 
-
+export const deleteUser = async (email) => {
+  return axios.delete(
+    `http://localhost:8000/users/delete/${email}`,{
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    });
+};

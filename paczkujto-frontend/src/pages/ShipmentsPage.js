@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getAllShipments } from "../services/shipmentService";
 import ShipmentCard from "../components/ShipmentCard";
-import ShipmentDetailsModal from "../components/ShipmentDetailsModal"; // Dodaj ten import
+import ShipmentDetailsModal from "../components/ShipmentDetailsModal";
 import "../styles/ShipmentsPage.css";
 import { translate } from "../i18n";
 
@@ -10,7 +10,7 @@ export default function ShipmentsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filterRole, setFilterRole] = useState("all");
-  const [selectedShipment, setSelectedShipment] = useState(null); // Dodaj ten stan
+  const [selectedShipment, setSelectedShipment] = useState(null);
 
   useEffect(() => {
     fetchShipments();
@@ -29,7 +29,6 @@ export default function ShipmentsPage() {
     }
   };
 
-  // Dodaj te dwie funkcje
   const handleViewDetails = (shipment) => {
     setSelectedShipment(shipment);
   };
@@ -38,7 +37,6 @@ export default function ShipmentsPage() {
     setSelectedShipment(null);
   };
 
-  // Filtrowanie przesyłek na podstawie wybranej roli
   const getFilteredShipments = () => {
     if (!shipments) return [];
     
@@ -93,14 +91,12 @@ export default function ShipmentsPage() {
             <ShipmentCard
               key={shipment.id}
               shipment={shipment}
-              // Zmień tę linię
               onDetails={() => handleViewDetails(shipment)}
             />
           ))}
         </div>
       )}
       
-      {/* Dodaj ten fragment */}
       {selectedShipment && (
         <ShipmentDetailsModal 
           shipment={selectedShipment} 
