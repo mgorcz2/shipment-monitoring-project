@@ -22,64 +22,64 @@ export default function RegisterClientPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleRegister = async e => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-    setLoading(true);
-    try {
-      const userRes = await registerUser({
-        email: form.email,
-        password: form.password,
-        role: "client"
-      });
-      const user_id = userRes.data.id;
-      await registerClient(
-        {
-          first_name: form.first_name,
-          last_name: form.last_name,
-          phone_number: form.phone_number,
-          address: form.address,
-        },
-        user_id
-      );
+const handleRegister = async e => {
+  e.preventDefault();
+  setError("");
+  setSuccess("");
+  setLoading(true);
+  
+  try {
+    const userData = {
+      email: form.email,
+      password: form.password,
+      role: "client"
+    };
 
-      setSuccess("Rejestracja zakończona sukcesem! Możesz się zalogować.");
-      setForm({
-        email: "",
-        password: "",
-        first_name: "",
-        last_name: "",
-        phone_number: "",
-        address: "",
-      });
-      setTimeout(() => {
-        window.location.href = "/login";
+    const clientData = {
+      first_name: form.first_name,
+      last_name: form.last_name,
+      phone_number: form.phone_number,
+      address: form.address
+    };
+
+    await registerClient(userData, clientData);
+
+    setSuccess("Rejestracja zakończona sukcesem! Możesz się zalogować.");
+    setForm({
+      email: "",
+      password: "",
+      first_name: "",
+      last_name: "",
+      phone_number: "",
+      address: "",
+    });
+    setTimeout(() => {
+      window.location.href = "/login";
     }, 2000);
-    } catch (err) {
-      if (err.response && err.response.data && err.response.data.detail) {
-        const detail = err.response.data.detail;
-        if (Array.isArray(detail)) {
-          setError(
-            detail
-              .map((item) =>
-                typeof item === "object" && item.msg
-                  ? item.msg
-                  : String(item)
-              )
-              .join(" | ")
-          );
-        } else {
-          setError(translate(detail));
-        }
-      } else if (err.response) {
-        setError("Błąd: " + translate(err.response.status));
+  } catch (err) {
+    if (err.response && err.response.data && err.response.data.detail) {
+      const detail = err.response.data.detail;
+      if (Array.isArray(detail)) {
+        setError(
+          detail
+            .map((item) =>
+              typeof item === "object" && item.msg
+                ? item.msg
+                : String(item)
+            )
+            .join(" | ")
+        );
       } else {
-        setError("Brak połączenia z serwerem");
+        setError(translate(detail));
       }
-    } finally {
-      setLoading(false);
+    } else if (err.response) {
+      setError("Błąd: " + translate(err.response.status));
+    } else {
+      setError("Brak połączenia z serwerem");
     }
+  } finally {
+    setLoading(false);
+  }
   };
 
   return (

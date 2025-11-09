@@ -4,7 +4,7 @@ from uuid import UUID
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, status
 from src.container import Container
-from src.core.domain.user import ClientIn
+from src.core.domain.user import ClientIn, UserIn
 from src.infrastructure.dto.userDTO import ClientDTO
 from src.infrastructure.services.iclient import IClientService
 
@@ -16,13 +16,13 @@ router = APIRouter(
 
 @router.post("/register", response_model=ClientDTO, status_code=status.HTTP_201_CREATED)
 @inject
-async def register_client(
+async def register_client_with_user(
+    user_data: UserIn,
     client: ClientIn,
-    user_id: UUID,
     service: IClientService = Depends(Provide[Container.client_service]),
 ) -> ClientDTO:
     try:
-        return await service.register_client(client, user_id)
+        return await service.register_client_with_user(user_data, client)
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error))
 

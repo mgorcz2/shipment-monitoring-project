@@ -1,9 +1,9 @@
 import axios from "axios";
 
-export const registerClient = async (data, user_id) => {
+export const registerClient = async (userData, clientData) => {
   return axios.post(
-    `http://localhost:8000/client/register?user_id=${user_id}`,
-    data,
+    `http://localhost:8000/client/register`,
+    { user_data: userData, client: clientData },
     { headers: { "Content-Type": "application/json" } }
   );
 };

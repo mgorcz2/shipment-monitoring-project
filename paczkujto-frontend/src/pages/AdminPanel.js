@@ -4,7 +4,9 @@ import { getAllUsers, deleteUser } from "../services/userService";
 import UserList from "../components/UsersTable";
 import UserDetailsModal from "../components/UserDetailsModal";
 import DeleteConfirmModal from "../components/DeleteConfirmModal"; 
+import RegisterStaffModal from "../components/RegisterStaffModal";
 import "../styles/AdminPanel.css";
+
 
 const AdminPanel = () => {
   const [users, setUsers] = useState([]);
@@ -12,7 +14,8 @@ const AdminPanel = () => {
   const [error, setError] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [userToDelete, setUserToDelete] = useState(null);  
-  const [isDeleting, setIsDeleting] = useState(false);      
+  const [isDeleting, setIsDeleting] = useState(false);    
+  const [showRegisterStaff, setShowRegisterStaff] = useState(false);  
 
   useEffect(() => {
     fetchUsers();
@@ -36,9 +39,6 @@ const AdminPanel = () => {
     setSelectedUser(user);
   };
 
-  const handleEditUser = (user) => {
-    alert(`Funkcja edycji użytkownika ${user.email} zostanie zaimplementowana później`);
-  };
 
   const handleDeleteUser = (user) => {
     setUserToDelete(user);  
@@ -77,8 +77,14 @@ const AdminPanel = () => {
       <div className="admin-header">
         <h1>Panel Administratora</h1>
         <p>Zarządzanie użytkownikami systemu</p>
+          <button 
+    className="btn btn-primary"
+    onClick={() => setShowRegisterStaff(true)}
+  >
+    + Zarejestruj Pracownika
+  </button>
       </div>
-
+      
       {loading ? (
         <div className="loading-state">Ładowanie użytkowników...</div>
       ) : error ? (
@@ -87,7 +93,6 @@ const AdminPanel = () => {
         <UserList
           users={users}
           onViewDetails={handleViewDetails}
-          onEditUser={handleEditUser}
           onDeleteUser={handleDeleteUser}
         />
       )}
@@ -104,6 +109,13 @@ const AdminPanel = () => {
           isDeleting={isDeleting}
         />
       )}
+
+      {showRegisterStaff && (
+  <RegisterStaffModal
+    onClose={() => setShowRegisterStaff(false)}
+    onSuccess={fetchUsers}
+  />
+)}
     </div>
   );
 };

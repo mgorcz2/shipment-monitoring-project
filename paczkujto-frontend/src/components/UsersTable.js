@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { FaSort, FaSortUp, FaSortDown, FaEdit, FaInfoCircle, FaTrash } from "react-icons/fa";
 import "../styles/AdminPanel.css";
+import { useNavigate } from "react-router-dom";
 
-const UserList = ({ users, onViewDetails, onEditUser, onDeleteUser }) => {
+const UserList = ({ users, onViewDetails, onDeleteUser }) => {
   const [sortField, setSortField] = useState("created_at");
   const [sortDirection, setSortDirection] = useState("desc");
   const [roleFilter, setRoleFilter] = useState("all");
+
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -105,13 +107,6 @@ const UserList = ({ users, onViewDetails, onEditUser, onDeleteUser }) => {
                         title="Szczegóły"
                       >
                         <FaInfoCircle />
-                      </button>
-                      <button
-                        className="action-btn edit-btn"
-                        onClick={() => onEditUser(user)}
-                        title="Edytuj"
-                      >
-                        <FaEdit />
                       </button>
                       <button
                         className="action-btn delete-btn"

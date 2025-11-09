@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Iterable
 from uuid import UUID
 
-from src.core.domain.user import StaffIn
+from src.core.domain.user import StaffIn, UserIn
 from src.infrastructure.dto.userDTO import StaffDTO
 
 
@@ -12,7 +12,9 @@ class IStaffService(ABC):
     """An abstract class representing the protocol of staff service."""
 
     @abstractmethod
-    async def register_staff(self, staff: StaffIn, user_id: UUID) -> StaffDTO:
+    async def register_staff_with_user(
+        self, staff: StaffIn, user_data: UserIn
+    ) -> StaffDTO:
         """Register a new staff member.
 
         Args:

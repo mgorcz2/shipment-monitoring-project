@@ -3,8 +3,10 @@
 from typing import Iterable
 from uuid import UUID
 
-from src.core.domain.user import StaffIn
+from src.core.domain.user import StaffIn, UserIn
 from src.core.repositories.istaff import IStaffRepository
+from src.core.repositories.iuser import IUserRepository
+from src.db import database
 from src.infrastructure.dto.userDTO import StaffDTO
 from src.infrastructure.services.istaff import IStaffService
 
@@ -12,15 +14,27 @@ from src.infrastructure.services.istaff import IStaffService
 class StaffService(IStaffService):
     """A class representing implementation of staff-related services."""
 
-    def __init__(self, repository: IStaffRepository):
-        self._repository = repository
+    def __init__(
+        self, staff_repository: IStaffRepository, user_repository: IUserRepository
+    ):
+        self._repository = staff_repository
+        self._user_repository = user_repository
 
-    async def register_staff(self, staff: StaffIn, user_id: UUID) -> StaffDTO:
+    async def register_staff_with_user(
+        self, staff: StaffIn, user_data: UserIn
+    ) -> StaffDTO:
         """Register a new staff member in repository and return DTO."""
-        record = await self._repository.register_staff(staff, user_id)
-        if not record:
-            raise ValueError("Failed to register the staff member. Please try again.")
-        return StaffDTO.from_record(record)
+        async with database.transaction():
+            try:
+                user = await self._user_repository.register_user(user_data)
+            except Exception as e:
+                raise ValueError("User registration failed")
+            record = await self._repository.register_staff(staff, user.id)
+            if not record:
+                raise ValueError(
+                    "Failed to register the staff member. Please try again."
+                )
+            return StaffDTO.from_record(record)
 
     async def get_staff(self, user_id: UUID) -> StaffDTO:
         """Get staff by user_id from repository and return DTO."""

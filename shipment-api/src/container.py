@@ -1,6 +1,7 @@
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Factory, Singleton
 
+from src.infrastructure.email.email_service import EmailService
 from src.infrastructure.repositories.clientdb import ClientRepository
 from src.infrastructure.repositories.packagedb import PackageRepository
 from src.infrastructure.repositories.shipmentdb import ShipmentRepository
@@ -11,7 +12,6 @@ from src.infrastructure.services.package import PackageService
 from src.infrastructure.services.shipment import ShipmentService
 from src.infrastructure.services.staff import StaffService
 from src.infrastructure.services.user import UserService
-from src.infrastructure.email.email_service import EmailService
 
 
 class Container(DeclarativeContainer):
@@ -32,14 +32,16 @@ class Container(DeclarativeContainer):
     staff_repository = Singleton(StaffRepository)
 
     staff_service = Factory(
-        StaffService,
-        repository=staff_repository,
+        StaffService, staff_repository=staff_repository, user_repository=user_repository
     )
     email_service = Singleton(EmailService)
     client_repository = Singleton(ClientRepository)
 
     client_service = Factory(
-        ClientService, repository=client_repository, user_repository=user_repository, email_service=email_service
+        ClientService,
+        repository=client_repository,
+        user_repository=user_repository,
+        email_service=email_service,
     )
 
     package_repository = Singleton(PackageRepository)
