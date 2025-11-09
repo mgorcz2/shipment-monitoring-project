@@ -13,3 +13,12 @@ export const getStaffById = async (staffId) => {
     { headers: { "Content-Type": "application/json" } }
   );
 }
+
+export const registerStaff = async (userData, staffData) => {
+  const token = getToken();
+  return await axios.post(
+    `http://localhost:8000/staff/register`,
+    { user_data: userData, staff: staffData },
+    { headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` } }
+  );
+};

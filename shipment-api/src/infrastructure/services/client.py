@@ -6,32 +6,45 @@ from uuid import UUID
 from src.core.domain.user import ClientIn, UserIn
 from src.core.repositories.iclient import IClientRepository
 from src.core.repositories.iuser import IUserRepository
+from src.db import database
 from src.infrastructure.dto.userDTO import ClientDTO
-from src.infrastructure.services.iclient import IClientService
 from src.infrastructure.email.email_service import EmailService
+from src.infrastructure.services.iclient import IClientService
 
 
 class ClientService(IClientService):
     """A class representing implementation of client-related services."""
 
-    def __init__(self, repository: IClientRepository, user_repository: IUserRepository, email_service: EmailService ) -> None:
+    def __init__(
+        self,
+        repository: IClientRepository,
+        user_repository: IUserRepository,
+        email_service: EmailService,
+    ) -> None:
         self._repository = repository
         self._user_repository = user_repository
         self._email_service = email_service
 
-    async def register_client(self, client: ClientIn, user_id: UUID) -> ClientDTO:
+    async def register_client_with_user(
+        self, user_data: UserIn, client: ClientIn
+    ) -> ClientDTO:
         """
         Register a new client in repository and return DTO.
         """
-        record = await self._repository.register_client(client, user_id)
-        if not record:
-            raise ValueError("Failed to register the client. Please try again.")        
-        self._email_service.send_welcome_email(
-        user_email=record["email"],
-        first_name=record["first_name"],  
-        address=record["address"] 
-        )
-        return ClientDTO.from_record(record)
+        async with database.transaction():
+            try:
+                user = await self._user_repository.register_user(user_data)
+            except Exception as e:
+                raise ValueError("User registration failed")
+            record = await self._repository.register_client(client, user.id)
+            if not record:
+                raise ValueError("Failed to register the client. Please try again.")
+            self._email_service.send_welcome_email(
+                user_email=record["email"],
+                first_name=record["first_name"],
+                address=record["address"],
+            )
+            return ClientDTO.from_record(record)
 
     async def get_client(self, user_id: UUID) -> ClientDTO:
         """Get client by user_id from repository and return DTO."""

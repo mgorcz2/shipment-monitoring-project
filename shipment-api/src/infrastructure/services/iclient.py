@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Iterable
 from uuid import UUID
 
-from src.core.domain.user import ClientIn
+from src.core.domain.user import ClientIn, UserIn
 from src.infrastructure.dto.userDTO import ClientDTO
 
 
@@ -12,7 +12,9 @@ class IClientService(ABC):
     """An abstract class representing the protocol of client service."""
 
     @abstractmethod
-    async def register_client(self, client: ClientIn, user_id: UUID) -> ClientDTO:
+    async def register_client_with_user(
+        self, user_data: UserIn, client: ClientIn, user_id: UUID
+    ) -> ClientDTO:
         """Register a new client.
 
         Args:
