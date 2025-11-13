@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import logo from "../assets/logo.png";
 import "../styles/CreatePackagePage.css";
-import { createShipment } from "../services/shipmentService";
-import { createPackage } from "../services/packageService";
+import { createPackageWithShipment } from "../services/packageService";
 import { geocodeAddress, formatAddress } from "../services/geocodingService";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
@@ -19,7 +18,7 @@ L.Icon.Default.mergeOptions({
 function calculateDistance(lat1, lon1, lat2, lon2) {
   if (!lat1 || !lon1 || !lat2 || !lon2) return null;
   
-  const R = 6371; // Promień Ziemi w km
+  const R = 6371;
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
   const a = 
@@ -368,8 +367,18 @@ export default function CreatePackagePage() {
     
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
-      const shipmentRes = await createShipment(
+      
+      const packageData = 
+        {
+          weight: form.weight,
+          length: form.length,
+          width: form.width,
+          height: form.height,
+          fragile: form.fragile,
+          note: form.note || "",
+        };
+
+        const shipmentData =
         {
           origin: {
             street: form.origin_street,
@@ -386,21 +395,8 @@ export default function CreatePackagePage() {
           recipient_email: form.recipient_email,
           origin_coords: coords,
           destination_coords: destCoords
-        },
-        token
-      );
-      const shipment_id = shipmentRes.data.id;
-      await createPackage(
-        {
-          weight: form.weight,
-          length: form.length,
-          width: form.width,
-          height: form.height,
-          fragile: form.fragile,
-        },
-        shipment_id,
-        token
-      );
+        }
+      await createPackageWithShipment(packageData, shipmentData);
       setSuccess("Paczka została nadana!");
       setTimeout(() => {
         navigate("/shipments");

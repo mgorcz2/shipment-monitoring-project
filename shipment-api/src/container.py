@@ -32,7 +32,7 @@ class Container(DeclarativeContainer):
     staff_repository = Singleton(StaffRepository)
 
     staff_service = Factory(
-        StaffService, staff_repository=staff_repository, user_repository=user_repository
+        StaffService, staff_repository=staff_repository, user_service=user_service
     )
     email_service = Singleton(EmailService)
     client_repository = Singleton(ClientRepository)
@@ -40,10 +40,12 @@ class Container(DeclarativeContainer):
     client_service = Factory(
         ClientService,
         repository=client_repository,
-        user_repository=user_repository,
+        user_service=user_service,
         email_service=email_service,
     )
 
     package_repository = Singleton(PackageRepository)
 
-    package_service = Factory(PackageService, repository=package_repository)
+    package_service = Factory(
+        PackageService, repository=package_repository, shipment_service=shipment_service
+    )

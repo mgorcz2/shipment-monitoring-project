@@ -4,7 +4,7 @@ from uuid import UUID
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, status
 from src.container import Container
-from src.core.domain.user import StaffIn, UserIn, UserRole
+from src.core.domain.user import StaffIn, User, UserIn, UserRole
 from src.core.security import auth
 from src.infrastructure.dto.userDTO import StaffDTO
 from src.infrastructure.services.istaff import IStaffService
@@ -21,6 +21,7 @@ router = APIRouter(
 async def register_staff_with_user(
     staff: StaffIn,
     user_data: UserIn,
+    current_user: User = Depends(auth.get_current_user),
     service: IStaffService = Depends(Provide[Container.staff_service]),
 ) -> StaffDTO:
     try:
@@ -34,6 +35,7 @@ async def register_staff_with_user(
 @inject
 async def get_staff(
     user_id: UUID,
+    current_user: User = Depends(auth.get_current_user),
     service: IStaffService = Depends(Provide[Container.staff_service]),
 ) -> StaffDTO:
     try:
@@ -48,6 +50,7 @@ async def get_staff(
 async def update_staff(
     user_id: UUID,
     data: StaffIn,
+    current_user: User = Depends(auth.get_current_user),
     service: IStaffService = Depends(Provide[Container.staff_service]),
 ) -> StaffDTO:
     try:
@@ -61,6 +64,7 @@ async def update_staff(
 @inject
 async def delete_staff(
     user_id: UUID,
+    current_user: User = Depends(auth.get_current_user),
     service: IStaffService = Depends(Provide[Container.staff_service]),
 ) -> StaffDTO:
     try:
@@ -73,6 +77,7 @@ async def delete_staff(
 @router.get("/", response_model=Iterable[StaffDTO])
 @inject
 async def get_all_staff(
+    current_user: User = Depends(auth.get_current_user),
     service: IStaffService = Depends(Provide[Container.staff_service]),
 ) -> Iterable[StaffDTO]:
     return await service.get_all_staff()

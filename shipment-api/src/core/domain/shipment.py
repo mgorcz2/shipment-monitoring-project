@@ -57,6 +57,7 @@ class PackageIn(BaseModel):
     width: float
     height: float
     fragile: bool
+    note: Optional[str] = None
     model_config = ConfigDict(from_attributes=True, extra="ignore")
 
 
@@ -66,4 +67,10 @@ class Package(PackageIn):
     id: int
     created_at: datetime
     last_updated: datetime
+    pickup_scheduled_date: Optional[datetime]
+    pickup_actual_date: Optional[datetime]
+    delivery_scheduled_date: Optional[datetime]
+    delivery_actual_date: Optional[datetime]
+    cancelled_at: Optional[datetime]
+    note: Optional[str]
     model_config = ConfigDict(from_attributes=True, extra="ignore")

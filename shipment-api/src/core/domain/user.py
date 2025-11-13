@@ -28,7 +28,7 @@ class UserIn(BaseModel):
         min_length=8,
         max_length=128,
     )
-    role: UserRole = "sender"
+    role: UserRole = "client"
 
     @field_validator("password")
     @classmethod

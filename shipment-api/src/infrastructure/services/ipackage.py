@@ -2,8 +2,9 @@
 
 from abc import ABC, abstractmethod
 from typing import Any, Iterable
+from uuid import UUID
 
-from src.core.domain.shipment import Package, PackageIn
+from src.core.domain.shipment import Package, PackageIn, ShipmentIn
 from src.infrastructure.dto.shipmentDTO import PackageDTO
 
 
@@ -11,7 +12,9 @@ class IPackageService(ABC):
     """An abstract class representing protocol of package service."""
 
     @abstractmethod
-    async def add_package(self, data: PackageIn, shipment_id: int) -> PackageDTO | None:
+    async def add_package_with_shipment(
+        self, data: PackageIn, shipment_data: ShipmentIn, user_id: UUID
+    ) -> PackageDTO | None:
         """Add a new package to the data storage."""
 
     @abstractmethod

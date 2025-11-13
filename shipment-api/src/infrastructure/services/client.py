@@ -10,6 +10,7 @@ from src.db import database
 from src.infrastructure.dto.userDTO import ClientDTO
 from src.infrastructure.email.email_service import EmailService
 from src.infrastructure.services.iclient import IClientService
+from src.infrastructure.services.iuser import IUserService
 
 
 class ClientService(IClientService):
@@ -18,11 +19,11 @@ class ClientService(IClientService):
     def __init__(
         self,
         repository: IClientRepository,
-        user_repository: IUserRepository,
+        user_service: IUserService,
         email_service: EmailService,
     ) -> None:
         self._repository = repository
-        self._user_repository = user_repository
+        self._user_service = user_service
         self._email_service = email_service
 
     async def register_client_with_user(
@@ -33,9 +34,9 @@ class ClientService(IClientService):
         """
         async with database.transaction():
             try:
-                user = await self._user_repository.register_user(user_data)
+                user = await self._user_service.register_user(user_data)
             except Exception as e:
-                raise ValueError("User registration failed")
+                raise ValueError(f"User registration failed: {str(e)}")
             record = await self._repository.register_client(client, user.id)
             if not record:
                 raise ValueError("Failed to register the client. Please try again.")

@@ -6,7 +6,9 @@ from uuid import UUID
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, status
 from src.container import Container
-from src.core.domain.shipment import Package, PackageIn
+from src.core.domain.shipment import Package, PackageIn, ShipmentIn
+from src.core.domain.user import User, UserRole
+from src.core.security import auth
 from src.infrastructure.dto.shipmentDTO import PackageDTO
 from src.infrastructure.services.ipackage import IPackageService
 
@@ -16,15 +18,18 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=PackageDTO, status_code=status.HTTP_201_CREATED)
+@router.post("/add", response_model=PackageDTO, status_code=status.HTTP_201_CREATED)
 @inject
-async def create_package(
+async def create_package_with_shipment(
     package: PackageIn,
-    shipment_id: int,
+    shipment_data: ShipmentIn,
+    current_user: User = Depends(auth.get_current_user),
     service: IPackageService = Depends(Provide[Container.package_service]),
 ) -> PackageDTO:
     try:
-        result = await service.add_package(package, shipment_id)
+        result = await service.add_package_with_shipment(
+            package, shipment_data, current_user.id
+        )
         if not result:
             raise ValueError("Nie udało się utworzyć paczki.")
         return result
@@ -36,6 +41,7 @@ async def create_package(
 @inject
 async def get_package(
     package_id: int,
+    current_user: User = Depends(auth.get_current_user),
     service: IPackageService = Depends(Provide[Container.package_service]),
 ) -> PackageDTO:
     try:
@@ -52,6 +58,7 @@ async def get_package(
 async def update_package(
     package_id: int,
     data: PackageIn,
+    current_user: User = Depends(auth.get_current_user),
     service: IPackageService = Depends(Provide[Container.package_service]),
 ) -> PackageDTO:
     try:
@@ -67,6 +74,7 @@ async def update_package(
 @inject
 async def delete_package(
     package_id: int,
+    current_user: User = Depends(auth.get_current_user),
     service: IPackageService = Depends(Provide[Container.package_service]),
 ) -> PackageDTO:
     try:
@@ -81,6 +89,7 @@ async def delete_package(
 @router.get("/", response_model=Iterable[PackageDTO])
 @inject
 async def get_all_packages(
+    current_user: User = Depends(auth.get_current_user),
     service: IPackageService = Depends(Provide[Container.package_service]),
 ) -> Iterable[PackageDTO]:
     return await service.get_all_packages()
