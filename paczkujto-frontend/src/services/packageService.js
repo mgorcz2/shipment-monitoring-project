@@ -17,6 +17,9 @@ export const createPackageWithShipment = async (packageData, shipmentData) => {
 
 
 export const getPackageByShipmentId = async (shipmentId) => {
-  return axios.get(`http://localhost:8000/packages/${shipmentId}`);
+  return axios.get(`http://localhost:8000/packages/${shipmentId}`, {
+      headers: {
+      Authorization: `Bearer ${getToken()}`
+    }});
 };
 

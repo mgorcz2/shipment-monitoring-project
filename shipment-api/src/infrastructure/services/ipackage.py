@@ -26,9 +26,7 @@ class IPackageService(ABC):
         """Get all packages from data storage."""
 
     @abstractmethod
-    async def update_package(
-        self, package_id: int, data: PackageIn
-    ) -> PackageDTO | None:
+    async def update_package(self, package_id: int, data: Package) -> PackageDTO | None:
         """Update package data."""
 
     @abstractmethod

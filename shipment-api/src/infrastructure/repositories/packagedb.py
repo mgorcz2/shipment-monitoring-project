@@ -4,7 +4,7 @@ from typing import Iterable
 
 from sqlalchemy import delete, insert, select, update
 
-from src.core.domain.shipment import PackageIn
+from src.core.domain.shipment import Package, PackageIn
 from src.core.repositories.ipackage import IPackageRepository
 from src.db import database, packages_table
 
@@ -34,7 +34,7 @@ class PackageRepository(IPackageRepository):
         records = await database.fetch_all(query)
         return [dict(record) for record in records] if records else []
 
-    async def update_package(self, package_id: int, data: PackageIn) -> dict | None:
+    async def update_package(self, package_id: int, data: Package) -> dict | None:
         query = (
             update(packages_table)
             .where(packages_table.c.id == package_id)
@@ -44,6 +44,12 @@ class PackageRepository(IPackageRepository):
                 width=data.width,
                 height=data.height,
                 fragile=data.fragile,
+                pickup_scheduled_date=data.pickup_scheduled_date,
+                pickup_actual_date=data.pickup_actual_date,
+                delivery_scheduled_date=data.delivery_scheduled_date,
+                delivery_actual_date=data.delivery_actual_date,
+                cancelled_at=data.cancelled_at,
+                note=data.note,
             )
         )
         await database.execute(query)

@@ -57,7 +57,7 @@ async def get_package(
 @inject
 async def update_package(
     package_id: int,
-    data: PackageIn,
+    data: Package,
     current_user: User = Depends(auth.get_current_user),
     service: IPackageService = Depends(Provide[Container.package_service]),
 ) -> PackageDTO:
