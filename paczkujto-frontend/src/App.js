@@ -8,6 +8,7 @@ import RegisterClientPage from "./pages/RegisterClientPage";
 import CreatePackagePage from "./pages/CreatePackagePage";
 import ProtectedRoute from "./services/authService";
 import AdminPanel from "./pages/AdminPanel";
+import CourierShipmentsPage from "./pages/CourierShipmentsPage";
 import './styles/globals.css'; 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
           </Route>
           
           <Route element={<ProtectedRoute allowedRoles={["courier"]} />}>
+            <Route path="/courier-shipments" element={<CourierShipmentsPage />} />
             <Route path="courier-dashboard" element={<p>Panel Kuriera</p>} />
           </Route>
           

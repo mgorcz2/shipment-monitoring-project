@@ -35,6 +35,7 @@ packages_table = sqlalchemy.Table(
     sqlalchemy.Column("width", sqlalchemy.Float),
     sqlalchemy.Column("height", sqlalchemy.Float),
     sqlalchemy.Column("fragile", sqlalchemy.Boolean),
+    sqlalchemy.Column("note", sqlalchemy.String),
     sqlalchemy.Column(
         "created_at", sqlalchemy.DateTime(timezone=True), server_default=func.now()
     ),
@@ -45,7 +46,14 @@ packages_table = sqlalchemy.Table(
         server_default=func.now(),
         onupdate=func.now(),
     ),
+    sqlalchemy.Column("pickup_scheduled_date", sqlalchemy.DateTime(timezone=True)),
+    sqlalchemy.Column("pickup_actual_date", sqlalchemy.DateTime(timezone=True)),
+    sqlalchemy.Column("delivery_scheduled_date", sqlalchemy.DateTime(timezone=True)),
+    sqlalchemy.Column("delivery_actual_date", sqlalchemy.DateTime(timezone=True)),
+    sqlalchemy.Column("cancelled_at", sqlalchemy.DateTime(timezone=True)),
 )
+
+
 staff_table = sqlalchemy.Table(
     "staff",
     metadata,

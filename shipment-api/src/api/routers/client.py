@@ -4,7 +4,8 @@ from uuid import UUID
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, status
 from src.container import Container
-from src.core.domain.user import ClientIn, UserIn
+from src.core.domain.user import ClientIn, User, UserIn, UserRole
+from src.core.security import auth
 from src.infrastructure.dto.userDTO import ClientDTO
 from src.infrastructure.services.iclient import IClientService
 
@@ -31,6 +32,7 @@ async def register_client_with_user(
 @inject
 async def get_client(
     user_id: UUID,
+    current_user: User = Depends(auth.get_current_user),
     service: IClientService = Depends(Provide[Container.client_service]),
 ) -> ClientDTO:
     try:
@@ -44,6 +46,7 @@ async def get_client(
 async def update_client(
     user_id: UUID,
     data: ClientIn,
+    current_user: User = Depends(auth.get_current_user),
     service: IClientService = Depends(Provide[Container.client_service]),
 ) -> ClientDTO:
     try:
@@ -56,6 +59,7 @@ async def update_client(
 @inject
 async def delete_client(
     user_id: UUID,
+    current_user: User = Depends(auth.get_current_user),
     service: IClientService = Depends(Provide[Container.client_service]),
 ) -> ClientDTO:
     try:
@@ -67,6 +71,7 @@ async def delete_client(
 @router.get("/", response_model=Iterable[ClientDTO])
 @inject
 async def get_all_clients(
+    current_user: User = Depends(auth.get_current_user),
     service: IClientService = Depends(Provide[Container.client_service]),
 ) -> Iterable[ClientDTO]:
     return await service.get_all_clients()

@@ -28,7 +28,7 @@ const menuItems = [
   { 
     id: "courier",
     icon: <FaTruck />, 
-    path: "/courier", 
+    path: "/courier-shipments", 
     allowedRoles: ["courier", "admin"]
   },
   { 
