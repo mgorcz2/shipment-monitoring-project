@@ -40,7 +40,7 @@ class PackageService(IPackageService):
     async def get_all_packages(self) -> Iterable[Any]:
         return await self._repository.get_all_packages()
 
-    async def update_package(self, package_id: int, data: PackageIn) -> Any | None:
+    async def update_package(self, package_id: int, data: Package) -> Any | None:
         return await self._repository.update_package(package_id, data)
 
     async def delete_package(self, package_id: int) -> Any | None:

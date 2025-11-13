@@ -34,19 +34,16 @@ const destinationIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-// Komponent, który dopasuje widok mapy do markerów
 function MapBoundsAdjuster({ coords }) {
   const map = useMap();
   
   useEffect(() => {
     if (coords && coords.length > 0) {
-      // Tworzymy bounds z wszystkich dostępnych współrzędnych
       const bounds = L.latLngBounds(coords);
       
-      // Dopasuj widok mapy z marginesem
       map.fitBounds(bounds, {
-        padding: [50, 50], // Dodaj margines 50px
-        maxZoom: 15        // Ogranicz maksymalny zoom
+        padding: [50, 50], 
+        maxZoom: 15        
       });
     }
   }, [coords, map]);
@@ -61,12 +58,10 @@ export default function ShipmentDetailsModal({ shipment, onClose }) {
   const [mapReady, setMapReady] = useState(false);
   const mapRef = useRef(null);
   
-  // Sprawdź, czy są dostępne koordynaty - używając nowego formatu danych
   const hasOriginCoords = shipment?.origin_coords && shipment.origin_coords.length === 2;
   const hasDestinationCoords = shipment?.destination_coords && shipment.destination_coords.length === 2;
   const hasCoords = hasOriginCoords || hasDestinationCoords;
   
-  // Przygotuj tablicę wszystkich współrzędnych dla bounds
   const allCoords = [];
   if (hasOriginCoords) {
     allCoords.push([shipment.origin_coords[0], shipment.origin_coords[1]]);
@@ -75,11 +70,10 @@ export default function ShipmentDetailsModal({ shipment, onClose }) {
     allCoords.push([shipment.destination_coords[0], shipment.destination_coords[1]]);
   }
   
-  // Oblicz środek mapy używając nowego formatu danych
   const center = hasCoords ? [
     hasOriginCoords ? shipment.origin_coords[0] : shipment.destination_coords[0],
     hasOriginCoords ? shipment.origin_coords[1] : shipment.destination_coords[1]
-  ] : [52.2297, 21.0122]; // Domyślnie Warszawa
+  ] : [52.2297, 21.0122]; 
 
   useEffect(() => {
     if (shipment?.id) {
@@ -214,9 +208,97 @@ export default function ShipmentDetailsModal({ shipment, onClose }) {
             </div>
           )}
           
-          <div className="detail-row">
-            <span className="detail-label">Data utworzenia:</span>
-            <span>{new Date(shipment.created_at).toLocaleString()}</span>
+          <div className="shipment-timeline">
+            <h3 className="timeline-title">📦 Historia przesyłki</h3>
+            <div className="timeline-items">
+              
+              <div className="timeline-item">
+                <div className="timeline-icon completed">✓</div>
+                <div className="timeline-content">
+                  <div className="timeline-step-title">Przesyłka utworzona</div>
+                  <div className="timeline-date">
+                    {new Date(shipment.created_at).toLocaleString('pl-PL')}
+                  </div>
+                </div>
+              </div>
+              
+              {packageDetails?.pickup_actual_date ? (
+                <div className="timeline-item">
+                  <div className="timeline-icon completed">✓</div>
+                  <div className="timeline-content">
+                    <div className="timeline-step-title">Odebrano przez kuriera</div>
+                    <div className="timeline-date">
+                      {new Date(packageDetails.pickup_actual_date).toLocaleString('pl-PL')}
+                    </div>
+                  </div>
+                </div>
+              ) : packageDetails?.pickup_scheduled_date ? (
+                <div className="timeline-item">
+                  <div className="timeline-icon pending">⏱</div>
+                  <div className="timeline-content">
+                    <div className="timeline-step-title">Planowany odbiór</div>
+                    <div className="timeline-date estimated">
+                      {new Date(packageDetails.pickup_scheduled_date).toLocaleString('pl-PL')}
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+              
+              {shipment.status === 'out_for_delivery' && (
+                <div className="timeline-item">
+                  <div className="timeline-icon active">🚚</div>
+                  <div className="timeline-content">
+                    <div className="timeline-step-title">W drodze do odbiorcy</div>
+                    <div className="timeline-date">
+                      {packageDetails?.delivery_scheduled_date 
+                        ? `Przewidywana dostawa: ${new Date(packageDetails.delivery_scheduled_date).toLocaleString('pl-PL')}`
+                        : 'W trakcie dostawy'}
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {packageDetails?.delivery_actual_date ? (
+                <div className="timeline-item">
+                  <div className="timeline-icon completed">✓</div>
+                  <div className="timeline-content">
+                    <div className="timeline-step-title">Dostarczona</div>
+                    <div className="timeline-date">
+                      {new Date(packageDetails.delivery_actual_date).toLocaleString('pl-PL')}
+                    </div>
+                  </div>
+                </div>
+              ) : shipment.status !== 'delivered' && packageDetails?.delivery_scheduled_date ? (
+                <div className="timeline-item">
+                  <div className="timeline-icon pending">📅</div>
+                  <div className="timeline-content">
+                    <div className="timeline-step-title">Przewidywana dostawa</div>
+                    <div className="timeline-date estimated">
+                      {new Date(packageDetails.delivery_scheduled_date).toLocaleString('pl-PL')}
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+              
+              {packageDetails?.cancelled_at && (
+                <div className="timeline-item">
+                  <div className="timeline-icon cancelled">✕</div>
+                  <div className="timeline-content">
+                    <div className="timeline-step-title">Anulowano</div>
+                    <div className="timeline-date">
+                      {new Date(packageDetails.cancelled_at).toLocaleString('pl-PL')}
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {packageDetails?.note && (
+                <div className="timeline-note">
+                  <strong>📝 Notatka:</strong> {packageDetails.note}
+                </div>
+              )}
+              
+            </div>
           </div>
           {shipment.courier_id && (
             <div className="detail-row">

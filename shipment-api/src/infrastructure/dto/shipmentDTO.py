@@ -87,6 +87,12 @@ class PackageDTO(BaseModel):
     fragile: bool
     created_at: datetime
     last_updated: datetime
+    pickup_scheduled_date: Optional[datetime]
+    pickup_actual_date: Optional[datetime]
+    delivery_scheduled_date: Optional[datetime]
+    delivery_actual_date: Optional[datetime]
+    cancelled_at: Optional[datetime]
+    note: Optional[str]
 
     model_config = ConfigDict(
         from_attributes=True,
@@ -107,4 +113,10 @@ class PackageDTO(BaseModel):
             fragile=record_dict.pop("fragile"),
             created_at=record_dict.pop("created_at"),
             last_updated=record_dict.pop("last_updated"),
+            pickup_scheduled_date=record_dict.pop("pickup_scheduled_date"),
+            pickup_actual_date=record_dict.pop("pickup_actual_date"),
+            delivery_scheduled_date=record_dict.pop("delivery_scheduled_date"),
+            delivery_actual_date=record_dict.pop("delivery_actual_date"),
+            cancelled_at=record_dict.pop("cancelled_at"),
+            note=record_dict.pop("note", None),
         )

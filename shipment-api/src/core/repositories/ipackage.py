@@ -40,7 +40,7 @@ class IPackageRepository(ABC):
         """
 
     @abstractmethod
-    async def update_package(self, package_id: int, data: PackageIn) -> Any | None:
+    async def update_package(self, package_id: int, data: Package) -> Any | None:
         """Update package data.
 
         Args:
