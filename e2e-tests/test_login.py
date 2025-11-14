@@ -62,15 +62,9 @@ class TestLogin:
 
     def test_client_registration_and_login(self, sample_user_data, sample_client_data):
         user_data = sample_user_data
-
-        user = create_user_via_api(user_data)
-        assert user is not None
-
-        user_id = user["id"]
-
         client_data = sample_client_data
 
-        client = register_client_via_api(client_data, user_id)
+        client = register_client_via_api(user_data, client_data)
         assert client is not None
 
         login_page = LoginPage(self.driver)
@@ -101,4 +95,4 @@ class TestLogin:
             client_obj = json.loads(client_storage)
             assert client_obj["address"] == client_data["address"]
 
-        cleanup_test_data(user_id, user_data["email"])
+        cleanup_test_data(client["id"], user_data["email"])

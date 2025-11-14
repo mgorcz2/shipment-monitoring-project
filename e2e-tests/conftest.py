@@ -31,9 +31,6 @@ def sample_user_data():
     return {
         "email": f"client_{unique_id}@test.com",
         "password": "TestPassword123!",
-        "first_name": "Test",
-        "last_name": "Client",
-        "phone_number": f"12345444",
         "role": "client",
     }
 
@@ -48,6 +45,18 @@ def sample_client_data():
     }
 
 
+@pytest.fixture(scope="function")
+def sample_registration_data():
+    unique_id = str(uuid.uuid4())[:8]
+    return {
+        "email": f"test_{unique_id}@example.com",
+        "password": "TestPassword123!",
+        "first_name": "Test",
+        "last_name": "User",
+        "phone": "123456789",
+        "address": "Test Street 123"
+    }
+
 def create_user_via_api(user_data):
     try:
         response = requests.post("http://localhost:8000/users/register", json=user_data)
@@ -61,10 +70,11 @@ def create_user_via_api(user_data):
         return None
 
 
-def register_client_via_api(client_data, user_id):
+def register_client_via_api(user_data, client_data):
     try:
+        payload = {"user_data": user_data, "client": client_data}
         response = requests.post(
-            f"http://localhost:8000/client/register?user_id={user_id}", json=client_data
+            f"http://localhost:8000/client/register", json=payload
         )
         if response.status_code in [200, 201]:
             return response.json()
@@ -87,15 +97,9 @@ def cleanup_test_data(user_id, email):
 @pytest.fixture(scope="function")
 def authenticated_driver(driver, sample_user_data, sample_client_data):
     user_data = sample_user_data
-
-    user = create_user_via_api(user_data)
-    assert user is not None
-
-    user_id = user["id"]
-
     client_data = sample_client_data
 
-    client = register_client_via_api(client_data, user_id)
+    client = register_client_via_api(user_data, client_data)
     assert client is not None
     login_page = LoginPage(driver)
     login_page.open("http://localhost:3000")
@@ -106,4 +110,4 @@ def authenticated_driver(driver, sample_user_data, sample_client_data):
     assert token is not None
 
     yield driver
-    cleanup_test_data(user_id, user_data["email"])
+    cleanup_test_data(client["id"], user_data["email"])
