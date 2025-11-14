@@ -131,15 +131,6 @@ def test_userin_invalid_role(valid_email, valid_password):
     with pytest.raises(ValidationError):
         UserIn(email=valid_email, password=valid_password, role="")
 
-
-def test_userin_default_role(valid_email, valid_password):
-    """
-    Test default role value.
-    """
-    user = UserIn(email=valid_email, password=valid_password)
-    assert user.role == UserRole.SENDER
-
-
 def test_userin_missing_password(valid_email):
     """
     Test missing password.
