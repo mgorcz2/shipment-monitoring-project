@@ -2,19 +2,24 @@ import React, { useState, useEffect } from "react";
 import { getAllShipments } from "../services/shipmentService";
 import ShipmentDetailsModal from "../components/ShipmentDetailsModal";
 import UpdatePackageStatusModal from "../components/UpdateShipmentStatusModal";
+import AssignCourierModal from "../components/AssignCourierModal";
 import { translate } from "../i18n";
 import "../styles/ShipmentsPage.css";
 
-export default function CourierShipmentsPage() {
+export default function AdminShipmentsPage() {
   const [shipments, setShipments] = useState([]);
   const [filteredShipments, setFilteredShipments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedShipment, setSelectedShipment] = useState(null);
   const [statusModalShipment, setStatusModalShipment] = useState(null);
+  const [courierModalShipment, setCourierModalShipment] = useState(null);
+  
+  // Filtry
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterSender, setFilterSender] = useState("");
   const [filterRecipient, setFilterRecipient] = useState("");
+  const [filterCourier, setFilterCourier] = useState("all");
   const [filterDateFrom, setFilterDateFrom] = useState("");
   const [filterDateTo, setFilterDateTo] = useState("");
   const [sortBy, setSortBy] = useState("created_at");
@@ -26,7 +31,7 @@ export default function CourierShipmentsPage() {
 
   useEffect(() => {
     applyFiltersAndSort();
-  }, [shipments, filterStatus, filterSender, filterRecipient, filterDateFrom, filterDateTo, sortBy]);
+  }, [shipments, filterStatus, filterSender, filterRecipient, filterCourier, filterDateFrom, filterDateTo, sortBy]);
 
   const fetchShipments = async () => {
     setLoading(true);
@@ -50,29 +55,37 @@ export default function CourierShipmentsPage() {
     }
 
     if (filterSender.trim()) {
-      result = result.filter(s => {
-        const senderName = s.sender_fullname || s.sender_email || "";
-        return senderName.toLowerCase().includes(filterSender.toLowerCase());
-      });
+      result = result.filter(s => 
+        s.sender_fullname?.toLowerCase().includes(filterSender.toLowerCase()) ||
+        s.sender_email?.toLowerCase().includes(filterSender.toLowerCase())
+      );
     }
 
+
     if (filterRecipient.trim()) {
-      result = result.filter(s => {
-        const recipientName = s.recipient_fullname || s.recipient_email || "";
-        return recipientName.toLowerCase().includes(filterRecipient.toLowerCase());
-      });
+      result = result.filter(s => 
+        s.recipient_fullname?.toLowerCase().includes(filterRecipient.toLowerCase()) ||
+        s.recipient_email?.toLowerCase().includes(filterRecipient.toLowerCase())
+      );
+    }
+
+    if (filterCourier !== "all") {
+      if (filterCourier === "assigned") {
+        result = result.filter(s => s.courier_id !== null);
+      } else if (filterCourier === "unassigned") {
+        result = result.filter(s => s.courier_id === null);
+      }
     }
 
     if (filterDateFrom) {
-      const fromDate = new Date(filterDateFrom);
-      fromDate.setHours(0, 0, 0, 0);
-      result = result.filter(s => new Date(s.created_at) >= fromDate);
+      const dateFrom = new Date(filterDateFrom);
+      result = result.filter(s => new Date(s.created_at) >= dateFrom);
     }
 
     if (filterDateTo) {
-      const toDate = new Date(filterDateTo);
-      toDate.setHours(23, 59, 59, 999);
-      result = result.filter(s => new Date(s.created_at) <= toDate);
+      const dateTo = new Date(filterDateTo);
+      dateTo.setHours(23, 59, 59, 999);
+      result = result.filter(s => new Date(s.created_at) <= dateTo);
     }
 
     result.sort((a, b) => {
@@ -86,28 +99,15 @@ export default function CourierShipmentsPage() {
         case "destination":
           return (a.destination || "").localeCompare(b.destination || "");
         case "sender":
-          return (a.sender_fullname || a.sender_email || "").localeCompare(b.sender_fullname || b.sender_email || "");
+          return (a.sender_fullname || "").localeCompare(b.sender_fullname || "");
         case "recipient":
-          return (a.recipient_fullname || a.recipient_email || "").localeCompare(b.recipient_fullname || b.recipient_email || "");
+          return (a.recipient_fullname || "").localeCompare(b.recipient_fullname || "");
         default:
           return 0;
       }
     });
 
     setFilteredShipments(result);
-  };
-
-  const clearFilters = () => {
-    setFilterStatus("all");
-    setFilterSender("");
-    setFilterRecipient("");
-    setFilterDateFrom("");
-    setFilterDateTo("");
-    setSortBy("created_at");
-  };
-
-  const handleStatusChange = async (shipmentId, newStatus) => {
-    console.log(`Zmiana statusu przesyłki ${shipmentId} na ${newStatus}`);
   };
 
   const getStatusColor = (status) => {
@@ -123,6 +123,16 @@ export default function CourierShipmentsPage() {
     }
   };
 
+  const clearFilters = () => {
+    setFilterStatus("all");
+    setFilterSender("");
+    setFilterRecipient("");
+    setFilterCourier("all");
+    setFilterDateFrom("");
+    setFilterDateTo("");
+    setSortBy("created_at");
+  };
+
   if (loading) {
     return <div className="loading-container">Ładowanie przesyłek...</div>;
   }
@@ -134,8 +144,45 @@ export default function CourierShipmentsPage() {
   return (
     <div className="shipments-page">
       <div className="shipments-header">
-        <h1>Moje dostawy</h1>
-        <p>Zarządzaj przypisanymi przesyłkami</p>
+        <h1>Zarządzanie przesyłkami</h1>
+        <p>Przeglądaj i zarządzaj wszystkimi przesyłkami w systemie</p>
+      </div>
+
+      <div className="shipments-stats">
+        <div className="stat-card">
+          <span className="stat-label">Wszystkie</span>
+          <span className="stat-value">{shipments.length}</span>
+        </div>
+        <div className="stat-card">
+          <span className="stat-label">Oczekujące</span>
+          <span className="stat-value">
+            {shipments.filter(s => s.status === "pending").length}
+          </span>
+        </div>
+        <div className="stat-card">
+          <span className="stat-label">Gotowe do odbioru</span>
+          <span className="stat-value">
+            {shipments.filter(s => s.status === "ready_for_pickup").length}
+          </span>
+        </div>
+        <div className="stat-card">
+          <span className="stat-label">W trasie</span>
+          <span className="stat-value">
+            {shipments.filter(s => s.status === "out_for_delivery" || s.status === "picked_up").length}
+          </span>
+        </div>
+        <div className="stat-card">
+          <span className="stat-label">Dostarczone</span>
+          <span className="stat-value">
+            {shipments.filter(s => s.status === "delivered").length}
+          </span>
+        </div>
+        <div className="stat-card">
+          <span className="stat-label">Bez kuriera</span>
+          <span className="stat-value">
+            {shipments.filter(s => !s.courier_id).length}
+          </span>
+        </div>
       </div>
 
       <div className="admin-filters-panel">
@@ -155,6 +202,19 @@ export default function CourierShipmentsPage() {
               <option value="delivered">Dostarczone</option>
               <option value="failed_attempt">Nieudana próba</option>
               <option value="returned_to_sender">Zwrócone</option>
+            </select>
+          </div>
+
+          <div className="filter-section">
+            <label htmlFor="filter-courier">Kurier:</label>
+            <select
+              id="filter-courier"
+              value={filterCourier}
+              onChange={(e) => setFilterCourier(e.target.value)}
+            >
+              <option value="all">Wszyscy</option>
+              <option value="assigned">Przypisani</option>
+              <option value="unassigned">Bez przypisania</option>
             </select>
           </div>
 
@@ -199,7 +259,9 @@ export default function CourierShipmentsPage() {
               className="filter-input"
             />
           </div>
+        </div>
 
+        <div className="filters-row-fixed">
           <div className="filter-section">
             <label htmlFor="filter-date-from">Data od:</label>
             <input
@@ -237,37 +299,6 @@ export default function CourierShipmentsPage() {
         <p>Znaleziono: <strong>{filteredShipments.length}</strong> z {shipments.length} przesyłek</p>
       </div>
 
-      <div className="shipments-stats">
-        <div className="stat-card">
-          <span className="stat-label">Wszystkie</span>
-          <span className="stat-value">{shipments.length}</span>
-        </div>
-        <div className="stat-card">
-          <span className="stat-label">Do odbioru</span>
-          <span className="stat-value">
-            {shipments.filter(s => s.status === "ready_for_pickup").length}
-          </span>
-        </div>
-        <div className="stat-card">
-          <span className="stat-label">Odebrane</span>
-          <span className="stat-value">
-            {shipments.filter(s => s.status === "picked_up").length}
-          </span>
-        </div>
-        <div className="stat-card">
-          <span className="stat-label">W trasie</span>
-          <span className="stat-value">
-            {shipments.filter(s => s.status === "out_for_delivery").length}
-          </span>
-        </div>
-        <div className="stat-card">
-          <span className="stat-label">Dostarczone</span>
-          <span className="stat-value">
-            {shipments.filter(s => s.status === "delivered").length}
-          </span>
-        </div>
-      </div>
-
       {filteredShipments.length === 0 ? (
         <div className="no-shipments">
           <p>Brak przesyłek spełniających wybrane kryteria</p>
@@ -281,6 +312,7 @@ export default function CourierShipmentsPage() {
                 <th>Status</th>
                 <th>Nadawca</th>
                 <th>Odbiorca</th>
+                <th>Kurier</th>
                 <th>Adres nadania</th>
                 <th>Adres docelowy</th>
                 <th>Data utworzenia</th>
@@ -301,6 +333,7 @@ export default function CourierShipmentsPage() {
                   </td>
                   <td>{shipment.sender_fullname || shipment.sender_email || "—"}</td>
                   <td>{shipment.recipient_fullname || shipment.recipient_email || "—"}</td>
+                  <td>{shipment.courier_id ? "Tak" : "Nie"}</td>
                   <td>{shipment.origin}</td>
                   <td>{shipment.destination}</td>
                   <td>{new Date(shipment.created_at).toLocaleDateString()}</td>
@@ -319,6 +352,13 @@ export default function CourierShipmentsPage() {
                         title="Zmień status"
                       >
                         ✏️
+                      </button>
+                      <button
+                        className="btn-assign"
+                        onClick={() => setCourierModalShipment(shipment)}
+                        title="Przypisz kuriera"
+                      >
+                        👤
                       </button>
                     </div>
                   </td>
@@ -340,6 +380,14 @@ export default function CourierShipmentsPage() {
         <UpdatePackageStatusModal
           shipment={statusModalShipment}
           onClose={() => setStatusModalShipment(null)}
+          onSuccess={fetchShipments}
+        />
+      )}
+
+      {courierModalShipment && (
+        <AssignCourierModal
+          shipment={courierModalShipment}
+          onClose={() => setCourierModalShipment(null)}
           onSuccess={fetchShipments}
         />
       )}

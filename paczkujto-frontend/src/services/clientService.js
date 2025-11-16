@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getToken } from "./authService";
 
 export const registerClient = async (userData, clientData) => {
   return axios.post(
@@ -12,6 +13,8 @@ export const registerClient = async (userData, clientData) => {
 export const getClientById = async (userId, token) => {
   return axios.get(
     `http://localhost:8000/client/${userId}`,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+    { headers: {
+          Authorization: `Bearer ${getToken()}`
+        }});
 };
+

@@ -31,10 +31,6 @@
   font-size: 0.9em;
   color: #fff;
 }
-.status-delivered { background: #01c363; }
-.status-in_transit { background: #f0ad4e; }
-.status-pending { background: #6c757d; }
-.status-cancelled { background: #dc3545; }
 .shipment-info {
   margin-bottom: 12px;
   font-size: 0.95em;

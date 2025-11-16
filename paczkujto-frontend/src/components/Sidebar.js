@@ -15,21 +15,20 @@ const menuItems = [
   },
   { 
     id: "shipments",
-    icon: <FaThLarge />, 
-    path: "/shipments", 
-    allowedRoles: ["client", "courier", "admin"] 
+    icon: <FaTruck />, 
+    pathByRole: {
+      client: "/shipments",
+      courier: "/courier-shipments",
+      admin: "/admin-shipments",
+      manager: "/admin-shipments"
+    },
+    allowedRoles: ["client", "courier", "admin", "manager"] 
   },
   { 
     id: "messages",
     icon: <FaComments />, 
     path: "/messages", 
     allowedRoles: ["client", "manager", "admin"] 
-  },
-  { 
-    id: "courier",
-    icon: <FaTruck />, 
-    path: "/courier-shipments", 
-    allowedRoles: ["courier", "admin"]
   },
   { 
     id: "calendar",
@@ -65,16 +64,20 @@ export default function Sidebar() {
       <nav className="sidebar-nav">
         {menuItems
           .filter(item => item.allowedRoles.includes(userRole))
-          .map((item) => (
-            <button
-              key={item.id}
-              className={`sidebar-btn${location.pathname.startsWith(item.path) ? " active" : ""}`}
-              onClick={() => navigate(item.path)}
-              title={item.id.charAt(0).toUpperCase() + item.id.slice(1)}
-            >
-              {item.icon}
-            </button>
-          ))
+          .map((item) => {
+            const itemPath = item.pathByRole ? item.pathByRole[userRole] : item.path;
+            const isActive = location.pathname === itemPath;
+            return (
+              <button
+                key={item.id}
+                className={`sidebar-btn${isActive ? " active" : ""}`}
+                onClick={() => navigate(itemPath)}
+                title={item.id.charAt(0).toUpperCase() + item.id.slice(1)}
+              >
+                {item.icon}
+              </button>
+            );
+          })
         }
       </nav>
       )}

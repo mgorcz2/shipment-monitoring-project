@@ -12,7 +12,9 @@ from src.core.domain.location import Location
 class ShipmentStatus(str, enum.Enum):
     """The shipment status enum class."""
 
+    PENDING = "pending"
     READY_FOR_PICKUP = "ready_for_pickup"
+    PICKED_UP = "picked_up"
     OUT_FOR_DELIVERY = "out_for_delivery"
     DELIVERED = "delivered"
     FAILED_ATTEMPT = "failed_attempt"

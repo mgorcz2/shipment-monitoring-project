@@ -1,7 +1,9 @@
 const translations = {
+  "pending": "Oczekująca",
   "Incorrect email or password": "Nieprawidłowy email lub hasło",
   "Błąd: 401": "Błąd: Nieautoryzowany",
   "ready_for_pickup": "Gotowa do odbioru od nadawcy",
+  "picked_up": "Odebrana od nadawcy",
   "out_for_delivery": "W drodze do odbiorcy",
   "delivered": "Dostarczona",
   "failed_attempt": "Nieudana próba dostarczenia",
