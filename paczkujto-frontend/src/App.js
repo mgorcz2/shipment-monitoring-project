@@ -9,6 +9,7 @@ import CreatePackagePage from "./pages/CreatePackagePage";
 import ProtectedRoute from "./services/authService";
 import AdminPanel from "./pages/AdminPanel";
 import CourierShipmentsPage from "./pages/CourierShipmentsPage";
+import AdminShipmentsPage from "./pages/AdminShipmentsPage";
 import './styles/globals.css'; 
 
 function App() {
@@ -20,7 +21,7 @@ function App() {
           <Route path="login" element={<LoginPage />} />
           <Route path="register-client" element={<RegisterClientPage />} />
         
-          <Route element={<ProtectedRoute allowedRoles={["client"]} />}>
+          <Route element={<ProtectedRoute allowedRoles={["client", "admin"]} />}>
             <Route path="shipments" element={<ShipmentsPage />} />
             <Route path="create-shipment" element={<CreatePackagePage />} />
           </Route>
@@ -30,8 +31,9 @@ function App() {
             <Route path="courier-dashboard" element={<p>Panel Kuriera</p>} />
           </Route>
           
-          <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+          <Route element={<ProtectedRoute allowedRoles={["admin", "manager"]} />}>
             <Route path="admin" element={<AdminPanel />} />
+            <Route path="admin-shipments" element={<AdminShipmentsPage />} />
           </Route>
         </Route>
       </Routes>

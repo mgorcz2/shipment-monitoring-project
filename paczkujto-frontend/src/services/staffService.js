@@ -8,9 +8,10 @@ export const getAllStaff = async () => {
 };
 
 export const getStaffById = async (staffId) => {
+  const token = getToken();
   return await axios.get(
     `http://localhost:8000/staff/${staffId}`,
-    { headers: { "Content-Type": "application/json" } }
+    { headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` } }
   );
 }
 

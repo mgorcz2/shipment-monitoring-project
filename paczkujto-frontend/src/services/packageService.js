@@ -23,3 +23,15 @@ export const getPackageByShipmentId = async (shipmentId) => {
     }});
 };
 
+export const updatePackage = async (packageId, packageData) => {
+  return axios.put(
+    `http://localhost:8000/packages/${packageId}`,
+    packageData,
+    {
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    }
+  );
+};
+

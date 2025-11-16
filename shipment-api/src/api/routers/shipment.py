@@ -61,7 +61,7 @@ async def assign_shipment_to_courier(
 @router.put(
     "/update_status", response_model=ShipmentDTO, status_code=status.HTTP_200_OK
 )
-@auth.role_required(UserRole.COURIER)
+@auth.role_required([UserRole.COURIER, UserRole.MANAGER, UserRole.ADMIN])
 @inject
 async def update_status(
     shipment_id: int,
@@ -132,7 +132,7 @@ async def get_all_shipments(
         Iterable[ShipmentDTO]: Shipments collection.
     """
     if shipments := await service.get_all_shipments():
-        if current_user.role == "admin":
+        if current_user.role == "admin" or current_user.role == "manager":
             return shipments
         if current_user.role == "courier":
             return [

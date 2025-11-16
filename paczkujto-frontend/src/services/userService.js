@@ -44,3 +44,12 @@ export const deleteUser = async (email) => {
       }
     });
 };
+
+export const getUsersByRole = async (role) => {
+  return axios.get(
+    `http://localhost:8000/users/role/${role}`,{
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    });
+};
