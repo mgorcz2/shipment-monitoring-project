@@ -35,6 +35,11 @@ async def get_client(
     current_user: User = Depends(auth.get_current_user),
     service: IClientService = Depends(Provide[Container.client_service]),
 ) -> ClientDTO:
+    # Allow users to view their own profile or admins to view any
+    if current_user.id != user_id and current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=403, detail="Not authorized to view this profile"
+        )
     try:
         return await service.get_client(user_id)
     except ValueError as error:
@@ -49,6 +54,11 @@ async def update_client(
     current_user: User = Depends(auth.get_current_user),
     service: IClientService = Depends(Provide[Container.client_service]),
 ) -> ClientDTO:
+    # Allow users to update their own profile or admins to update any
+    if current_user.id != user_id and current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=403, detail="Not authorized to update this profile"
+        )
     try:
         return await service.update_client(user_id, data)
     except ValueError as error:
@@ -62,6 +72,11 @@ async def delete_client(
     current_user: User = Depends(auth.get_current_user),
     service: IClientService = Depends(Provide[Container.client_service]),
 ) -> ClientDTO:
+    # Allow users to delete their own account or admins to delete any
+    if current_user.id != user_id and current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=403, detail="Not authorized to delete this profile"
+        )
     try:
         return await service.delete_client(user_id)
     except ValueError as error:
