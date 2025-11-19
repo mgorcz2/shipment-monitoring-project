@@ -58,10 +58,9 @@ export default function ProfilePage() {
           first_name: staff.first_name || "",
           last_name: staff.last_name || "",
           phone_number: staff.phone_number || "",
-          address: "" // staff nie ma adresu
+          address: ""
         });
       } else if (user.role === "admin") {
-        // Admin nie ma profilu w client/staff - wyświetl tylko dane z user
         setProfileData({ admin: true });
         setFormData({
           first_name: "",
@@ -95,7 +94,7 @@ export default function ProfilePage() {
       if (userRole === "client") {
         await updateClient(userData.id, formData);
       } else if (userRole === "courier" || userRole === "manager") {
-        const { address, ...staffData } = formData; // staff nie ma adresu
+        const { address, ...staffData } = formData;
         await updateStaff(userData.id, staffData);
       }
       
