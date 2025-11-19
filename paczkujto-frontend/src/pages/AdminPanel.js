@@ -5,6 +5,7 @@ import UserList from "../components/UsersTable";
 import UserDetailsModal from "../components/UserDetailsModal";
 import DeleteConfirmModal from "../components/DeleteConfirmModal"; 
 import RegisterStaffModal from "../components/RegisterStaffModal";
+import EditUserModal from "../components/EditUserModal";
 import "../styles/AdminPanel.css";
 
 
@@ -15,7 +16,8 @@ const AdminPanel = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [userToDelete, setUserToDelete] = useState(null);  
   const [isDeleting, setIsDeleting] = useState(false);    
-  const [showRegisterStaff, setShowRegisterStaff] = useState(false);  
+  const [showRegisterStaff, setShowRegisterStaff] = useState(false);
+  const [editModalUser, setEditModalUser] = useState(null);  
 
   useEffect(() => {
     fetchUsers();
@@ -39,6 +41,9 @@ const AdminPanel = () => {
     setSelectedUser(user);
   };
 
+  const handleEditUser = (user) => {
+    setEditModalUser(user);
+  };
 
   const handleDeleteUser = (user) => {
     setUserToDelete(user);  
@@ -93,6 +98,7 @@ const AdminPanel = () => {
         <UserList
           users={users}
           onViewDetails={handleViewDetails}
+          onEditUser={handleEditUser}
           onDeleteUser={handleDeleteUser}
         />
       )}
@@ -111,11 +117,19 @@ const AdminPanel = () => {
       )}
 
       {showRegisterStaff && (
-  <RegisterStaffModal
-    onClose={() => setShowRegisterStaff(false)}
-    onSuccess={fetchUsers}
-  />
-)}
+        <RegisterStaffModal
+          onClose={() => setShowRegisterStaff(false)}
+          onSuccess={fetchUsers}
+        />
+      )}
+
+      {editModalUser && (
+        <EditUserModal
+          user={editModalUser}
+          onClose={() => setEditModalUser(null)}
+          onSuccess={fetchUsers}
+        />
+      )}
     </div>
   );
 };

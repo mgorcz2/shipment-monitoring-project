@@ -53,3 +53,12 @@ export const getUsersByRole = async (role) => {
       }
     });
 };
+
+export const deleteMyAccount = async () => {
+  return axios.delete(
+    `http://localhost:8000/users/me`,{
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    });
+};

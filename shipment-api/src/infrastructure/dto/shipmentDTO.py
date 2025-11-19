@@ -14,7 +14,7 @@ class ShipmentDTO(BaseModel):
     """A model representing DTO for shipment data."""
 
     id: int
-    sender_id: UUID
+    sender_id: Optional[UUID]
     recipient_id: Optional[UUID]
     courier_id: Optional[UUID]
     sender_fullname: Optional[str]
@@ -48,7 +48,7 @@ class ShipmentDTO(BaseModel):
             sender_fullname=record_dict.pop("sender_fullname", None),
             recipient_fullname=record_dict.pop("recipient_fullname", None),
             recipient_email=record_dict.pop("recipient_email", None),
-            sender_id=record_dict.pop("sender_id"),
+            sender_id=record_dict.pop("sender_id", None),
             status=record_dict.pop("status"),
             origin=record_dict.pop("origin"),
             destination=record_dict.pop("destination"),

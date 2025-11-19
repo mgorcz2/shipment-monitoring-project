@@ -18,3 +18,20 @@ export const getClientById = async (userId, token) => {
         }});
 };
 
+export const updateClient = async (userId, clientData) => {
+  return axios.put(
+    `http://localhost:8000/client/${userId}`,
+    clientData,
+    { headers: {
+          Authorization: `Bearer ${getToken()}`
+        }});
+};
+
+export const deleteClient = async (userId) => {
+  return axios.delete(
+    `http://localhost:8000/client/${userId}`,
+    { headers: {
+          Authorization: `Bearer ${getToken()}`
+        }});
+};
+

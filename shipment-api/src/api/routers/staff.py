@@ -30,7 +30,6 @@ async def register_staff_with_user(
         raise HTTPException(status_code=400, detail=str(error))
 
 
-@auth.role_required([UserRole.ADMIN])
 @router.get("/{user_id}", response_model=StaffDTO)
 @inject
 async def get_staff(
@@ -38,13 +37,17 @@ async def get_staff(
     current_user: User = Depends(auth.get_current_user),
     service: IStaffService = Depends(Provide[Container.staff_service]),
 ) -> StaffDTO:
+    # Allow users to view their own profile or admins to view any
+    if current_user.id != user_id and current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=403, detail="Not authorized to view this profile"
+        )
     try:
         return await service.get_staff(user_id)
     except ValueError as error:
         raise HTTPException(status_code=404, detail=str(error))
 
 
-@auth.role_required([UserRole.ADMIN])
 @router.put("/{user_id}", response_model=StaffDTO)
 @inject
 async def update_staff(
@@ -53,13 +56,17 @@ async def update_staff(
     current_user: User = Depends(auth.get_current_user),
     service: IStaffService = Depends(Provide[Container.staff_service]),
 ) -> StaffDTO:
+    # Allow users to update their own profile or admins to update any
+    if current_user.id != user_id and current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=403, detail="Not authorized to update this profile"
+        )
     try:
         return await service.update_staff(user_id, data)
     except ValueError as error:
         raise HTTPException(status_code=404, detail=str(error))
 
 
-@auth.role_required([UserRole.ADMIN])
 @router.delete("/{user_id}", response_model=StaffDTO)
 @inject
 async def delete_staff(
@@ -67,6 +74,11 @@ async def delete_staff(
     current_user: User = Depends(auth.get_current_user),
     service: IStaffService = Depends(Provide[Container.staff_service]),
 ) -> StaffDTO:
+    # Allow users to delete their own account or admins to delete any
+    if current_user.id != user_id and current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=403, detail="Not authorized to delete this profile"
+        )
     try:
         return await service.delete_staff(user_id)
     except ValueError as error:

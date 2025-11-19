@@ -10,6 +10,7 @@ import ProtectedRoute from "./services/authService";
 import AdminPanel from "./pages/AdminPanel";
 import CourierShipmentsPage from "./pages/CourierShipmentsPage";
 import AdminShipmentsPage from "./pages/AdminShipmentsPage";
+import ProfilePage from "./pages/ProfilePage";
 import './styles/globals.css'; 
 
 function App() {
@@ -34,6 +35,10 @@ function App() {
           <Route element={<ProtectedRoute allowedRoles={["admin", "manager"]} />}>
             <Route path="admin" element={<AdminPanel />} />
             <Route path="admin-shipments" element={<AdminShipmentsPage />} />
+          </Route>
+
+          <Route element={<ProtectedRoute allowedRoles={["client", "courier", "manager", "admin"]} />}>
+            <Route path="profile" element={<ProfilePage />} />
           </Route>
         </Route>
       </Routes>

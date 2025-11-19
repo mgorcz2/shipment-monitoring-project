@@ -66,15 +66,39 @@ async def login_for_access_token(
         ) from error
 
 
-
 @router.get("/me", response_model=UserDTO)
 @inject
 async def get_my_profile(
     current_user: User = Depends(auth.get_current_user),
     service: IUserService = Depends(Provide[Container.user_service]),
 ) -> UserDTO:
-    user = await service.get_user_by_id(current_user.id)  
+    user = await service.get_user_by_id(current_user.id)
     return user
+
+
+@router.delete("/me", status_code=status.HTTP_200_OK)
+@inject
+async def delete_my_account(
+    current_user: User = Depends(auth.get_current_user),
+    service: IUserService = Depends(Provide[Container.user_service]),
+) -> dict:
+    """The endpoint for user to delete their own account.
+
+    Args:
+        current_user (User): The currently authenticated user.
+        service (IUserService): The injected user service.
+
+    Returns:
+        dict: Success message.
+    """
+    try:
+        await service.detele_user(current_user.email)
+        return {"message": "Account deleted successfully"}
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(error),
+        ) from error
 
 
 @router.get("/email/{email}", response_model=UserDTO, status_code=status.HTTP_200_OK)

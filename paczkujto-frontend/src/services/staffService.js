@@ -15,6 +15,23 @@ export const getStaffById = async (staffId) => {
   );
 }
 
+export const updateStaff = async (staffId, staffData) => {
+  const token = getToken();
+  return await axios.put(
+    `http://localhost:8000/staff/${staffId}`,
+    staffData,
+    { headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` } }
+  );
+};
+
+export const deleteStaff = async (staffId) => {
+  const token = getToken();
+  return await axios.delete(
+    `http://localhost:8000/staff/${staffId}`,
+    { headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` } }
+  );
+};
+
 export const registerStaff = async (userData, staffData) => {
   const token = getToken();
   return await axios.post(
