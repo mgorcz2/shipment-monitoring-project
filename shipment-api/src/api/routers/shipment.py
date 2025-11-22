@@ -78,13 +78,19 @@ async def update_status(
     Returns:
         Any | None: The shipment details if exists.
     """
-    if shipment := await service.update_status(
-        current_user.id, shipment_id, new_status
-    ):
+    if current_user.role == "courier":
+        shipment = await service.get_shipment_by_id(shipment_id)
+        if not shipment or shipment.courier_id != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Shipment not found or not assigned to this courier",
+            )
+
+    if shipment := await service.update_status(shipment_id, new_status):
         return shipment
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail="Shipment not found or not assigned to this courier",
+        detail="Shipment not found",
     )
 
 

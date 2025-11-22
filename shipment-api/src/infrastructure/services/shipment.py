@@ -14,6 +14,7 @@ from src.infrastructure.dto.shipmentDTO import (
     ShipmentDTO,
     ShipmentWithDistanceDTO,
 )
+from src.infrastructure.external.email.email_service import EmailService
 from src.infrastructure.external.geolocation import geopy
 from src.infrastructure.services.ishipment import IShipmentService
 
@@ -22,9 +23,13 @@ class ShipmentService(IShipmentService):
     """A class representing implementation of shipment-related services."""
 
     _repository: IShipmentRepository
+    _email_service: EmailService
 
-    def __init__(self, repository: IShipmentRepository) -> None:
+    def __init__(
+        self, repository: IShipmentRepository, email_service: EmailService
+    ) -> None:
         self._repository = repository
+        self._email_service = email_service
 
     async def assign_shipment_to_courier(
         self, shipment_id: int, courier_id: UUID
@@ -44,21 +49,31 @@ class ShipmentService(IShipmentService):
         return ShipmentDTO.from_record(shipment) if shipment else None
 
     async def update_status(
-        self, courier_id: UUID, shipment_id: int, new_status: ShipmentStatus
+        self, shipment_id: int, new_status: ShipmentStatus
     ) -> ShipmentDTO | None:
         """The method changing shipment status by provided id in the repository.
 
         Args:
-            courier_id (int): The id of the courier.
             shipment_id (int): The id of the shipment.
             new_status (ShipmentStatus): The new status.
 
         Returns:
             ShipmentDTO | None: The shipment DTO details if updated.
         """
-        shipment = await self._repository.update_status(
-            courier_id, shipment_id, new_status
-        )
+        shipment = await self._repository.update_status(shipment_id, new_status)
+
+        if shipment:
+            # Wyślij email do odbiorcy o zmianie statusu
+            try:
+                recipient_email = shipment["recipient_email"]
+                if recipient_email:
+                    await self._email_service.send_shipment_notification(
+                        recipient_email, shipment_id, new_status.value
+                    )
+            except Exception as e:
+                # Nie blokuj zmiany statusu jeśli email nie działa
+                print(f"Błąd podczas wysyłania emaila o zmianie statusu: {e}")
+
         return ShipmentDTO.from_record(shipment) if shipment else None
 
     async def check_status(

@@ -30,12 +30,11 @@ class IShipmentRepository(ABC):
 
     @abstractmethod
     async def update_status(
-        self, courier_id: UUID, shipment_id: int, new_status: ShipmentStatus
+        self, shipment_id: int, new_status: ShipmentStatus
     ) -> Shipment | None:
-        """The abstract changing shipment status by provided id and courier id.
+        """The abstract changing shipment status by provided id.
 
         Args:
-            courier_id (int): The id of the courier.
             shipment_id (int): The id of the shipment.
             new_status (ShipmentStatus): The new status.
 

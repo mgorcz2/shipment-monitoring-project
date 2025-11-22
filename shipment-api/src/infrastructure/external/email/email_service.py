@@ -87,41 +87,57 @@ class EmailService:
         return await self.send_email(user_email, subject, body, is_html=True)
 
     async def send_shipment_notification(
-        self, user_email: str, shipment_id: str, status: str
+        self, recipient_email: str, shipment_id: int, status: str
     ) -> bool:
-        """Wysyła powiadomienie o zmianie statusu przesyłki"""
+        """Wysyła powiadomienie do odbiorcy o zmianie statusu przesyłki"""
         subject = f"Aktualizacja przesyłki #{shipment_id}"
 
-        status_messages = {
-            "created": "została utworzona",
-            "picked_up": "została odebrana",
-            "in_transit": "jest w transporcie",
-            "delivered": "została dostarczona",
-            "cancelled": "została anulowana",
+        status_display = {
+            "created": "Utworzona",
+            "picked_up": "Odebrana",
+            "in_transit": "W transporcie",
+            "delivered": "Dostarczona",
+            "cancelled": "Anulowana",
         }
-
-        status_text = status_messages.get(status, "zmieniła status")
+        status_name = status_display.get(status, status)
 
         body = f"""
         <html>
-        <body style="font-family: Arial, sans-serif;">
+        <body style="font-family: Arial, sans-serif; color: #333;">
             <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
                 <h2 style="color: #01c363;">Aktualizacja przesyłki</h2>
-                <p>Twoja przesyłka <strong>#{shipment_id}</strong> {status_text}.</p>
-                <div style="text-align: center; margin: 20px 0;">
-                    <a href="http://localhost:3000/track/{shipment_id}?email={{recipient_email}}" 
+                
+                <p>Twoja przesyłka o numerze <strong>#{shipment_id}</strong> zmieniła status.</p>
+                
+                <div style="background: #f7f7f7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                    <h3 style="margin-top: 0; color: #01c363;">Aktualny status:</h3>
+                    <p style="font-size: 24px; font-weight: bold; color: #01c363; margin: 5px 0;">{status_name}</p>
+                </div>
+                
+                <p>Aby sprawdzić szczegóły przesyłki, kliknij poniższy przycisk:</p>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="http://localhost:3000/track/{shipment_id}?email={recipient_email}" 
                        style="background: #01c363; color: white; padding: 12px 24px; 
-                              text-decoration: none; border-radius: 6px;">
-                        Sprawdź szczegóły
+                              text-decoration: none; border-radius: 6px; font-weight: bold;">
+                        Śledź przesyłkę
                     </a>
                 </div>
-                <p style="color: #888;">Zespół paczkuj.to</p>
+                
+                <p>Dziękujemy za skorzystanie z naszych usług!</p>
+                
+                <hr style="border: 1px solid #eee; margin: 30px 0;">
+                
+                <p style="color: #888; font-size: 14px;">
+                    Jeśli masz pytania, skontaktuj się z naszym działem obsługi klienta.<br>
+                    <strong style="color: #01c363;">Zespół paczkuj.to</strong>
+                </p>
             </div>
         </body>
         </html>
         """
 
-        return await self.send_email(user_email, subject, body, is_html=True)
+        return await self.send_email(recipient_email, subject, body, is_html=True)
 
     async def send_package_created_email(
         self, recipient_email: str, shipment_id: int

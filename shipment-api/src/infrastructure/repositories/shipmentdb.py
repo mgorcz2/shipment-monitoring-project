@@ -41,12 +41,11 @@ class ShipmentRepository(IShipmentRepository):
         return shipment
 
     async def update_status(
-        self, courier_id: UUID, shipment_id: int, new_status: ShipmentStatus
+        self, shipment_id: int, new_status: ShipmentStatus
     ) -> Any | None:
         """The method changing shipment status by provided id in the data storage.
 
         Args:
-            courier_id (int): The id of the courier.
             shipment_id (int): The id of the shipment.
             new_status (ShipmentStatus): The new status.
 
@@ -55,10 +54,7 @@ class ShipmentRepository(IShipmentRepository):
         """
         query = (
             update(shipment_table)
-            .where(
-                (shipment_table.c.id == shipment_id)
-                & (shipment_table.c.courier_id == courier_id)
-            )
+            .where(shipment_table.c.id == shipment_id)
             .values(status=new_status)
             .returning(shipment_table)
         )
