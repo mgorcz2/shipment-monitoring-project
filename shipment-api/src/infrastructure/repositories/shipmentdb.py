@@ -90,22 +90,28 @@ class ShipmentRepository(IShipmentRepository):
             recipient_client.c.last_name,
         ).label("recipient_fullname")
 
-        query = select(
-            shipment_table,
-            sender_fullname,
-            recipient_fullname,
-        ).select_from(
-            shipment_table.outerjoin(
-                user_table, shipment_table.c.sender_id == user_table.c.id
+        query = (
+            select(
+                shipment_table,
+                sender_fullname,
+                recipient_fullname,
             )
-            .outerjoin(client_table, user_table.c.id == client_table.c.id)
-            .outerjoin(
-                recipient_user, shipment_table.c.recipient_id == recipient_user.c.id
+            .select_from(
+                shipment_table.outerjoin(
+                    user_table, shipment_table.c.sender_id == user_table.c.id
+                )
+                .outerjoin(client_table, user_table.c.id == client_table.c.id)
+                .outerjoin(
+                    recipient_user, shipment_table.c.recipient_id == recipient_user.c.id
+                )
+                .outerjoin(
+                    recipient_client, recipient_user.c.id == recipient_client.c.id
+                )
             )
-            .outerjoin(recipient_client, recipient_user.c.id == recipient_client.c.id)
-        ).where(
-            (shipment_table.c.id == shipment_id)
-            & (shipment_table.c.recipient_email == recipient_email)
+            .where(
+                (shipment_table.c.id == shipment_id)
+                & (shipment_table.c.recipient_email == recipient_email)
+            )
         )
         shipment = await database.fetch_one(query)
         return shipment
