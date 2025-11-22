@@ -1,94 +1,85 @@
-import pytest
 import time
-import uuid
-import requests
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-from pages.register_page import RegisterPage
+
 from conftest import create_user_via_api
+from pages.register_page import RegisterPage
+
+FRONTEND_URL = "http://localhost:3000"
+BACKEND_URL = "http://localhost:8000"
 
 
-class TestRegister:
-    
-    @pytest.fixture(autouse=True)
-    def setup(self):
-        chrome_options = Options()
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.add_argument("--window-size=1920,1080")
-        
-        service = Service(ChromeDriverManager().install())
-        self.driver = webdriver.Chrome(service=service, options=chrome_options)
-        self.driver.maximize_window()
-        
-        self.frontend_url = "http://localhost:3000"
-        self.backend_url = "http://localhost:8000"
-        
-        yield
-        
-        self.driver.quit()
+def test_successful_registration(driver, sample_registration_data):
+    """Test successful user registration"""
+    test_data = sample_registration_data
+    register_page = RegisterPage(driver)
+    register_page.open(FRONTEND_URL)
 
-    def test_successful_registration(self, sample_registration_data):
-        test_data = sample_registration_data
-        register_page = RegisterPage(self.driver)
-        register_page.open(self.frontend_url)
-        
-        register_page.register_attempt(
-            test_data["email"],
-            test_data["password"], 
-            test_data["first_name"],
-            test_data["last_name"],
-            test_data["phone"],
-            test_data["address"]
-        )
-        
-        success_message = register_page.wait_for_success(timeout=10)
-        assert success_message is not None
-        assert "sukcesem" in success_message or "success" in success_message.lower()
-        
-        time.sleep(3)
-        current_url = self.driver.current_url
+    register_page.register_attempt(
+        test_data["email"],
+        test_data["password"],
+        test_data["first_name"],
+        test_data["last_name"],
+        test_data["phone"],
+        test_data["address"],
+    )
 
-    
-    def test_registration_with_existing_email(self, sample_registration_data):
-        existing_email = sample_registration_data["email"]
-        
-        sample_registration_data["email"] = existing_email
-        create_user_via_api(sample_registration_data)
-    
-        register_page = RegisterPage(self.driver)
-        register_page.open(self.frontend_url)
-        
-        register_page.register_attempt(
-            existing_email,
-            "Password123!",
-            "Another",
-            "User", 
-            "987654321",
-            "Another Street 456"
-        )
-        
+    success_element = register_page.get_success_element(timeout=10)
+    assert success_element is not None
+    assert success_element.is_displayed()
 
-        error_message = register_page.wait_for_error(timeout=5)
-        
-        assert error_message is not None
-        assert "already registered" in error_message.lower()
-    
-    def test_registration_with_invalid_data(self):
-        register_page = RegisterPage(self.driver)
-        register_page.open(self.frontend_url)
-        
-        register_page.register_attempt(
-            "mail@example.com",  
-            "string123",  
-            "aaa",             
-            "ss",             
-            "abc",           
-            "aaa"             
-        )
-        
-        error_message = register_page.wait_for_error(timeout=5)
-        assert error_message is not None
-        
+    success_text = success_element.text
+    assert success_text is not None
+    assert len(success_text) > 0
+    assert "sukcesem" in success_text or "success" in success_text.lower()
+
+    time.sleep(3)
+    assert "/login" in driver.current_url or "/shipments" in driver.current_url
+
+
+def test_registration_with_existing_email(driver, sample_registration_data):
+    """Test registration with already existing email"""
+    existing_email = sample_registration_data["email"]
+
+    sample_registration_data["email"] = existing_email
+    create_user_via_api(sample_registration_data)
+
+    register_page = RegisterPage(driver)
+    register_page.open(FRONTEND_URL)
+
+    register_page.register_attempt(
+        existing_email,
+        "Password123!",
+        "Another",
+        "User",
+        "987654321",
+        "Another Street 456",
+    )
+
+    error_element = register_page.get_error_element(timeout=5)
+    assert error_element is not None
+    assert error_element.is_displayed()
+
+    error_text = error_element.text
+    assert error_text is not None
+    assert len(error_text) > 0
+    assert (
+        "already registered" in error_text.lower()
+        or "already exists" in error_text.lower()
+    )
+
+
+def test_registration_with_invalid_data(driver):
+    """Test registration with invalid data"""
+    register_page = RegisterPage(driver)
+    register_page.open(FRONTEND_URL)
+
+    register_page.register_attempt(
+        "mail@example.com", "string123", "aaa", "ss", "abc", "aaa"
+    )
+
+    error_element = register_page.get_error_element(timeout=5)
+    assert error_element is not None
+    assert error_element.is_displayed()
+
+    error_text = error_element.text
+    assert error_text is not None
+    assert len(error_text) > 0

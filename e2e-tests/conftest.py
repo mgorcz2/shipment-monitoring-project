@@ -54,8 +54,9 @@ def sample_registration_data():
         "first_name": "Test",
         "last_name": "User",
         "phone": "123456789",
-        "address": "Test Street 123"
+        "address": "Test Street 123",
     }
+
 
 def create_user_via_api(user_data):
     try:
@@ -72,14 +73,8 @@ def create_user_via_api(user_data):
 
 def register_client_via_api(user_data, client_data):
     try:
-        payload = {
-            "user_data": user_data,
-            "client": client_data
-        }
-        response = requests.post(
-            "http://localhost:8000/client/register", 
-            json=payload
-        )
+        payload = {"user_data": user_data, "client": client_data}
+        response = requests.post("http://localhost:8000/client/register", json=payload)
         if response.status_code in [200, 201]:
             return response.json()
         else:
@@ -88,6 +83,7 @@ def register_client_via_api(user_data, client_data):
     except Exception as e:
         print(f"API error: {e}")
         return None
+
 
 @pytest.fixture(scope="function")
 def authenticated_driver(driver, sample_user_data, sample_client_data):

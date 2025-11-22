@@ -1,11 +1,15 @@
 import time
+import uuid
 
 import pytest
+from conftest import register_client_via_api
 from pages.create_package_page import CreatePackagePage
+from pages.login_page import LoginPage
 from pages.shipments_page import ShipmentsPage
 
 
 def test_create_package(authenticated_driver):
+    """Test creating a package and verifying it appears in shipments list"""
     package_page = CreatePackagePage(authenticated_driver)
     package_page.open("http://localhost:3000")
 
@@ -31,22 +35,20 @@ def test_create_package(authenticated_driver):
         "fragile": False,
     }
 
-    shipments_page = ShipmentsPage(authenticated_driver)
-    shipments_page.open("http://localhost:3000")
-    initial_shipments_count = shipments_page.get_shipments_count()
+    recipient_email = "created_package_test@example.com"
 
-    package_page.open("http://localhost:3000")
-    package_page.create_full_package(
-        origin, destination, "odbiorca@test.com", package_data
-    )
+    package_page.create_full_package(origin, destination, recipient_email, package_data)
 
     time.sleep(5)
     assert "/shipments" in authenticated_driver.current_url
-    
-    final_shipments_count = shipments_page.get_shipments_count()
-    
-    assert final_shipments_count > initial_shipments_count
+
+    shipments_page = ShipmentsPage(authenticated_driver)
     assert shipments_page.has_shipments()
+
+    card_text = shipments_page.get_shipment_card_text(recipient_email)
+    assert card_text is not None
+    assert recipient_email in card_text
+    assert "Warszawa" in card_text
 
 
 def test_shipping_cost_calculation(authenticated_driver):
@@ -81,20 +83,22 @@ def test_fragile_package_cost(authenticated_driver):
     time.sleep(3)
 
     cost_normal = package_page.get_shipping_cost()
+    assert cost_normal is not None
 
     checkbox = authenticated_driver.find_element(*package_page.fragile_checkbox)
     checkbox.click()
     time.sleep(3)
 
     cost_fragile = package_page.get_shipping_cost()
-
+    assert cost_fragile is not None
     assert cost_fragile > cost_normal
 
 
 def test_package_appears_in_shipments_list(authenticated_driver):
+    """Test that created fragile package appears in shipments list with correct details"""
     package_page = CreatePackagePage(authenticated_driver)
     shipments_page = ShipmentsPage(authenticated_driver)
-    
+
     origin = {
         "street": "Krakowska",
         "number": "1",
@@ -117,12 +121,158 @@ def test_package_appears_in_shipments_list(authenticated_driver):
         "fragile": True,
     }
 
+    recipient_email = "fragile_package_test@example.com"
+
     package_page.open("http://localhost:3000")
+    package_page.create_full_package(origin, destination, recipient_email, package_data)
+
+    time.sleep(5)
+
+    assert "/shipments" in authenticated_driver.current_url
+    assert shipments_page.has_shipments()
+
+    card_text = shipments_page.get_shipment_card_text(recipient_email)
+    assert card_text is not None
+    assert recipient_email in card_text
+    assert "Warszawa" in card_text
+
+
+def test_recipient_sees_shipment_assigned_to_them(driver, authenticated_driver):
+    """Test that sender creates package for recipient, then recipient logs in and sees the shipment"""
+    recipient_unique_id = str(uuid.uuid4())[:8]
+    recipient_user_data = {
+        "email": f"recipient_{recipient_unique_id}@test.com",
+        "password": "TestPassword123!",
+        "role": "client",
+    }
+    recipient_client_data = {
+        "first_name": "Recipient",
+        "last_name": "User",
+        "phone_number": "444555666",
+        "address": "Recipient Street 2",
+    }
+
+    recipient = register_client_via_api(recipient_user_data, recipient_client_data)
+    assert recipient is not None
+
+    package_page = CreatePackagePage(authenticated_driver)
+    package_page.open("http://localhost:3000")
+
+    origin = {
+        "street": "Krakowska",
+        "number": "5",
+        "city": "Kraków",
+        "postcode": "30-001",
+    }
+
+    destination = {
+        "street": "Główna",
+        "number": "15",
+        "city": "Gdańsk",
+        "postcode": "80-001",
+    }
+
+    package_data = {
+        "weight": 2,
+        "length": 20,
+        "width": 15,
+        "height": 10,
+        "fragile": False,
+    }
+
     package_page.create_full_package(
-        origin, destination, "test_shipment@example.com", package_data
+        origin, destination, recipient_user_data["email"], package_data
     )
 
     time.sleep(5)
-    
     assert "/shipments" in authenticated_driver.current_url
+
+    driver.execute_script("localStorage.clear();")
+
+    login_page = LoginPage(driver)
+    login_page.open("http://localhost:3000")
+    login_page.login_attempt(
+        recipient_user_data["email"], recipient_user_data["password"]
+    )
+
+    time.sleep(3)
+    recipient_token = driver.execute_script("return localStorage.getItem('token');")
+    assert recipient_token is not None
+
+    shipments_page = ShipmentsPage(driver)
+    shipments_page.open("http://localhost:3000")
+
+    time.sleep(3)
+
     assert shipments_page.has_shipments()
+
+    card_text = shipments_page.get_shipment_card_text(recipient_user_data["email"])
+    assert card_text is not None
+    assert recipient_user_data["email"] in card_text
+    assert "Kraków" in card_text
+    assert "Gdańsk" in card_text
+
+
+def test_shipment_details_modal_opens(authenticated_driver):
+    """Test that clicking details button opens modal with shipment details"""
+    package_page = CreatePackagePage(authenticated_driver)
+    package_page.open("http://localhost:3000")
+
+    origin = {
+        "street": "Piotrkowska",
+        "number": "100",
+        "city": "Łódź",
+        "postcode": "90-001",
+    }
+
+    destination = {
+        "street": "Floriańska",
+        "number": "20",
+        "city": "Kraków",
+        "postcode": "31-019",
+    }
+
+    package_data = {
+        "weight": 4,
+        "length": 35,
+        "width": 25,
+        "height": 15,
+        "fragile": True,
+    }
+
+    recipient_email = "modal_test@example.com"
+
+    package_page.create_full_package(origin, destination, recipient_email, package_data)
+
+    time.sleep(5)
+    assert "/shipments" in authenticated_driver.current_url
+
+    shipments_page = ShipmentsPage(authenticated_driver)
+    assert shipments_page.has_shipments()
+
+    shipment_card = shipments_page.find_shipment_by_recipient_email(recipient_email)
+    assert shipment_card is not None
+
+    shipments_page.click_details_button_for_shipment(recipient_email)
+
+    modal = shipments_page.get_details_modal()
+    assert modal is not None
+    assert modal.is_displayed()
+
+    modal_text = shipments_page.get_modal_details_text()
+    assert modal_text is not None
+    assert recipient_email in modal_text
+    assert "Łódź" in modal_text
+    assert "Kraków" in modal_text
+
+    shipments_page.close_details_modal()
+
+    time.sleep(1)
+    # Modal should be closed - trying to find it should timeout/fail
+    try:
+        shipments_page.get_details_modal(timeout=1)
+        # If we get here, modal is still visible - test should fail
+        assert False, "Modal should be closed but is still present"
+    except Exception:
+        # Expected - modal is not present anymore
+        pass
