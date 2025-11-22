@@ -8,9 +8,9 @@ class LoginPage:
         self.driver = driver
         self.wait = WebDriverWait(driver, 10)
         
-        self.email_input = (By.CSS_SELECTOR, "input[type='email']")
-        self.password_input = (By.CSS_SELECTOR, "input[type='password']")
-        self.login_button = (By.CSS_SELECTOR, "button[type='submit']")
+        self.email_input = (By.ID, "email-input")
+        self.password_input = (By.ID, "password-input")
+        self.login_button = (By.ID, "login-submit-button")
         self.error_message = (By.CSS_SELECTOR, ".login-error")
         self.register_button = (By.CSS_SELECTOR, "button.btn-outline")
     
@@ -20,7 +20,7 @@ class LoginPage:
         return self
     
     def enter_email(self, email):
-        email_field = self.wait.until(EC.presence_of_element_located(self.email_input))
+        email_field = self.driver.find_element(*self.email_input)
         email_field.clear()
         email_field.send_keys(email)
         time.sleep(0.5)

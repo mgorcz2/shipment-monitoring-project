@@ -26,7 +26,7 @@ class RegisterPage:
         return self
     
     def fill_email(self, email):
-        email_field = self.wait.until(EC.presence_of_element_located(self.email_input))
+        email_field = self.driver.find_element(*self.email_input)
         email_field.clear()
         email_field.send_keys(email)
         time.sleep(0.3)

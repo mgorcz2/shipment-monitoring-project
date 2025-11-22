@@ -452,11 +452,12 @@ export default function CreatePackagePage() {
     <div className="create-package-container">
       <img src={logo} alt="Logo" style={{ width: 80, marginBottom: 16 }} />
       <h2 className="create-package-title">Nadaj paczkę</h2>
-      <form className="create-package-form" onSubmit={handleSubmit}>
+      <form className="create-package-form" onSubmit={handleSubmit} id="create-package-form">
         <h3 className="section-header">Adres nadania</h3>
         <input
           type="text"
           name="origin_street"
+          id="origin-street-input"
           placeholder="Ulica"
           value={form.origin_street}
           onChange={handleChange}
@@ -467,6 +468,7 @@ export default function CreatePackagePage() {
         <input
           type="text"
           name="origin_street_number"
+          id="origin-street-number-input"
           placeholder="Numer"
           value={form.origin_street_number}
           onChange={handleChange}
@@ -477,6 +479,7 @@ export default function CreatePackagePage() {
         <input
           type="text"
           name="origin_city"
+          id="origin-city-input"
           placeholder="Miasto"
           value={form.origin_city}
           onChange={handleChange}
@@ -525,6 +528,7 @@ export default function CreatePackagePage() {
         <input
           type="text"
           name="destination_street"
+          id="destination-street-input"
           placeholder="Ulica"
           value={form.destination_street}
           onChange={handleChange}
@@ -535,6 +539,7 @@ export default function CreatePackagePage() {
         <input
           type="text"
           name="destination_street_number"
+          id="destination-street-number-input"
           placeholder="Numer"
           value={form.destination_street_number}
           onChange={handleChange}
@@ -599,6 +604,7 @@ export default function CreatePackagePage() {
         <input
           type="email"
           name="recipient_email"
+          id="recipient-email-input"
           placeholder="Email odbiorcy"
           value={form.recipient_email}
           onChange={handleChange}
@@ -726,6 +732,7 @@ export default function CreatePackagePage() {
         
         <button
           type="submit"
+          id="submit-package-button"
           className="create-package-button"
           disabled={loading || !coords || !destCoords}
         >

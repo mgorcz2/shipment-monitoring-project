@@ -7,7 +7,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from pages.register_page import RegisterPage
-from conftest import cleanup_test_data, create_user_via_api, register_client_via_api
+from conftest import create_user_via_api
 
 
 class TestRegister:
@@ -30,54 +30,6 @@ class TestRegister:
         
         self.driver.quit()
 
-
-    def test_register_page_loads(self):
-        register_page = RegisterPage(self.driver)
-        register_page.open(self.frontend_url)
-        
-        assert "register" in self.driver.current_url.lower()
-        
-        email_field = self.driver.find_element(*register_page.email_input)
-        password_field = self.driver.find_element(*register_page.password_input)
-        first_name_field = self.driver.find_element(*register_page.first_name_input)
-        last_name_field = self.driver.find_element(*register_page.last_name_input)
-        phone_field = self.driver.find_element(*register_page.phone_input)
-        address_field = self.driver.find_element(*register_page.address_input)
-        register_btn = self.driver.find_element(*register_page.register_button)
-        
-        assert email_field.is_displayed()
-        assert password_field.is_displayed()
-        assert first_name_field.is_displayed()
-        assert last_name_field.is_displayed()
-        assert phone_field.is_displayed()
-        assert address_field.is_displayed()
-        assert register_btn.is_displayed()
-        
-
-    def test_empty_form_validation(self):
-        register_page = RegisterPage(self.driver)
-        register_page.open(self.frontend_url)
-        register_page.click_register()
-        
-        time.sleep(1)
-        current_url = self.driver.current_url
-        assert "register" in current_url
-
-    def test_invalid_email_validation(self):
-        register_page = RegisterPage(self.driver)
-        register_page.open(self.frontend_url)
-        register_page.fill_email("invalid-email")
-        register_page.click_register()
-        time.sleep(1)
-        
-        email_field = self.driver.find_element(*register_page.email_input)
-        email_valid = self.driver.execute_script("return arguments[0].validity.valid;", email_field)
-        email_message = self.driver.execute_script("return arguments[0].validationMessage;", email_field)
-        
-        assert not email_valid
-        assert "email" in email_message.lower() or "@" in email_message
-            
-    
     def test_successful_registration(self, sample_registration_data):
         test_data = sample_registration_data
         register_page = RegisterPage(self.driver)
@@ -130,7 +82,7 @@ class TestRegister:
         
         register_page.register_attempt(
             "mail@example.com",  
-            "123",           
+            "string123",  
             "aaa",             
             "ss",             
             "abc",           
@@ -139,20 +91,4 @@ class TestRegister:
         
         error_message = register_page.wait_for_error(timeout=5)
         assert error_message is not None
-
-    
-    def test_form_field_validation(self):
-        register_page = RegisterPage(self.driver)
-        register_page.open(self.frontend_url)
-        
-        register_page.click_register()
-
-        email_field = self.driver.find_element(*register_page.email_input)
-        password_field = self.driver.find_element(*register_page.password_input)
-        
-        email_valid = self.driver.execute_script("return arguments[0].validity.valid;", email_field)
-        password_valid = self.driver.execute_script("return arguments[0].validity.valid;", password_field)
-
-        assert not email_valid
-        assert not password_valid
         

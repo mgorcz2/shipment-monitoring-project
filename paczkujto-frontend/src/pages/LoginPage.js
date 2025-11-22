@@ -61,9 +61,10 @@ export default function LoginPage() {
     <div className="login-container">
       <img src={logo} alt="Logo" className="login-logo" />
       <h2 className="login-title">Zaloguj się do paczkuj.to</h2>
-      <form onSubmit={handleLogin} className="login-form">
+      <form onSubmit={handleLogin} className="login-form" id="login-form">
         <input
           type="email"
+          id="email-input"
           placeholder="Email"
           value={email}
           onChange={e => setEmail(e.target.value)}
@@ -73,6 +74,7 @@ export default function LoginPage() {
         />
         <input
           type="password"
+          id="password-input"
           placeholder="Hasło"
           value={password}
           onChange={e => setPassword(e.target.value)}
@@ -80,7 +82,7 @@ export default function LoginPage() {
           className="login-input"
           disabled={loading}
         />
-        <button type="submit" className="btn btn-primary" disabled={loading}>
+        <button type="submit" id="login-submit-button" className="btn btn-primary" disabled={loading}>
           {loading ? "Logowanie..." : "Zaloguj"}
         </button>
         {error && <div className="login-error">{error}</div>}

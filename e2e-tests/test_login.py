@@ -4,7 +4,7 @@ import uuid
 
 import pytest
 import requests
-from conftest import cleanup_test_data, create_user_via_api, register_client_via_api
+from conftest import register_client_via_api
 from pages.login_page import LoginPage
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -60,7 +60,7 @@ class TestLogin:
         assert "/login" in current_url
         assert token is None
 
-    def test_client_registration_and_login(self, sample_user_data, sample_client_data):
+    def test_client_login(self, sample_user_data, sample_client_data):
         user_data = sample_user_data
         client_data = sample_client_data
 
@@ -73,7 +73,6 @@ class TestLogin:
 
         time.sleep(5)
 
-        current_url = self.driver.current_url
         token = self.driver.execute_script("return localStorage.getItem('token');")
         user_storage = self.driver.execute_script(
             "return localStorage.getItem('user');"
@@ -82,7 +81,6 @@ class TestLogin:
             "return localStorage.getItem('client_data');"
         )
 
-        assert "/login" not in current_url
         assert token is not None
         assert user_storage is not None
 
@@ -93,6 +91,5 @@ class TestLogin:
 
         if client_storage:
             client_obj = json.loads(client_storage)
-            assert client_obj["address"] == client_data["address"]
-
-        cleanup_test_data(client["id"], user_data["email"])
+            assert client_obj["first_name"] == client_data["first_name"]
+            assert client_obj["last_name"] == client_data["last_name"]

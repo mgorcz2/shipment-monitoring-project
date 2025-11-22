@@ -72,9 +72,13 @@ def create_user_via_api(user_data):
 
 def register_client_via_api(user_data, client_data):
     try:
-        payload = {"user_data": user_data, "client": client_data}
+        payload = {
+            "user_data": user_data,
+            "client": client_data
+        }
         response = requests.post(
-            f"http://localhost:8000/client/register", json=payload
+            "http://localhost:8000/client/register", 
+            json=payload
         )
         if response.status_code in [200, 201]:
             return response.json()
@@ -84,15 +88,6 @@ def register_client_via_api(user_data, client_data):
     except Exception as e:
         print(f"API error: {e}")
         return None
-
-
-def cleanup_test_data(user_id, email):
-    try:
-        requests.delete(f"http://localhost:8000/client/{user_id}")
-        requests.delete(f"http://localhost:8000/users/delete/{email}")
-    except Exception:
-        pass
-
 
 @pytest.fixture(scope="function")
 def authenticated_driver(driver, sample_user_data, sample_client_data):
@@ -110,4 +105,3 @@ def authenticated_driver(driver, sample_user_data, sample_client_data):
     assert token is not None
 
     yield driver
-    cleanup_test_data(client["id"], user_data["email"])
