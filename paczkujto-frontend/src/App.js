@@ -11,12 +11,16 @@ import AdminPanel from "./pages/AdminPanel";
 import CourierShipmentsPage from "./pages/CourierShipmentsPage";
 import AdminShipmentsPage from "./pages/AdminShipmentsPage";
 import ProfilePage from "./pages/ProfilePage";
+import TrackShipmentPage from "./pages/TrackShipmentPage";
 import './styles/globals.css'; 
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public route without Layout */}
+        <Route path="/track/:id" element={<TrackShipmentPage />} />
+        
         <Route path="/" element={<Layout />}>
           <Route index element={<HomePage />} />
           <Route path="login" element={<LoginPage />} />

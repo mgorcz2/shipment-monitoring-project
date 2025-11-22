@@ -10,12 +10,11 @@ class ShipmentsPage:
         self.driver = driver
         self.wait = WebDriverWait(driver, 10)
 
-        self.shipments_container = (By.CSS_SELECTOR, ".shipments-container")
         self.shipment_cards = (By.CSS_SELECTOR, ".shipment-card")
-        self.shipment_card_first = (By.CSS_SELECTOR, ".shipment-card:first-child")
         self.modal_overlay = (By.CSS_SELECTOR, ".modal-overlay")
         self.modal_details = (By.CSS_SELECTOR, ".shipment-details")
         self.modal_close_btn = (By.CSS_SELECTOR, ".modal-close-btn")
+        self.role_filter_select = (By.ID, "role-filter")
 
     def open(self, base_url):
         self.driver.get(f"{base_url}/shipments")
@@ -65,3 +64,16 @@ class ShipmentsPage:
         close_button = self.driver.find_element(*self.modal_close_btn)
         close_button.click()
         time.sleep(1)
+
+    def get_role_filter(self):
+        return self.driver.find_element(*self.role_filter_select)
+
+    def select_filter(self, filter_value):
+        """Select filter: 'all', 'sender', or 'recipient'"""
+        filter_element = self.get_role_filter()
+        filter_element.click()
+        option = filter_element.find_element(
+            By.CSS_SELECTOR, f"option[value='{filter_value}']"
+        )
+        option.click()
+        time.sleep(0.5)

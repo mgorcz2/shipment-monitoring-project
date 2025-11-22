@@ -75,7 +75,35 @@ class ShipmentRepository(IShipmentRepository):
         Returns:
             Any | None: The shipment details if exists.
         """
-        query = select(shipment_table).where(
+        recipient_user = user_table.alias("recipient_user")
+        recipient_client = client_table.alias("recipient_client")
+
+        sender_fullname = func.concat_ws(
+            literal_column("' '"),
+            client_table.c.first_name,
+            client_table.c.last_name,
+        ).label("sender_fullname")
+
+        recipient_fullname = func.concat_ws(
+            literal_column("' '"),
+            recipient_client.c.first_name,
+            recipient_client.c.last_name,
+        ).label("recipient_fullname")
+
+        query = select(
+            shipment_table,
+            sender_fullname,
+            recipient_fullname,
+        ).select_from(
+            shipment_table.outerjoin(
+                user_table, shipment_table.c.sender_id == user_table.c.id
+            )
+            .outerjoin(client_table, user_table.c.id == client_table.c.id)
+            .outerjoin(
+                recipient_user, shipment_table.c.recipient_id == recipient_user.c.id
+            )
+            .outerjoin(recipient_client, recipient_user.c.id == recipient_client.c.id)
+        ).where(
             (shipment_table.c.id == shipment_id)
             & (shipment_table.c.recipient_email == recipient_email)
         )

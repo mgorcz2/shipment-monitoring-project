@@ -4,8 +4,9 @@ axios.interceptors.response.use(
   (response) => response,
   (error) => {
     const isLoginRequest = error.config?.url?.includes("/users/token");
+    const isPublicTrackingRequest = error.config?.url?.includes("/shipments/check_status");
     
-    if (!isLoginRequest) {
+    if (!isLoginRequest && !isPublicTrackingRequest) {
       if (
         error.response?.status === 401 ||
         (error.response?.status === 500 && 

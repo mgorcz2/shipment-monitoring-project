@@ -15,7 +15,6 @@ from src.infrastructure.dto.shipmentDTO import (
     ShipmentDTO,
     ShipmentWithDistanceDTO,
 )
-from src.infrastructure.external.email import email_service
 from src.infrastructure.services.ishipment import IShipmentService
 from src.infrastructure.services.iuser import IUserService
 
@@ -257,24 +256,7 @@ async def add_shipment(
     """
     try:
         sender_id = current_user.id
-        if new_shipment := await service.add_shipment(new_shipment, sender_id):
-            recipient_email = new_shipment.recipient_email
-
-            if recipient_email == "AB":
-                await email_service.send_email(
-                    new_shipment.id,
-                    subject="Powiadomienie: Nadano Twoją przesyłkę",
-                    recipient=recipient_email,
-                    body=f"""
-                        <h2>Twoja przesyłka została nadana!</h2>
-                        <p>Przesyłka o numerze <strong>{new_shipment.id}</strong> została nadana i jest w drodze do Ciebie.</p>
-                        <p>Aby sprawdzić jej aktualny status, odwiedź poniższy link:</p>
-                        <p><a href="http://localhost:8000/shipments/check_status?shipment_id={new_shipment.id}&recipient_email={recipient_email}" target="_blank">Śledź przesyłkę</a></p>
-                        <p>Dziękujemy za skorzystanie z naszych usług!</p>
-                        <hr>
-                        <p>Jeśli masz pytania, skontaktuj się z naszym działem obsługi klienta.</p>
-                        """,
-                )
+        new_shipment = await service.add_shipment(new_shipment, sender_id)
         return new_shipment
     except ValueError as error:
         raise HTTPException(

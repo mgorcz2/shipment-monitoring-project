@@ -1,7 +1,7 @@
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Factory, Singleton
 
-from src.infrastructure.email.email_service import EmailService
+from src.infrastructure.external.email.email_service import EmailService
 from src.infrastructure.repositories.clientdb import ClientRepository
 from src.infrastructure.repositories.packagedb import PackageRepository
 from src.infrastructure.repositories.shipmentdb import ShipmentRepository

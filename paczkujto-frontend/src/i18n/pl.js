@@ -9,7 +9,11 @@ const translations = {
   "failed_attempt": "Nieudana próba dostarczenia",
   "returned_to_sender": "Zwrócona do nadawcy",
   "lost": "Zagubiona",
-  "damaged": "Uszkodzona"
+  "damaged": "Uszkodzona",
+  "Filter by role": "Filtruj wg roli",
+  "All Shipments": "Wszystkie przesyłki",
+  "Shipments I Sent": "Przesyłki które nadaję",
+  "Shipments I Receive": "Przesyłki które odbieram"
 };
 
 export default translations;

@@ -103,13 +103,13 @@ class UserService(IUserService):
             if user_with_new_email:
                 raise ValueError("User with that email already registered.")
         updated_user = UserIn(
-            email=update_data.email if update_data.email else original_user["email"],
+            email=update_data.email if update_data.email else original_user.email,
             password=(
                 password_hashing.hash_password(update_data.password)
                 if update_data.password
-                else original_user["password"]
+                else original_user.password
             ),
-            role=update_data.role if update_data.role else original_user["role"],
+            role=update_data.role if update_data.role else original_user.role,
         )
         user = await self._repository.update_user(email, updated_user)
         if not user:

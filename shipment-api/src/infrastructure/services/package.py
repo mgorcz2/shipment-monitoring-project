@@ -6,6 +6,7 @@ from uuid import UUID
 from src.core.domain.shipment import Package, PackageIn, ShipmentIn
 from src.core.repositories.ipackage import IPackageRepository
 from src.db import database
+from src.infrastructure.external.email.email_service import EmailService
 from src.infrastructure.services.ipackage import IPackageService
 from src.infrastructure.services.ishipment import IShipmentService
 
@@ -18,6 +19,7 @@ class PackageService(IPackageService):
     ) -> None:
         self._repository = repository
         self._shipment_service = shipment_service
+        self._email_service = EmailService()
 
     async def add_package_with_shipment(
         self, data: PackageIn, shipment_data: ShipmentIn, user_id: UUID
@@ -32,6 +34,13 @@ class PackageService(IPackageService):
             package = await self._repository.add_package(data, shipment.id)
             if not package:
                 raise ValueError("Failed to add package. Try again later.")
+            try:
+                if shipment_data.recipient_email:
+                    await self._email_service.send_package_created_email(
+                        shipment_data.recipient_email, shipment.id
+                    )
+            except Exception as e:
+                print(f"Email sending failed: {str(e)}")
             return package
 
     async def get_package_by_id(self, package_id: int) -> Any | None:

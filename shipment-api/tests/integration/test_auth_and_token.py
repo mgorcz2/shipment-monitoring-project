@@ -6,8 +6,8 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from freezegun import freeze_time
 from httpx import ASGITransport, AsyncClient
-
 from src.core.domain.user import UserRole
+from src.core.security.consts import ACCESS_TOKEN_EXPIRE_MINUTES
 from src.db import database
 from src.main import app
 
@@ -85,7 +85,9 @@ async def check_role_access(client, valid_password):
         method: str = "GET",
         payload: dict = None,
     ):
-        email = f"{role.value}@example.com"
+        import uuid
+
+        email = f"{role.value}.{uuid.uuid4().hex[:8]}@example.com"
         await register_user(client, email, valid_password, role.value)
         token = await login_user(client, email, valid_password)
         auth_header = auth_headers(token)
@@ -199,7 +201,9 @@ async def test_token_expiry(client, valid_email, valid_password):
     auth_header = auth_headers(token)
     response = await client.get("/users/all", headers=auth_header)
     assert response.status_code == 200
-    with freeze_time(datetime.now(timezone.utc) + timedelta(minutes=15)):
+    with freeze_time(
+        datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES + 1)
+    ):
         response = await client.get("/users/all", headers=auth_header)
         assert response.status_code == 401, "Token should be expired"
         assert "Could not validate credentials" in response.json()["detail"]

@@ -41,7 +41,6 @@ async def create_package_with_shipment(
 @inject
 async def get_package(
     package_id: int,
-    current_user: User = Depends(auth.get_current_user),
     service: IPackageService = Depends(Provide[Container.package_service]),
 ) -> PackageDTO:
     try:

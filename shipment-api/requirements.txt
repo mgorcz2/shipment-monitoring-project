@@ -1,5 +1,5 @@
 databases[asyncpg]==0.9.0
-dependency-injector==4.42.0
+dependency-injector==4.43.0
 fastapi==0.115.4
 metar==1.11.0
 pydantic==2.10.1
@@ -20,3 +20,4 @@ coverage==7.8.0
 freezegun==1.5.1
 selenium
 webdriver-manager
+pydantic[email]

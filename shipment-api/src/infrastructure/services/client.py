@@ -8,7 +8,7 @@ from src.core.repositories.iclient import IClientRepository
 from src.core.repositories.iuser import IUserRepository
 from src.db import database
 from src.infrastructure.dto.userDTO import ClientDTO
-from src.infrastructure.email.email_service import EmailService
+from src.infrastructure.external.email.email_service import EmailService
 from src.infrastructure.services.iclient import IClientService
 from src.infrastructure.services.iuser import IUserService
 
@@ -40,11 +40,14 @@ class ClientService(IClientService):
             record = await self._repository.register_client(client, user.id)
             if not record:
                 raise ValueError("Failed to register the client. Please try again.")
-            self._email_service.send_welcome_email(
-                user_email=record["email"],
-                first_name=record["first_name"],
-                address=record["address"],
-            )
+            try:
+                await self._email_service.send_welcome_email(
+                    user_email=record["email"],
+                    first_name=record["first_name"],
+                    address=record["address"],
+                )
+            except Exception as e:
+                raise ValueError(f"Failed to send email: {str(e)}")
             return ClientDTO.from_record(record)
 
     async def get_client(self, user_id: UUID) -> ClientDTO:

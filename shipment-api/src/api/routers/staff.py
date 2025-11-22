@@ -37,7 +37,6 @@ async def get_staff(
     current_user: User = Depends(auth.get_current_user),
     service: IStaffService = Depends(Provide[Container.staff_service]),
 ) -> StaffDTO:
-    # Allow users to view their own profile or admins to view any
     if current_user.id != user_id and current_user.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=403, detail="Not authorized to view this profile"
@@ -56,7 +55,6 @@ async def update_staff(
     current_user: User = Depends(auth.get_current_user),
     service: IStaffService = Depends(Provide[Container.staff_service]),
 ) -> StaffDTO:
-    # Allow users to update their own profile or admins to update any
     if current_user.id != user_id and current_user.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=403, detail="Not authorized to update this profile"
@@ -74,7 +72,6 @@ async def delete_staff(
     current_user: User = Depends(auth.get_current_user),
     service: IStaffService = Depends(Provide[Container.staff_service]),
 ) -> StaffDTO:
-    # Allow users to delete their own account or admins to delete any
     if current_user.id != user_id and current_user.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=403, detail="Not authorized to delete this profile"

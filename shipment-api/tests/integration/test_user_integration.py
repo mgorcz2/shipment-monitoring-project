@@ -3,7 +3,6 @@
 # pylint: disable=redefined-outer-name
 import pytest
 from httpx import ASGITransport, AsyncClient
-
 from src.core.domain.user import UserRole
 from src.db import database
 from src.main import app

@@ -10,7 +10,8 @@ A web-based application for tracking and managing courier shipments. This servic
 - PostgreSQL 17.0
 - FastApi
 - Docker
-<img src="https://skillicons.dev/icons?i=python,postgres,fastapi,docker"/>
+- React
+<img src="https://skillicons.dev/icons?i=python,postgres,fastapi,docker,react"/>
 
 ## Useful Commands
 - Installing production dependencies: pip install -r requirements.txt
@@ -19,18 +20,13 @@ A web-based application for tracking and managing courier shipments. This servic
 - API documentation (Swagger): http://localhost:8000/docs
 - Building the project using Docker: docker compose build (to refresh the cache: docker compose build --no-cache)
 - Running the project using Docker: docker compose up (to avoid cache issues: docker compose up --force-recreate)
-- Running tests: pytest
-- Running tests with coverage: coverage run -m pytest
+- Running backend unit tests: pytest tests/unit/ (docker-compose exec app pytest tests/unit/ -v)
+- Running backend tests with coverage: coverage run -m pytest
+- Running backend integration tests: pytest tests/integration/ (docker-compose exec app pytest tests/integration/ -v)
+- Running end-to-end tests with selenium: pytest e2e-tests/
 - Generating a coverage report in the terminal: coverage report
 - Generating an HTML coverage report: coverage html
 
 ## Frontend (React)
- - npm start
-
- 
-## Setup
-To ensure email sending works correctly, set the following variables in the Docker container configuration("docker-compose.yml")
-- MAIL_USERNAME=your_email@example.com 
-- MAIL_PASSWORD=your_email_password 
-- MAIL_FROM=your_email@example.com 
-- MAIL_SERVER=smtp.example.com
+- Installing dependencies: npm install
+- Starting the development server: npm start
