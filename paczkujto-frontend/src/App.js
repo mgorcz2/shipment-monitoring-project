@@ -9,7 +9,7 @@ import CreatePackagePage from "./pages/CreatePackagePage";
 import ProtectedRoute from "./services/authService";
 import AdminPanel from "./pages/AdminPanel";
 import CourierShipmentsPage from "./pages/CourierShipmentsPage";
-import AdminShipmentsPage from "./pages/AdminShipmentsPage";
+import ManagerShipmentsPage from "./pages/ManagerShipmentsPage";
 import ProfilePage from "./pages/ProfilePage";
 import TrackShipmentPage from "./pages/TrackShipmentPage";
 import './styles/globals.css'; 
@@ -26,7 +26,7 @@ function App() {
           <Route path="login" element={<LoginPage />} />
           <Route path="register-client" element={<RegisterClientPage />} />
         
-          <Route element={<ProtectedRoute allowedRoles={["client", "admin"]} />}>
+          <Route element={<ProtectedRoute allowedRoles={["client", "admin", "manager"]} />}>
             <Route path="shipments" element={<ShipmentsPage />} />
             <Route path="create-shipment" element={<CreatePackagePage />} />
           </Route>
@@ -38,7 +38,7 @@ function App() {
           
           <Route element={<ProtectedRoute allowedRoles={["admin", "manager"]} />}>
             <Route path="admin" element={<AdminPanel />} />
-            <Route path="admin-shipments" element={<AdminShipmentsPage />} />
+            <Route path="manager-shipments" element={<ManagerShipmentsPage />} />
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={["client", "courier", "manager", "admin"]} />}>

@@ -19,8 +19,8 @@ const menuItems = [
     pathByRole: {
       client: "/shipments",
       courier: "/courier-shipments",
-      admin: "/admin-shipments",
-      manager: "/admin-shipments"
+      admin: "/manager-shipments",
+      manager: "/manager-shipments"
     },
     allowedRoles: ["client", "courier", "admin", "manager"] 
   },

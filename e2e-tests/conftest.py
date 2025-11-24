@@ -40,8 +40,8 @@ def sample_client_data():
     return {
         "first_name": "Test",
         "last_name": "Client",
-        "phone_number": f"12345222",
-        "address": f"Test Street 2",
+        "phone_number": "12345222",
+        "address": "Test Street 2",
     }
 
 
@@ -85,6 +85,22 @@ def register_client_via_api(user_data, client_data):
         return None
 
 
+def create_package_via_api(token, package_data):
+    try:
+        headers = {"Authorization": f"Bearer {token}"}
+        response = requests.post(
+            "http://localhost:8000/packages/add", json=package_data, headers=headers
+        )
+        if response.status_code in [200, 201]:
+            return response.json()
+        else:
+            print(f"Error creating package: {response.status_code} - {response.text}")
+            return None
+    except Exception as e:
+        print(f"API error: {e}")
+        return None
+
+
 @pytest.fixture(scope="function")
 def authenticated_driver(driver, sample_user_data, sample_client_data):
     user_data = sample_user_data
@@ -99,5 +115,76 @@ def authenticated_driver(driver, sample_user_data, sample_client_data):
     time.sleep(3)
     token = driver.execute_script("return localStorage.getItem('token');")
     assert token is not None
+
+    yield driver
+
+
+@pytest.fixture(scope="module")
+def authenticated_manager_driver():
+    chrome_options = Options()
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--window-size=1920,1080")
+    # chrome_options.add_argument("--headless")
+
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+
+    unique_id = str(uuid.uuid4())[:8]
+    manager_user_data = {
+        "email": f"manager_{unique_id}@test.com",
+        "password": "ManagerPassword123!",
+        "role": "manager",
+    }
+
+    user = create_user_via_api(manager_user_data)
+    assert user is not None, "Failed to create manager user"
+
+    login_page = LoginPage(driver)
+    login_page.open("http://localhost:3000")
+    login_page.login_attempt(manager_user_data["email"], manager_user_data["password"])
+
+    time.sleep(3)
+    token = driver.execute_script("return localStorage.getItem('token');")
+    assert token is not None, "Manager login failed"
+
+    yield driver
+    driver.quit()
+
+
+@pytest.fixture(scope="module")
+def manager_with_package(authenticated_manager_driver):
+    from pages.create_package_page import CreatePackagePage
+
+    driver = authenticated_manager_driver
+    package_page = CreatePackagePage(driver)
+    package_page.open("http://localhost:3000")
+
+    origin = {
+        "street": "Krakowska",
+        "number": "1",
+        "city": "Warszawa",
+        "postcode": "00-001",
+    }
+
+    destination = {
+        "street": "Marszałkowska",
+        "number": "10",
+        "city": "Warszawa",
+        "postcode": "00-590",
+    }
+
+    package_data = {
+        "weight": 5,
+        "length": 30,
+        "width": 20,
+        "height": 10,
+        "fragile": False,
+    }
+
+    recipient_email = f"manager_test_{str(uuid.uuid4())[:8]}@test.com"
+
+    package_page.create_full_package(origin, destination, recipient_email, package_data)
+    time.sleep(3)
 
     yield driver

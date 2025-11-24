@@ -21,6 +21,10 @@ export default function HomePage() {
       return "Witaj, Administratorze!";
     }
 
+    if (userRole === "manager") {
+      return "Witaj, Menadżerze!";
+    }
+
     return `Witaj, ${user.email}!`;
   };
 
@@ -51,7 +55,7 @@ export default function HomePage() {
               </button>
             </>
           )}
-          {userRole === "admin" && (
+          {(userRole === "admin" || userRole === "manager") && (
             <button
               className="btn btn-primary"
               style={{ fontSize: 20, padding: "18px 40px" }}

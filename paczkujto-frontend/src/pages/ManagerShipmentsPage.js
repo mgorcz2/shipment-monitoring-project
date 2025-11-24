@@ -6,7 +6,7 @@ import AssignCourierModal from "../components/AssignCourierModal";
 import { translate } from "../i18n";
 import "../styles/ShipmentsPage.css";
 
-export default function AdminShipmentsPage() {
+export default function ManagerShipmentsPage() {
   const [shipments, setShipments] = useState([]);
   const [filteredShipments, setFilteredShipments] = useState([]);
   const [loading, setLoading] = useState(true);
