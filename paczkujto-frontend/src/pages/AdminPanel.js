@@ -17,7 +17,8 @@ const AdminPanel = () => {
   const [userToDelete, setUserToDelete] = useState(null);  
   const [isDeleting, setIsDeleting] = useState(false);    
   const [showRegisterStaff, setShowRegisterStaff] = useState(false);
-  const [editModalUser, setEditModalUser] = useState(null);  
+  const [editModalUser, setEditModalUser] = useState(null);
+  const [success, setSuccess] = useState(null);
 
   useEffect(() => {
     fetchUsers();
@@ -58,12 +59,14 @@ const AdminPanel = () => {
       
       setUsers(users.filter(u => u.id !== userToDelete.id));
       
-      alert(`✓ Użytkownik ${userToDelete.email} został usunięty`);
+      setSuccess(`Użytkownik ${userToDelete.email} został usunięty`);
+      setTimeout(() => setSuccess(null), 3000);
       
       setUserToDelete(null);
     } catch (err) {
       console.error("Błąd podczas usuwania:", err);
-      alert(`✗ Błąd: ${err.response?.data?.detail || "Nie udało się usunąć użytkownika"}`);
+      setError(err.response?.data?.detail || "Nie udało się usunąć użytkownika");
+      setUserToDelete(null);
     } finally {
       setIsDeleting(false);
     }
@@ -75,6 +78,12 @@ const AdminPanel = () => {
 
   const closeDetailsModal = () => {
     setSelectedUser(null);
+  };
+
+  const handleEditSuccess = () => {
+    setSuccess("Dane użytkownika zostały zaktualizowane");
+    setTimeout(() => setSuccess(null), 3000);
+    fetchUsers();
   };
 
   return (
@@ -89,6 +98,9 @@ const AdminPanel = () => {
     + Zarejestruj Pracownika
   </button>
       </div>
+      
+      {error && <div className="alert alert-error">{error}</div>}
+      {success && <div className="alert alert-success">{success}</div>}
       
       {loading ? (
         <div className="loading-state">Ładowanie użytkowników...</div>
@@ -127,7 +139,7 @@ const AdminPanel = () => {
         <EditUserModal
           user={editModalUser}
           onClose={() => setEditModalUser(null)}
-          onSuccess={fetchUsers}
+          onSuccess={handleEditSuccess}
         />
       )}
     </div>

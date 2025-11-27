@@ -14,8 +14,8 @@ A web-based application for tracking and managing courier shipments. This servic
 <img src="https://skillicons.dev/icons?i=python,postgres,fastapi,docker,react"/>
 
 ## Useful Commands
-- Installing production dependencies: pip install -r requirements.txt
-- Installing development dependencies: pip install -r requirements-dev.txt
+- Installing production dependencies: pip install -r shipment-api/requirements.txt
+- Installing development dependencies: pip install -r shipment-api/requirements-dev.txt
 - Starting the application server: uvicorn shipment-api.main:app --host 0.0.0.0 --port 8000
 - API documentation (Swagger): http://localhost:8000/docs
 - Building the project using Docker: docker compose build (to refresh the cache: docker compose build --no-cache)
@@ -23,7 +23,7 @@ A web-based application for tracking and managing courier shipments. This servic
 - Running backend unit tests: pytest shipment-api/tests/unit/ (docker-compose exec app pytest tests/unit/ -v)
 - Running backend tests with coverage: coverage run -m pytest
 - Running backend integration tests: pytest shipment-api/tests/integration/ (docker-compose exec app pytest tests/integration/ -v)
-- Running end-to-end tests with selenium: pytest e2e-tests/
+- Running end-to-end tests with selenium: pytest e2e-tests/ (to run e2e test you need to have the frontend and backend servers running)
 - Generating a coverage report in the terminal: coverage report
 - Generating an HTML coverage report: coverage html
 

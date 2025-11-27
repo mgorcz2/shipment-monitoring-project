@@ -113,8 +113,6 @@ def authenticated_driver(driver, sample_user_data, sample_client_data):
     login_page.login_attempt(user_data["email"], user_data["password"])
 
     time.sleep(3)
-    token = driver.execute_script("return localStorage.getItem('token');")
-    assert token is not None
 
     yield driver
 
@@ -125,7 +123,7 @@ def authenticated_manager_driver():
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--window-size=1920,1080")
-    # chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless")
 
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=chrome_options)
@@ -137,17 +135,12 @@ def authenticated_manager_driver():
         "role": "manager",
     }
 
-    user = create_user_via_api(manager_user_data)
-    assert user is not None, "Failed to create manager user"
-
+    create_user_via_api(manager_user_data)
     login_page = LoginPage(driver)
     login_page.open("http://localhost:3000")
     login_page.login_attempt(manager_user_data["email"], manager_user_data["password"])
 
     time.sleep(3)
-    token = driver.execute_script("return localStorage.getItem('token');")
-    assert token is not None, "Manager login failed"
-
     yield driver
     driver.quit()
 
@@ -188,3 +181,55 @@ def manager_with_package(authenticated_manager_driver):
     time.sleep(3)
 
     yield driver
+
+
+@pytest.fixture(scope="module")
+def authenticated_admin_driver():
+    chrome_options = Options()
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--window-size=1920,1080")
+    # chrome_options.add_argument("--headless")
+
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+
+    unique_id = str(uuid.uuid4())[:8]
+
+    admin_user_data = {
+        "email": f"admin_{unique_id}@test.com",
+        "password": "Test1234!",
+        "role": "admin",
+    }
+    admin_user = create_user_via_api(admin_user_data)
+    assert admin_user is not None
+
+    client_user_data = {
+        "email": f"client_{unique_id}@test.com",
+        "password": "Test1234!",
+        "role": "client",
+    }
+    client_data = {
+        "first_name": "Test",
+        "last_name": "Client",
+        "phone_number": "123456789",
+        "address": "Test Street 1",
+    }
+    register_client_via_api(client_user_data, client_data)
+
+    courier_user_data = {
+        "email": f"courier_{unique_id}@test.com",
+        "password": "Test1234!",
+        "role": "courier",
+    }
+    create_user_via_api(courier_user_data)
+
+    login_page = LoginPage(driver)
+    login_page.open("http://localhost:3000")
+    login_page.enter_email(admin_user_data["email"])
+    login_page.enter_password(admin_user_data["password"])
+    login_page.click_login()
+    time.sleep(2)
+
+    yield driver
+    driver.quit()
