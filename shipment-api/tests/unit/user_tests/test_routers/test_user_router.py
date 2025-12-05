@@ -5,9 +5,8 @@ from types import SimpleNamespace
 from uuid import uuid4
 
 import pytest
-from fastapi import HTTPException, status
-
 import src.api.routers.user as user_router
+from fastapi import HTTPException, status
 from src.core.domain.user import User, UserIn, UserRole
 from src.infrastructure.dto.tokenDTO import TokenDTO
 from src.infrastructure.dto.userDTO import UserDTO
@@ -21,7 +20,9 @@ def mock_user_service(mocker):
     return mocker.AsyncMock()
 
 
-@pytest.fixture(params=[UserRole.ADMIN, UserRole.CLIENT, UserRole.COURIER, UserRole.MANAGER])
+@pytest.fixture(
+    params=[UserRole.ADMIN, UserRole.CLIENT, UserRole.COURIER, UserRole.MANAGER]
+)
 def user(request):
     return User(
         id=uuid4(),
@@ -109,7 +110,7 @@ async def test_get_user_by_email_success(mock_user_service, user, valid_userDTO)
     """
     dto = valid_userDTO
     mock_user_service.get_user_by_email.return_value = dto
-    if user.role == UserRole.ADMIN:
+    if user.role in [UserRole.ADMIN, UserRole.MANAGER]:
         result = await user_router.get_user_by_email(
             email=valid_userDTO.email, current_user=user, service=mock_user_service
         )
@@ -130,10 +131,10 @@ async def test_get_user_by_email_not_found(mock_user_service, user):
     Test the get_user_by_email function with an invalid email
     and check if it raises an HTTPException with the correct status code and detail.
     Also check if the function raises an HTTPException with the correct status code and detail
-    when the user is not an admin.
+    when the user is not an admin or manager.
     """
     mock_user_service.get_user_by_email.side_effect = ValueError("Error")
-    if user.role == UserRole.ADMIN:
+    if user.role in [UserRole.ADMIN, UserRole.MANAGER]:
         with pytest.raises(HTTPException) as exc:
             await user_router.get_user_by_email(
                 email="x@y.z", current_user=user, service=mock_user_service

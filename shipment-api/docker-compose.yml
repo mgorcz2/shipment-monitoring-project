@@ -35,8 +35,8 @@ services:
     networks:
       - backend
     container_name: db
-    volumes:
-      - pgdata:/var/lib/postgresql/data 
+    #volumes:
+    #  - pgdata:/var/lib/postgresql/data 
     
   mailhog:
     image: mailhog/mailhog
@@ -50,5 +50,5 @@ services:
 networks:
   backend:
 
-volumes:
-  pgdata: 
+#volumes:
+ # pgdata: 

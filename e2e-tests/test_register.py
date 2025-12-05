@@ -61,10 +61,7 @@ def test_registration_with_existing_email(driver, sample_registration_data):
     error_text = error_element.text
     assert error_text is not None
     assert len(error_text) > 0
-    assert (
-        "already registered" in error_text.lower()
-        or "already exists" in error_text.lower()
-    )
+    assert "already registered" in error_text.lower()
 
 
 def test_registration_with_invalid_data(driver):
@@ -82,4 +79,4 @@ def test_registration_with_invalid_data(driver):
 
     error_text = error_element.text
     assert error_text is not None
-    assert len(error_text) > 0
+    assert "invalid" in error_text.lower() or "error" in error_text.lower()

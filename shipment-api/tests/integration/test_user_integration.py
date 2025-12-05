@@ -11,9 +11,11 @@ from src.main import app
 @pytest.fixture()
 def admin_email():
     """
-    Fixture to provide an admin email for testing.
+    Fixture to provide a unique admin email for each test.
     """
-    return "admin@example.com"
+    import uuid
+
+    return f"admin_{uuid.uuid4().hex[:8]}@example.com"
 
 
 @pytest.fixture(autouse=True)

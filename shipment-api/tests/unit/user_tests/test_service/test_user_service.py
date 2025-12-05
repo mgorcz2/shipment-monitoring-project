@@ -9,7 +9,7 @@ import src.core.security.token as token_module
 import src.infrastructure.services.user as user_service_module
 from jose import jwt
 from src.config import config
-from src.core.domain.user import UserIn, UserRole, UserUpdate
+from src.core.domain.user import User, UserIn, UserRole, UserUpdate
 from src.core.security import consts
 from src.core.security.token import create_access_token
 from src.infrastructure.dto.userDTO import UserDTO
@@ -214,7 +214,14 @@ async def test_update_user_failed(user_service, repo_mock, sample_record):
     """
     Test the update of a user when the repository fails.
     """
-    repo_mock.get_user_by_email.return_value = sample_record
+    # Convert dict to User object
+    user_obj = User(
+        id=sample_record["id"],
+        email=sample_record["email"],
+        password=sample_record["password"],
+        role=sample_record["role"],
+    )
+    repo_mock.get_user_by_email.return_value = user_obj
     repo_mock.update_user.return_value = None
     with pytest.raises(
         ValueError, match="Failed to update the user. Please try again."

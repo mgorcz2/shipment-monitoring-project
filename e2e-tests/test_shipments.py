@@ -104,7 +104,7 @@ def test_shipment_details_content(authenticated_driver):
     shipments_page.close_details_modal()
 
 
-def test_filter_shipments_by_sender(authenticated_driver, sample_user_data):
+def test_filter_shipments_by_sender(authenticated_driver):
     """Test filtering shipments - show only packages I sent"""
     package_page = CreatePackagePage(authenticated_driver)
     package_page.open("http://localhost:3000")
@@ -196,9 +196,7 @@ def test_filter_all_shipments(authenticated_driver):
 
     recipient_email = "filter_all_test@example.com"
 
-    package_page.create_full_package(
-        origin, destination, recipient_email, package_data
-    )
+    package_page.create_full_package(origin, destination, recipient_email, package_data)
 
     time.sleep(5)
     assert "/shipments" in authenticated_driver.current_url
