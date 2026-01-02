@@ -19,6 +19,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Public route without Layout */}
+        <Route path="/track" element={<TrackShipmentPage />} />
         <Route path="/track/:id" element={<TrackShipmentPage />} />
         
         <Route path="/" element={<Layout />}>

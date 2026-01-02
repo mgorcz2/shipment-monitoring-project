@@ -55,6 +55,13 @@ export default function HomePage() {
               </button>
             </>
           )}
+          <button
+            className="btn btn-primary"
+            style={{ fontSize: 20, padding: "18px 40px" }}
+            onClick={() => navigate("/track")}
+          >
+            Śledź przesyłkę
+          </button>
           {(userRole === "admin" || userRole === "manager") && (
             <button
               className="btn btn-primary"
@@ -66,13 +73,22 @@ export default function HomePage() {
           )}
         </div>
       ) : (
-        <button
-          className="btn btn-primary"
-          style={{ fontSize: 20, padding: "18px 40px" }}
-          onClick={() => navigate("/login")}
-        >
-          Zaloguj się
-        </button>
+        <div style={{ display: "flex", gap: 24 }}>
+          <button
+            className="btn btn-primary"
+            style={{ fontSize: 20, padding: "18px 40px" }}
+            onClick={() => navigate("/login")}
+          >
+            Zaloguj się
+          </button>
+          <button
+            className="btn btn-primary"
+            style={{ fontSize: 20, padding: "18px 40px" }}
+            onClick={() => navigate("/track")}
+          >
+            Śledź przesyłkę
+          </button>
+        </div>
       )}
     </div>
   );
