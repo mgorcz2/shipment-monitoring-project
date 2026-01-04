@@ -453,239 +453,250 @@ export default function CreatePackagePage() {
       <img src={logo} alt="Logo" style={{ width: 80, marginBottom: 16 }} />
       <h2 className="create-package-title">Nadaj paczkę</h2>
       <form className="create-package-form" onSubmit={handleSubmit} id="create-package-form">
-        <h3 className="section-header">Adres nadania</h3>
-        <input
-          type="text"
-          name="origin_street"
-          id="origin-street-input"
-          placeholder="Ulica"
-          value={form.origin_street}
-          onChange={handleChange}
-          required
-          className="create-package-input"
-          disabled={loading}
-        />
-        <input
-          type="text"
-          name="origin_street_number"
-          id="origin-street-number-input"
-          placeholder="Numer"
-          value={form.origin_street_number}
-          onChange={handleChange}
-          required
-          className="create-package-input"
-          disabled={loading}
-        />
-        <input
-          type="text"
-          name="origin_city"
-          id="origin-city-input"
-          placeholder="Miasto"
-          value={form.origin_city}
-          onChange={handleChange}
-          required
-          className="create-package-input"
-          disabled={loading}
-        />
-        <input
-          type="text"
-          name="origin_postcode"
-          placeholder="Kod pocztowy (xx-xxx)"
-          value={form.origin_postcode}
-          onChange={handleChange}
-          required
-          className="create-package-input"
-          disabled={loading}
-        />
+        <div className="create-package-grid">
+          <div className="create-package-section">
+            <h3 className="section-header">Adres nadania</h3>
+            <input
+              type="text"
+              name="origin_street"
+              id="origin-street-input"
+              placeholder="Ulica"
+              value={form.origin_street}
+              onChange={handleChange}
+              required
+              className="create-package-input"
+              disabled={loading}
+            />
+            <input
+              type="text"
+              name="origin_street_number"
+              id="origin-street-number-input"
+              placeholder="Numer"
+              value={form.origin_street_number}
+              onChange={handleChange}
+              required
+              className="create-package-input"
+              disabled={loading}
+            />
+            <input
+              type="text"
+              name="origin_city"
+              id="origin-city-input"
+              placeholder="Miasto"
+              value={form.origin_city}
+              onChange={handleChange}
+              required
+              className="create-package-input"
+              disabled={loading}
+            />
+            <input
+              type="text"
+              name="origin_postcode"
+              placeholder="Kod pocztowy (xx-xxx)"
+              value={form.origin_postcode}
+              onChange={handleChange}
+              required
+              className="create-package-input"
+              disabled={loading}
+            />
 
-        {geocodingOriginLoading && (
-          <div className="geocoding-status loading">Wyszukiwanie adresu...</div>
-        )}
-        {geocodingOriginError && (
-          <div className="geocoding-status error">{geocodingOriginError}</div>
-        )}
-        {coords && !geocodingOriginLoading && !geocodingOriginError && (
-          <div className="geocoding-status success">Adres znaleziony ✓</div>
-        )}
+            {geocodingOriginLoading && (
+              <div className="geocoding-status loading">Wyszukiwanie adresu...</div>
+            )}
+            {geocodingOriginError && (
+              <div className="geocoding-status error">{geocodingOriginError}</div>
+            )}
+            {coords && !geocodingOriginLoading && !geocodingOriginError && (
+              <div className="geocoding-status success">Adres znaleziony ✓</div>
+            )}
 
-        {coords && (
-          <div className="map-container">
-            <MapContainer 
-              center={coords} 
-              zoom={15} 
-              className="leaflet-container"
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution="&copy; OpenStreetMap contributors"
+            {coords && (
+              <div className="map-container">
+                <MapContainer center={coords} zoom={15} className="leaflet-container">
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution="&copy; OpenStreetMap contributors"
+                  />
+                  <Marker position={coords} />
+                </MapContainer>
+              </div>
+            )}
+          </div>
+
+          <div className="create-package-section">
+            <h3 className="section-header">Adres odbioru</h3>
+            <input
+              type="text"
+              name="destination_street"
+              id="destination-street-input"
+              placeholder="Ulica"
+              value={form.destination_street}
+              onChange={handleChange}
+              required
+              className="create-package-input"
+              disabled={loading}
+            />
+            <input
+              type="text"
+              name="destination_street_number"
+              id="destination-street-number-input"
+              placeholder="Numer"
+              value={form.destination_street_number}
+              onChange={handleChange}
+              required
+              className="create-package-input"
+              disabled={loading}
+            />
+            <input
+              type="text"
+              name="destination_city"
+              placeholder="Miasto"
+              value={form.destination_city}
+              onChange={handleChange}
+              required
+              className="create-package-input"
+              disabled={loading}
+            />
+            <input
+              type="text"
+              name="destination_postcode"
+              placeholder="Kod pocztowy (xx-xxx)"
+              value={form.destination_postcode}
+              onChange={handleChange}
+              required
+              className="create-package-input"
+              disabled={loading}
+            />
+
+            {geocodingDestLoading && (
+              <div className="geocoding-status loading">Wyszukiwanie adresu...</div>
+            )}
+            {geocodingDestError && (
+              <div className="geocoding-status error">{geocodingDestError}</div>
+            )}
+            {destCoords && !geocodingDestLoading && !geocodingDestError && (
+              <div className="geocoding-status success">Adres znaleziony ✓</div>
+            )}
+
+            {destCoords && (
+              <div className="map-container">
+                <MapContainer center={destCoords} zoom={15} className="leaflet-container">
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution="&copy; OpenStreetMap contributors"
+                  />
+                  <Marker position={destCoords} />
+                </MapContainer>
+              </div>
+            )}
+          </div>
+
+          <div className="create-package-section create-package-section--full">
+            {distance !== null && (
+              <div className="distance-info">
+                <span className="distance-label">Odległość:</span>
+                <span className="distance-value">{distance.toFixed(2)} km</span>
+              </div>
+            )}
+
+            <input
+              type="email"
+              name="recipient_email"
+              id="recipient-email-input"
+              placeholder="Email odbiorcy"
+              value={form.recipient_email}
+              onChange={handleChange}
+              required
+              className="create-package-input"
+              disabled={loading}
+            />
+          </div>
+
+          <div className="create-package-section create-package-section--full">
+            <h3 className="section-header">Dane paczki</h3>
+
+            <div className="package-fields-grid">
+              <div className="field-with-hint">
+                <input
+                  type="number"
+                  name="weight"
+                  placeholder="Waga (kg)"
+                  min="1"
+                  max="1000"
+                  step="1"
+                  value={form.weight}
+                  onChange={handleChange}
+                  required
+                  className="create-package-input"
+                  disabled={loading}
+                />
+                <div className="input-hint">Waga musi być w zakresie 1-1000 kg</div>
+              </div>
+
+              <div className="field-with-hint">
+                <input
+                  type="number"
+                  name="length"
+                  placeholder="Długość (cm)"
+                  min="1"
+                  max="400"
+                  step="1"
+                  value={form.length}
+                  onChange={handleChange}
+                  required
+                  className="create-package-input"
+                  disabled={loading}
+                />
+                <div className="input-hint">Długość musi być w zakresie 1-400 cm</div>
+              </div>
+
+              <div className="field-with-hint">
+                <input
+                  type="number"
+                  name="width"
+                  placeholder="Szerokość (cm)"
+                  min="1"
+                  max="400"
+                  step="1"
+                  value={form.width}
+                  onChange={handleChange}
+                  required
+                  className="create-package-input"
+                  disabled={loading}
+                />
+                <div className="input-hint">Szerokość musi być w zakresie 1-400 cm</div>
+              </div>
+
+              <div className="field-with-hint">
+                <input
+                  type="number"
+                  name="height"
+                  placeholder="Wysokość (cm)"
+                  min="1"
+                  max="400"
+                  step="1"
+                  value={form.height}
+                  onChange={handleChange}
+                  required
+                  className="create-package-input"
+                  disabled={loading}
+                />
+                <div className="input-hint">Wysokość musi być w zakresie 1-400 cm</div>
+              </div>
+            </div>
+
+            <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <input
+                type="checkbox"
+                name="fragile"
+                checked={form.fragile}
+                onChange={handleChange}
+                disabled={loading}
               />
-              <Marker position={coords} />
-            </MapContainer>
-          </div>
-        )}
+              Czy paczka jest krucha?
+            </label>
 
-        <h3 className="section-header">Adres odbioru</h3>
-        <input
-          type="text"
-          name="destination_street"
-          id="destination-street-input"
-          placeholder="Ulica"
-          value={form.destination_street}
-          onChange={handleChange}
-          required
-          className="create-package-input"
-          disabled={loading}
-        />
-        <input
-          type="text"
-          name="destination_street_number"
-          id="destination-street-number-input"
-          placeholder="Numer"
-          value={form.destination_street_number}
-          onChange={handleChange}
-          required
-          className="create-package-input"
-          disabled={loading}
-        />
-        <input
-          type="text"
-          name="destination_city"
-          placeholder="Miasto"
-          value={form.destination_city}
-          onChange={handleChange}
-          required
-          className="create-package-input"
-          disabled={loading}
-        />
-        <input
-          type="text"
-          name="destination_postcode"
-          placeholder="Kod pocztowy (xx-xxx)"
-          value={form.destination_postcode}
-          onChange={handleChange}
-          required
-          className="create-package-input"
-          disabled={loading}
-        />
-
-        {geocodingDestLoading && (
-          <div className="geocoding-status loading">Wyszukiwanie adresu...</div>
-        )}
-        {geocodingDestError && (
-          <div className="geocoding-status error">{geocodingDestError}</div>
-        )}
-        {destCoords && !geocodingDestLoading && !geocodingDestError && (
-          <div className="geocoding-status success">Adres znaleziony ✓</div>
-        )}
-
-        {destCoords && (
-          <div className="map-container">
-            <MapContainer 
-              center={destCoords} 
-              zoom={15} 
-              className="leaflet-container"
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution="&copy; OpenStreetMap contributors"
-              />
-              <Marker position={destCoords} />
-            </MapContainer>
-          </div>
-        )}
-
-        {distance !== null && (
-          <div className="distance-info">
-            <span className="distance-label">Odległość:</span>
-            <span className="distance-value">{distance.toFixed(2)} km</span>
-          </div>
-        )}
-
-        <input
-          type="email"
-          name="recipient_email"
-          id="recipient-email-input"
-          placeholder="Email odbiorcy"
-          value={form.recipient_email}
-          onChange={handleChange}
-          required
-          className="create-package-input"
-          disabled={loading}
-        />
-
-        <h3 className="section-header">Dane paczki</h3>
-        <input
-          type="number"
-          name="weight"
-          placeholder="Waga (kg)"
-          min="1"
-          max="1000"
-          step="1"
-          value={form.weight}
-          onChange={handleChange}
-          required
-          className="create-package-input"
-          disabled={loading}
-        />
-        <div className="input-hint">Waga musi być w zakresie 1-1000 kg</div>
-        
-        <input
-          type="number"
-          name="length"
-          placeholder="Długość (cm)"
-          min="1"
-          max="400"
-          step="1"
-          value={form.length}
-          onChange={handleChange}
-          required
-          className="create-package-input"
-          disabled={loading}
-        />
-        <div className="input-hint">Długość musi być w zakresie 1-400 cm</div>
-        
-        <input
-          type="number"
-          name="width"
-          placeholder="Szerokość (cm)"
-          min="1"
-          max="400"
-          step="1"
-          value={form.width}
-          onChange={handleChange}
-          required
-          className="create-package-input"
-          disabled={loading}
-        />
-        <div className="input-hint">Szerokość musi być w zakresie 1-400 cm</div>
-        
-        <input
-          type="number"
-          name="height"
-          placeholder="Wysokość (cm)"
-          min="1"
-          max="400"
-          step="1"
-          value={form.height}
-          onChange={handleChange}
-          required
-          className="create-package-input"
-          disabled={loading}
-        />
-        <div className="input-hint">Wysokość musi być w zakresie 1-400 cm</div>
-        
-        <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <input
-            type="checkbox"
-            name="fragile"
-            checked={form.fragile}
-            onChange={handleChange}
-            disabled={loading}
-          />
-          Czy paczka jest krucha?
-        </label>
-        
-        {shippingCost !== null && (
+            {shippingCost !== null && (
           <div className="shipping-cost-container">
             <h3>Szacowany koszt przesyłki</h3>
             <div className="shipping-cost-details">
@@ -728,18 +739,20 @@ export default function CreatePackagePage() {
               </div>
             </div>
           </div>
-        )}
-        
-        <button
+            )}
+
+            <button
           type="submit"
           id="submit-package-button"
           className="create-package-button"
           disabled={loading || !coords || !destCoords}
         >
           {loading ? "Nadaję..." : "Nadaj paczkę"}
-        </button>
-        {error && <div className="create-package-error">{error}</div>}
-        {success && <div className="create-package-success">{success}</div>}
+            </button>
+            {error && <div className="create-package-error">{error}</div>}
+            {success && <div className="create-package-success">{success}</div>}
+          </div>
+        </div>
       </form>
     </div>
   );

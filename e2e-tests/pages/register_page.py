@@ -15,7 +15,6 @@ class RegisterPage:
         self.first_name_input = (By.CSS_SELECTOR, "input[name='first_name']")
         self.last_name_input = (By.CSS_SELECTOR, "input[name='last_name']")
         self.phone_input = (By.CSS_SELECTOR, "input[name='phone_number']")
-        self.address_input = (By.CSS_SELECTOR, "input[name='address']")
         self.register_button = (By.CSS_SELECTOR, "button[type='submit']")
 
         self.error_message = (By.CSS_SELECTOR, ".register-error")
@@ -65,27 +64,19 @@ class RegisterPage:
         time.sleep(0.3)
         return self
 
-    def fill_address(self, address):
-        address_field = self.driver.find_element(*self.address_input)
-        address_field.clear()
-        address_field.send_keys(address)
-        time.sleep(0.3)
-        return self
-
     def click_register(self):
         register_btn = self.driver.find_element(*self.register_button)
         register_btn.click()
         time.sleep(1)
         return self
 
-    def register_attempt(self, email, password, first_name, last_name, phone, address):
+    def register_attempt(self, email, password, first_name, last_name, phone):
         return (
             self.fill_email(email)
             .fill_password(password)
             .fill_first_name(first_name)
             .fill_last_name(last_name)
             .fill_phone(phone)
-            .fill_address(address)
             .click_register()
         )
 

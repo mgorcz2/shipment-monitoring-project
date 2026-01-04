@@ -109,20 +109,6 @@ const UserDetailsModal = ({ user, onClose }) => {
                   <div className="info-label">Telefon:</div>
                   <div className="info-value">{details.phone_number || "-"}</div>
                 </div>
-                
-                <div className="info-row">
-                  <div className="info-label">Adres:</div>
-                  <div className="info-value">
-                    {details.address ? (
-                      <>
-                        <div>{details.address.street} {details.address.street_number}</div>
-                        <div>{details.address.postcode} {details.address.city}</div>
-                      </>
-                    ) : (
-                      "-"
-                    )}
-                  </div>
-                </div>
               </>
             )}
             

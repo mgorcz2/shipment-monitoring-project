@@ -94,7 +94,7 @@ const TrackShipmentPage = () => {
         { state: { prefetchedShipment: response.data } }
       );
     } catch (err) {
-      setError('Nie znaleziono przesyłki lub nieprawidłowy adres email.');
+      setError('Nie znaleziono przesyłki.');
       setLoading(false);
     }
   };
@@ -105,7 +105,7 @@ const TrackShipmentPage = () => {
         <div style={{ width: '100%', maxWidth: 520, background: '#fff', padding: 24, borderRadius: 8 }}>
           <h2 style={{ marginTop: 0, marginBottom: 16 }}>Śledź przesyłkę</h2>
           <p style={{ marginTop: 0, marginBottom: 20, color: '#444' }}>
-            Wpisz identyfikator przesyłki i adres email odbiorcy (taki jak w powiadomieniu mailowym).
+            Wpisz identyfikator przesyłki i adres email odbiorcy.
           </p>
 
           <form onSubmit={handleSubmit}>

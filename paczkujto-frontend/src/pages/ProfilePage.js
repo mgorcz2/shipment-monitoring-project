@@ -23,8 +23,7 @@ export default function ProfilePage() {
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
-    phone_number: "",
-    address: ""
+    phone_number: ""
   });
 
   useEffect(() => {
@@ -47,8 +46,7 @@ export default function ProfilePage() {
         setFormData({
           first_name: client.first_name || "",
           last_name: client.last_name || "",
-          phone_number: client.phone_number || "",
-          address: client.address || ""
+          phone_number: client.phone_number || ""
         });
       } else if (user.role === "courier" || user.role === "manager") {
         const staffResponse = await getStaffById(user.id);
@@ -57,16 +55,14 @@ export default function ProfilePage() {
         setFormData({
           first_name: staff.first_name || "",
           last_name: staff.last_name || "",
-          phone_number: staff.phone_number || "",
-          address: ""
+          phone_number: staff.phone_number || ""
         });
       } else if (user.role === "admin") {
         setProfileData({ admin: true });
         setFormData({
           first_name: "",
           last_name: "",
-          phone_number: "",
-          address: ""
+          phone_number: ""
         });
       }
     } catch (err) {
@@ -92,10 +88,10 @@ export default function ProfilePage() {
 
     try {
       if (userRole === "client") {
-        await updateClient(userData.id, formData);
+        const { first_name, last_name, phone_number } = formData;
+        await updateClient(userData.id, { first_name, last_name, phone_number });
       } else if (userRole === "courier" || userRole === "manager") {
-        const { address, ...staffData } = formData;
-        await updateStaff(userData.id, staffData);
+        await updateStaff(userData.id, formData);
       }
       
       setSuccess("Dane zostały zaktualizowane pomyślnie!");
@@ -133,7 +129,6 @@ export default function ProfilePage() {
         first_name: profileData.first_name || "",
         last_name: profileData.last_name || "",
         phone_number: profileData.phone_number || "",
-        address: profileData.address || ""
       });
     }
   };
@@ -243,24 +238,6 @@ export default function ProfilePage() {
                   <div className="info-value">{profileData.phone_number}</div>
                 )}
               </div>
-
-              {userRole === "client" && (
-                <div className="info-item">
-                  <label>Adres:</label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      className="form-input"
-                      placeholder="Opcjonalnie"
-                    />
-                  ) : (
-                    <div className="info-value">{profileData.address || "—"}</div>
-                  )}
-                </div>
-              )}
             </div>
 
             {isEditing && (

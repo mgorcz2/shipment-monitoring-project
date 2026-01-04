@@ -150,7 +150,7 @@ export default function UpdateShipmentStatusModal({ shipment, onClose, onSuccess
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
+      <div className="modal-content modal-content--update-status">
         <button className="modal-close-btn" onClick={onClose}>×</button>
         
         <h2>Zmień status przesyłki #{shipment.id}</h2>

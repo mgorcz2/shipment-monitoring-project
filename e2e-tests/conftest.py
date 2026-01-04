@@ -54,7 +54,6 @@ def sample_registration_data():
         "first_name": "Test",
         "last_name": "User",
         "phone": "123456789",
-        "address": "Test Street 123",
     }
 
 

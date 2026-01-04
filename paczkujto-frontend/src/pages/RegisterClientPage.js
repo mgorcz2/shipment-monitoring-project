@@ -12,7 +12,6 @@ export default function RegisterClientPage() {
     first_name: "",
     last_name: "",
     phone_number: "",
-    address: "",
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -39,7 +38,6 @@ const handleRegister = async e => {
       first_name: form.first_name,
       last_name: form.last_name,
       phone_number: form.phone_number,
-      address: form.address
     };
 
     await registerClient(userData, clientData);
@@ -51,7 +49,6 @@ const handleRegister = async e => {
       first_name: "",
       last_name: "",
       phone_number: "",
-      address: "",
     });
     setTimeout(() => {
       window.location.href = "/login";
@@ -134,15 +131,6 @@ const handleRegister = async e => {
           value={form.phone_number}
           onChange={handleChange}
           required
-          className="register-input"
-          disabled={loading}
-        />
-        <input
-          type="text"
-          name="address"
-          placeholder="Adres"
-          value={form.address}
-          onChange={handleChange}
           className="register-input"
           disabled={loading}
         />

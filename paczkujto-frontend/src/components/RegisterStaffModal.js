@@ -3,6 +3,7 @@ import { registerUser } from "../services/registerUserService";
 import { registerStaff } from "../services/staffService";
 import { translate } from "../i18n";
 import "../styles/AdminPanel.css";
+import "../styles/ShipmentsPage.css";
 
 const RegisterStaffModal = ({ onClose, onSuccess }) => {
   const [form, setForm] = useState({
@@ -148,17 +149,17 @@ const RegisterStaffModal = ({ onClose, onSuccess }) => {
               type="tel"
               id="phone_number"
               name="phone_number"
-              value={form.phone}
+              value={form.phone_number}
               onChange={handleChange}
               required
             />
           </div>
 
           <div className="modal-actions">
-            <button type="button" onClick={onClose} className="cancel-button">
+            <button type="button" onClick={onClose} className="btn-cancel">
               Anuluj
             </button>
-            <button type="submit" className="submit-button" disabled={loading}>
+            <button type="submit" className="btn-submit" disabled={loading}>
               {loading ? "Rejestrowanie..." : "Zarejestruj"}
             </button>
           </div>

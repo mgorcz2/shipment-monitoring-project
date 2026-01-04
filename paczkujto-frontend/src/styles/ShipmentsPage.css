@@ -22,6 +22,40 @@
   margin-bottom: 20px;
 }
 
+.role-toggle {
+  display: inline-flex;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 12px;
+  background: var(--bg-white);
+  border: 1px solid var(--primary-light);
+  margin-bottom: 20px;
+}
+
+.role-toggle-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.role-toggle-btn:hover {
+  background: var(--primary-light);
+}
+
+.role-toggle-btn.active {
+  background: var(--primary-color);
+  color: var(--bg-white);
+}
+
+.role-toggle-btn.active:hover {
+  background: var(--primary-color);
+}
+
 .role-filter-select {
   padding: 8px 12px;
   border-radius: 8px;
@@ -67,6 +101,21 @@
   margin: auto;
   display: flex;
   flex-direction: column;
+}
+
+/* Update status modal: allow datepicker popper to escape without being clipped */
+.modal-content.modal-content--update-status {
+  overflow: visible;
+  min-width: 560px;
+  max-width: 760px;
+}
+
+@media (max-width: 768px) {
+  .modal-content.modal-content--update-status {
+    width: calc(100vw - 32px);
+    min-width: 0;
+    max-width: calc(100vw - 32px);
+  }
 }
 
 

@@ -1,5 +1,6 @@
 import React from "react";
 import "../styles/AdminPanel.css";
+import "../styles/ShipmentsPage.css";
 
 const DeleteConfirmModal = ({ user, onConfirm, onCancel, isDeleting }) => {
   if (!user) return null;
@@ -42,18 +43,20 @@ const DeleteConfirmModal = ({ user, onConfirm, onCancel, isDeleting }) => {
           </ul>
         </div>
 
-        <div className="modal-footer">
-          <button 
-            className="btn btn-secondary" 
+        <div className="modal-actions">
+          <button
+            type="button"
             onClick={onCancel}
             disabled={isDeleting}
+            className="btn-cancel"
           >
             Anuluj
           </button>
-          <button 
-            className="btn btn-danger" 
+          <button
+            type="button"
             onClick={onConfirm}
             disabled={isDeleting}
+            className="btn-submit"
           >
             {isDeleting ? "Usuwanie..." : "Usuń użytkownika"}
           </button>

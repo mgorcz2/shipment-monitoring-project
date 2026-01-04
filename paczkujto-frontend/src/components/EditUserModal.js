@@ -12,8 +12,7 @@ export default function EditUserModal({ user, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
-    phone_number: "",
-    address: ""
+    phone_number: ""
   });
 
   useEffect(() => {
@@ -32,8 +31,7 @@ export default function EditUserModal({ user, onClose, onSuccess }) {
         setFormData({
           first_name: client.first_name || "",
           last_name: client.last_name || "",
-          phone_number: client.phone_number || "",
-          address: client.address || ""
+          phone_number: client.phone_number || ""
         });
       } else if (user.role === "courier" || user.role === "manager") {
         const response = await getStaffById(user.id);
@@ -42,8 +40,7 @@ export default function EditUserModal({ user, onClose, onSuccess }) {
         setFormData({
           first_name: staff.first_name || "",
           last_name: staff.last_name || "",
-          phone_number: staff.phone_number || "",
-          address: ""
+          phone_number: staff.phone_number || ""
         });
       } else {
         setError("Nie można edytować użytkownika z rolą: " + user.role);
@@ -71,10 +68,10 @@ export default function EditUserModal({ user, onClose, onSuccess }) {
 
     try {
       if (user.role === "client") {
-        await updateClient(user.id, formData);
+        const { first_name, last_name, phone_number } = formData;
+        await updateClient(user.id, { first_name, last_name, phone_number });
       } else if (user.role === "courier" || user.role === "manager") {
-        const { address, ...staffData } = formData;
-        await updateStaff(user.id, staffData);
+        await updateStaff(user.id, formData);
       }
       
       onSuccess();
@@ -146,21 +143,6 @@ export default function EditUserModal({ user, onClose, onSuccess }) {
                 required
               />
             </div>
-
-            {user.role === "client" && (
-              <div className="form-group">
-                <label htmlFor="address">Adres:</label>
-                <input
-                  type="text"
-                  id="address"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  placeholder="Opcjonalnie"
-                />
-              </div>
-            )}
 
             {error && <div className="error-text">{error}</div>}
             

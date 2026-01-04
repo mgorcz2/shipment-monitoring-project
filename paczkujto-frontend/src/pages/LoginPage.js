@@ -102,7 +102,7 @@ export default function LoginPage() {
           onClick={handleRegisterClick}
           disabled={loading}
         >
-          Nie masz konta? Zarejestruj się jako klient
+          Nie masz konta? Zarejestruj się
         </button>
       </div>
     </div>

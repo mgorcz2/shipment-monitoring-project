@@ -9,7 +9,7 @@ export default function ShipmentsPage() {
   const [shipments, setShipments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [filterRole, setFilterRole] = useState("all");
+  const [filterRole, setFilterRole] = useState("sender");
   const [selectedShipment, setSelectedShipment] = useState(null);
 
   useEffect(() => {
@@ -41,13 +41,14 @@ export default function ShipmentsPage() {
     if (!shipments) return [];
     
     const userId = JSON.parse(localStorage.getItem("user"))?.id;
+    const userEmail = JSON.parse(localStorage.getItem("user"))?.email;
     if (!userId) return shipments;
     
     switch (filterRole) {
       case "sender":
         return shipments.filter(s => s.sender_id === userId);
       case "recipient":
-        return shipments.filter(s => s.recipient_id === userId);
+        return shipments.filter(s => s.recipient_email === userEmail);
       case "all":
       default:
         return shipments;
@@ -60,18 +61,23 @@ export default function ShipmentsPage() {
     <div className="shipments-page">
       <h1>Moje przesyłki</h1>
       
-      <div className="filter-controls">
-        <label htmlFor="role-filter">{translate("Filter by role")}:</label>
-        <select 
-          id="role-filter" 
-          value={filterRole}
-          onChange={(e) => setFilterRole(e.target.value)}
-          className="role-filter-select"
+      <div className="role-toggle" role="tablist" aria-label={translate("Filter by role")}>
+        <button
+          type="button"
+          className={`role-toggle-btn${filterRole === "sender" ? " active" : ""}`}
+          onClick={() => setFilterRole("sender")}
+          aria-pressed={filterRole === "sender"}
         >
-          <option value="all">{translate("All Shipments")}</option>
-          <option value="sender">{translate("Shipments I Sent")}</option>
-          <option value="recipient">{translate("Shipments I Receive")}</option>
-        </select>
+          {translate("Shipments I Sent")}
+        </button>
+        <button
+          type="button"
+          className={`role-toggle-btn${filterRole === "recipient" ? " active" : ""}`}
+          onClick={() => setFilterRole("recipient")}
+          aria-pressed={filterRole === "recipient"}
+        >
+          {translate("Shipments I Receive")}
+        </button>
       </div>
       
       {loading ? (
@@ -80,10 +86,7 @@ export default function ShipmentsPage() {
         <div className="error-message">{error}</div>
       ) : filteredShipments.length === 0 ? (
         <div className="no-shipments-message">
-          {filterRole === "all" 
-            ? "Nie masz jeszcze żadnych przesyłek" 
-            : `Nie masz żadnych przesyłek jako ${filterRole === "sender" ? "nadawca" : "odbiorca"}`
-          }
+          {`Nie masz żadnych przesyłek jako ${filterRole === "sender" ? "nadawca" : "odbiorca"}`}
         </div>
       ) : (
         <div className="shipments-grid">

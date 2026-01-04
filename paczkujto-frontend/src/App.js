@@ -12,18 +12,18 @@ import CourierShipmentsPage from "./pages/CourierShipmentsPage";
 import ManagerShipmentsPage from "./pages/ManagerShipmentsPage";
 import ProfilePage from "./pages/ProfilePage";
 import TrackShipmentPage from "./pages/TrackShipmentPage";
+import ContactPage from "./pages/ContactPage";
 import './styles/globals.css'; 
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public route without Layout */}
         <Route path="/track" element={<TrackShipmentPage />} />
         <Route path="/track/:id" element={<TrackShipmentPage />} />
-        
         <Route path="/" element={<Layout />}>
           <Route index element={<HomePage />} />
+          <Route path="contact" element={<ContactPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="register-client" element={<RegisterClientPage />} />
         
@@ -37,8 +37,11 @@ function App() {
             <Route path="courier-dashboard" element={<p>Panel Kuriera</p>} />
           </Route>
           
-          <Route element={<ProtectedRoute allowedRoles={["admin", "manager"]} />}>
+          <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
             <Route path="admin" element={<AdminPanel />} />
+          </Route>
+
+          <Route element={<ProtectedRoute allowedRoles={["admin", "manager"]} />}>
             <Route path="manager-shipments" element={<ManagerShipmentsPage />} />
           </Route>
 

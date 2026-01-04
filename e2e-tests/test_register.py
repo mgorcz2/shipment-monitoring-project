@@ -19,7 +19,6 @@ def test_successful_registration(driver, sample_registration_data):
         test_data["first_name"],
         test_data["last_name"],
         test_data["phone"],
-        test_data["address"],
     )
 
     success_element = register_page.get_success_element(timeout=10)
@@ -51,7 +50,6 @@ def test_registration_with_existing_email(driver, sample_registration_data):
         "Another",
         "User",
         "987654321",
-        "Another Street 456",
     )
 
     error_element = register_page.get_error_element(timeout=5)
@@ -69,9 +67,7 @@ def test_registration_with_invalid_data(driver):
     register_page = RegisterPage(driver)
     register_page.open(FRONTEND_URL)
 
-    register_page.register_attempt(
-        "mail@example.com", "string123", "aaa", "ss", "abc", "aaa"
-    )
+    register_page.register_attempt("mail@example.com", "string123", "aaa", "ss", "abc")
 
     error_element = register_page.get_error_element(timeout=5)
     assert error_element is not None

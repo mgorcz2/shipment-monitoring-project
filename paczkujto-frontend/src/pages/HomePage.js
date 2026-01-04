@@ -18,11 +18,11 @@ export default function HomePage() {
     }
     
     if (userRole === "admin") {
-      return "Witaj, Administratorze!";
+      return `Witaj, ${user.email}!`;
     }
 
     if (userRole === "manager") {
-      return "Witaj, Menadżerze!";
+      return `Witaj, ${user.email}!`;
     }
 
     return `Witaj, ${user.email}!`;
@@ -55,6 +55,19 @@ export default function HomePage() {
               </button>
             </>
           )}
+
+          {(userRole === "courier" || userRole === "manager" || userRole === "admin") && (
+            <button
+              className="btn btn-primary"
+              style={{ fontSize: 20, padding: "18px 40px" }}
+              onClick={() =>
+                navigate(userRole === "courier" ? "/courier-shipments" : "/manager-shipments")
+              }
+            >
+              Zarządzaj przesyłkami
+            </button>
+          )}
+
           <button
             className="btn btn-primary"
             style={{ fontSize: 20, padding: "18px 40px" }}
@@ -62,13 +75,13 @@ export default function HomePage() {
           >
             Śledź przesyłkę
           </button>
-          {(userRole === "admin" || userRole === "manager") && (
+          {userRole === "admin" && (
             <button
               className="btn btn-primary"
               style={{ fontSize: 20, padding: "18px 40px" }}
               onClick={() => navigate("/admin")}
             >
-              Panel administracyjny
+              Zarządzaj użytkownikami
             </button>
           )}
         </div>
